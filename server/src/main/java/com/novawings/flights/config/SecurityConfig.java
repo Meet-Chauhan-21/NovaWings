@@ -41,7 +41,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/flights/search-admin").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/flights/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/home/config").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -29,11 +30,19 @@ public class Flight {
 
     private String destination;
 
+    private LocalDate departureDate;
+
     private LocalDateTime departureTime;
 
     private LocalDateTime arrivalTime;
 
+    private int durationMinutes;
+
     private double price;
 
     private int availableSeats;
+
+    private int totalSeats;
+
+    private String status;
 }

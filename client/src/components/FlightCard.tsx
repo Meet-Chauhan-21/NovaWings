@@ -7,13 +7,15 @@ import type { Flight } from "../types";
 
 interface FlightCardProps {
   flight: Flight;
+  passengers?: number;
 }
 
 /**
  * FlightCard renders a card showing airline, route, times, price, and seats.
  * Includes a "View Details" button linking to the flight detail page.
+ * Optionally passes passengers count forward via query param.
  */
-const FlightCard: React.FC<FlightCardProps> = React.memo(({ flight }) => {
+const FlightCard: React.FC<FlightCardProps> = React.memo(({ flight, passengers }) => {
   /** Format an ISO date string to a readable short format */
   const formatTime = (iso: string): string => {
     const date = new Date(iso);
@@ -59,7 +61,7 @@ const FlightCard: React.FC<FlightCardProps> = React.memo(({ flight }) => {
       </div>
 
       <Link
-        to={`/flights/${flight.id}`}
+        to={`/flights/${flight.id}${passengers ? `?passengers=${passengers}` : ""}`}
         className="block text-center bg-sky-500 text-white py-2.5 rounded-xl hover:bg-sky-600 transition hover:scale-105 font-medium"
       >
         View Details

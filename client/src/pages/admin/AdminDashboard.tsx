@@ -1,7 +1,7 @@
 // src/pages/admin/AdminDashboard.tsx
 // Admin dashboard with sidebar navigation and tab-based content
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,15 +20,19 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { getAllFlights, deleteFlight } from "../../services/flightService";
+import { getAllFlights, deleteFlight, searchAdmin } from "../../services/flightService";
 import { getAllBookings } from "../../services/bookingService";
 import { getAllUsers } from "../../services/userService";
+import homeService from "../../services/homeService";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import BookingStatusDropdown from "../../components/BookingStatusDropdown";
+import Pagination from "../../components/Pagination";
+import CityCombobox from "../../components/CityCombobox";
 import { useAuthContext } from "../../context/AuthContext";
-import type { UserResponse, BookingResponse } from "../../types";
+import useDebounce from "../../hooks/useDebounce";
+import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight } from "../../types";
 
-type TabType = "overview" | "flights" | "bookings" | "users" | "analytics";
+type TabType = "overview" | "flights" | "bookings" | "users" | "analytics" | "homepage";
 
 /** Sidebar tab definition */
 interface Tab {
@@ -43,6 +47,7 @@ const tabs: Tab[] = [
   { id: "bookings", icon: "📋", label: "All Bookings" },
   { id: "users", icon: "👥", label: "Users" },
   { id: "analytics", icon: "📈", label: "Analytics" },
+  { id: "homepage", icon: "🏠", label: "Homepage" },
 ];
 
 /**
@@ -54,22 +59,101 @@ export default function AdminDashboard() {
   const { user, logout } = useAuthContext();
   const [activeTab, setActiveTab] = useState<TabType>("overview");
 
+  // ── Flights tab state ──
+  const [flightsEnabled, setFlightsEnabled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sourceFilter, setSourceFilter] = useState("");
+  const [destFilter, setDestFilter] = useState("");
+  const [airlineFilter, setAirlineFilter] = useState("");
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchPageSize, setSearchPageSize] = useState(20);
+  const debouncedSearch = useDebounce(searchQuery, 400);
+
   // Bookings tab filters
   const [seatFilter, setSeatFilter] = useState<"all" | "confirmed" | "cancelled">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [bookingUserSearch, setBookingUserSearch] = useState("");
+  const [bookingsPage, setBookingsPage] = useState(1);
+  const [bookingsPageSize, setBookingsPageSize] = useState(25);
 
   // Users tab state
   const [userSearch, setUserSearch] = useState("");
   const [userRoleFilter, setUserRoleFilter] = useState<"all" | "USER" | "ADMIN">("all");
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersPageSize, setUsersPageSize] = useState(20);
+
+  // Homepage tab state
+  const [hcHeroTitle, setHcHeroTitle] = useState("");
+  const [hcHeroSubtitle, setHcHeroSubtitle] = useState("");
+  const [hcPopularRoutes, setHcPopularRoutes] = useState<RouteConfig[]>([]);
+  const [hcDealRoutes, setHcDealRoutes] = useState<RouteConfig[]>([]);
+  const [addPopSource, setAddPopSource] = useState("");
+  const [addPopDest, setAddPopDest] = useState("");
+  const [addPopLabel, setAddPopLabel] = useState("Popular");
+  const [addDealSource, setAddDealSource] = useState("");
+  const [addDealDest, setAddDealDest] = useState("");
+  const [addDealLabel, setAddDealLabel] = useState("Hot Deal");
 
   // Parallel queries for flights & bookings
   const [flightsQuery, bookingsQuery] = useQueries({
     queries: [
-      { queryKey: ["flights"], queryFn: getAllFlights, staleTime: 5 * 60 * 1000 },
+      {
+        queryKey: ["flights"],
+        queryFn: getAllFlights,
+        staleTime: 5 * 60 * 1000,
+        enabled: flightsEnabled,
+      },
       { queryKey: ["allBookings"], queryFn: getAllBookings, staleTime: 5 * 60 * 1000 },
     ],
+  });
+
+  // Server-side admin search query
+  const hasSearchFilters = !!(debouncedSearch || sourceFilter || destFilter || airlineFilter);
+  const adminSearchQuery = useQuery({
+    queryKey: ["adminFlightSearch", debouncedSearch, sourceFilter, destFilter, airlineFilter, searchPage, searchPageSize],
+    queryFn: () =>
+      searchAdmin({
+        q: debouncedSearch || undefined,
+        source: sourceFilter || undefined,
+        destination: destFilter || undefined,
+        airline: airlineFilter || undefined,
+        page: searchPage - 1,
+        size: searchPageSize,
+      }),
+    enabled: hasSearchFilters,
+    staleTime: 30 * 1000,
+    placeholderData: (prev) => prev,
+  });
+
+  // Homepage config query
+  const homeConfigQuery = useQuery({
+    queryKey: ["homeConfig"],
+    queryFn: homeService.getConfig,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Sync homepage config to local state when loaded
+  useEffect(() => {
+    if (homeConfigQuery.data) {
+      const c = homeConfigQuery.data;
+      setHcHeroTitle(c.heroTitle ?? "");
+      setHcHeroSubtitle(c.heroSubtitle ?? "");
+      setHcPopularRoutes(c.popularRoutes ?? []);
+      setHcDealRoutes(c.dealRoutes ?? []);
+    }
+  }, [homeConfigQuery.data]);
+
+  // Homepage config save mutation
+  const homeConfigMutation = useMutation({
+    mutationFn: (config: HomeConfig) => homeService.updateConfig(config),
+    onSuccess: () => {
+      toast.success("Homepage updated!");
+      queryClient.invalidateQueries({ queryKey: ["homeConfig"] });
+    },
+    onError: () => {
+      toast.error("Failed to save changes");
+    },
   });
 
   // Users query
@@ -82,7 +166,7 @@ export default function AdminDashboard() {
   const flights = flightsQuery.data ?? [];
   const bookings = bookingsQuery.data ?? [];
   const users = usersQuery.data ?? [];
-  const isLoading = flightsQuery.isLoading || bookingsQuery.isLoading;
+  const isLoading = bookingsQuery.isLoading;
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteFlight(id),
@@ -218,6 +302,31 @@ export default function AdminDashboard() {
     }
     return result;
   }, [users, userRoleFilter, userSearch]);
+
+  // Reset bookings page when filters change
+  useEffect(() => { setBookingsPage(1); }, [seatFilter, searchTerm, bookingUserSearch, bookingsPageSize]);
+  // Reset users page when filters change
+  useEffect(() => { setUsersPage(1); }, [userRoleFilter, userSearch, usersPageSize]);
+  // Reset search page when search filters change
+  useEffect(() => { setSearchPage(1); }, [debouncedSearch, sourceFilter, destFilter, airlineFilter, searchPageSize]);
+
+  // ─── Paginated slices ───
+  const paginatedBookings = useMemo(() => {
+    const start = (bookingsPage - 1) * bookingsPageSize;
+    return filteredBookings.slice(start, start + bookingsPageSize);
+  }, [filteredBookings, bookingsPage, bookingsPageSize]);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (usersPage - 1) * usersPageSize;
+    return filteredUsers.slice(start, start + usersPageSize);
+  }, [filteredUsers, usersPage, usersPageSize]);
+
+  // Flights tab: determine what to display
+  const flightsClientPage = useMemo(() => {
+    if (hasSearchFilters) return [];
+    const start = (searchPage - 1) * searchPageSize;
+    return flights.slice(start, start + searchPageSize);
+  }, [flights, searchPage, searchPageSize, hasSearchFilters]);
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -376,73 +485,183 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800">Manage Flights</h2>
-                <button
-                  onClick={() => navigate("/admin/flights/add")}
-                  className="bg-sky-500 text-white px-6 py-2.5 rounded-xl hover:bg-sky-600 transition font-medium"
-                >
-                  + Add Flight
-                </button>
-              </div>
-
-              <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="px-6 py-3 font-semibold text-gray-700">Flight</th>
-                        <th className="px-6 py-3 font-semibold text-gray-700">Airline</th>
-                        <th className="px-6 py-3 font-semibold text-gray-700">Route</th>
-                        <th className="px-6 py-3 font-semibold text-gray-700">Departure</th>
-                        <th className="px-6 py-3 font-semibold text-gray-700">Price</th>
-                        <th className="px-6 py-3 font-semibold text-gray-700">Seats</th>
-                        <th className="px-6 py-3 font-semibold text-gray-700">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {flights.map((flight) => (
-                        <tr key={flight.id} className="border-b border-gray-200 hover:bg-gray-50">
-                          <td className="px-6 py-3 font-mono text-xs">{flight.flightNumber}</td>
-                          <td className="px-6 py-3">{flight.airlineName}</td>
-                          <td className="px-6 py-3">
-                            {flight.source} → {flight.destination}
-                          </td>
-                          <td className="px-6 py-3 text-sm text-gray-600">
-                            {new Date(flight.departureTime).toLocaleString("en-IN", {
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </td>
-                          <td className="px-6 py-3 font-bold text-sky-600">₹{flight.price.toLocaleString("en-IN")}</td>
-                          <td className="px-6 py-3">{flight.availableSeats}</td>
-                          <td className="px-6 py-3">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => navigate(`/admin/flights/${flight.id}/edit`)}
-                                className="bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-amber-200 transition"
-                              >
-                                ✏️ Edit
-                              </button>
-                              <button
-                                onClick={() => {
-                                  const confirmed = window.confirm(
-                                    `Delete flight ${flight.flightNumber}? This cannot be undone.`
-                                  );
-                                  if (confirmed) deleteMutation.mutate(flight.id);
-                                }}
-                                className="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-200 transition"
-                              >
-                                🗑️ Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="flex items-center gap-3">
+                  {!flightsEnabled && (
+                    <button
+                      onClick={() => setFlightsEnabled(true)}
+                      className="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl hover:bg-gray-200 transition font-medium text-sm"
+                    >
+                      📥 Load All Flights
+                    </button>
+                  )}
+                  <button
+                    onClick={() => navigate("/admin/flights/add")}
+                    className="bg-sky-500 text-white px-6 py-2.5 rounded-xl hover:bg-sky-600 transition font-medium"
+                  >
+                    + Add Flight
+                  </button>
                 </div>
               </div>
+
+              {/* Search & Filter Bar */}
+              <div className="bg-white rounded-2xl shadow-md p-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <input
+                    type="text"
+                    placeholder="Search flight number or airline..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Source city..."
+                    value={sourceFilter}
+                    onChange={(e) => setSourceFilter(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Destination city..."
+                    value={destFilter}
+                    onChange={(e) => setDestFilter(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Airline name..."
+                    value={airlineFilter}
+                    onChange={(e) => setAirlineFilter(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                  />
+                </div>
+                {hasSearchFilters && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSourceFilter("");
+                      setDestFilter("");
+                      setAirlineFilter("");
+                    }}
+                    className="mt-3 text-sm text-sky-600 hover:text-sky-800 font-medium"
+                  >
+                    ✕ Clear all filters
+                  </button>
+                )}
+              </div>
+
+              {/* Flights Table */}
+              {(() => {
+                // Determine data source
+                const isServerSearch = hasSearchFilters;
+                const displayFlights: Flight[] = isServerSearch
+                  ? (adminSearchQuery.data?.content ?? [])
+                  : flightsClientPage;
+                const totalItems = isServerSearch
+                  ? (adminSearchQuery.data?.totalElements ?? 0)
+                  : flights.length;
+                const isFlightsLoading = isServerSearch
+                  ? adminSearchQuery.isLoading
+                  : flightsQuery.isLoading;
+
+                if (!flightsEnabled && !hasSearchFilters) {
+                  return (
+                    <div className="bg-white rounded-2xl shadow-md p-12 text-center">
+                      <p className="text-gray-500 text-lg mb-2">Flights are not loaded yet</p>
+                      <p className="text-gray-400 text-sm mb-6">
+                        Use the search bar above to find specific flights, or click "Load All Flights" to browse everything.
+                      </p>
+                      <button
+                        onClick={() => setFlightsEnabled(true)}
+                        className="bg-sky-500 text-white px-6 py-2.5 rounded-xl hover:bg-sky-600 transition font-medium"
+                      >
+                        📥 Load All Flights
+                      </button>
+                    </div>
+                  );
+                }
+
+                if (isFlightsLoading) return <LoadingSpinner />;
+
+                return (
+                  <>
+                    <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                          <thead className="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                              <th className="px-6 py-3 font-semibold text-gray-700">Flight</th>
+                              <th className="px-6 py-3 font-semibold text-gray-700">Airline</th>
+                              <th className="px-6 py-3 font-semibold text-gray-700">Route</th>
+                              <th className="px-6 py-3 font-semibold text-gray-700">Departure</th>
+                              <th className="px-6 py-3 font-semibold text-gray-700">Price</th>
+                              <th className="px-6 py-3 font-semibold text-gray-700">Seats</th>
+                              <th className="px-6 py-3 font-semibold text-gray-700">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {displayFlights.length === 0 ? (
+                              <tr>
+                                <td colSpan={7} className="px-6 py-8 text-center text-gray-400">
+                                  No flights found
+                                </td>
+                              </tr>
+                            ) : (
+                              displayFlights.map((flight) => (
+                                <tr key={flight.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                  <td className="px-6 py-3 font-mono text-xs">{flight.flightNumber}</td>
+                                  <td className="px-6 py-3">{flight.airlineName}</td>
+                                  <td className="px-6 py-3">
+                                    {flight.source} → {flight.destination}
+                                  </td>
+                                  <td className="px-6 py-3 text-sm text-gray-600">
+                                    {new Date(flight.departureTime).toLocaleString("en-IN", {
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </td>
+                                  <td className="px-6 py-3 font-bold text-sky-600">₹{flight.price.toLocaleString("en-IN")}</td>
+                                  <td className="px-6 py-3">{flight.availableSeats}</td>
+                                  <td className="px-6 py-3">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => navigate(`/admin/flights/${flight.id}/edit`)}
+                                        className="bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-amber-200 transition"
+                                      >
+                                        ✏️ Edit
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          const confirmed = window.confirm(
+                                            `Delete flight ${flight.flightNumber}? This cannot be undone.`
+                                          );
+                                          if (confirmed) deleteMutation.mutate(flight.id);
+                                        }}
+                                        className="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-200 transition"
+                                      >
+                                        🗑️ Delete
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <Pagination
+                      currentPage={searchPage}
+                      totalItems={totalItems}
+                      itemsPerPage={searchPageSize}
+                      onPageChange={setSearchPage}
+                      onItemsPerPageChange={(size) => setSearchPageSize(size)}
+                    />
+                  </>
+                );
+              })()}
             </div>
           )}
 
@@ -507,7 +726,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredBookings.map((booking) => {
+                      {paginatedBookings.map((booking) => {
                         const bookedByUser = userMap.get(booking.userId);
                         const roleBadge = bookedByUser?.role === "ADMIN"
                           ? "bg-purple-100 text-purple-700"
@@ -555,6 +774,13 @@ export default function AdminDashboard() {
                   </table>
                 </div>
               </div>
+              <Pagination
+                currentPage={bookingsPage}
+                totalItems={filteredBookings.length}
+                itemsPerPage={bookingsPageSize}
+                onPageChange={setBookingsPage}
+                onItemsPerPageChange={(size) => setBookingsPageSize(size)}
+              />
             </div>
           )}
 
@@ -594,6 +820,7 @@ export default function AdminDashboard() {
               {usersQuery.isLoading ? (
                 <LoadingSpinner />
               ) : (
+                <>
                 <div className="bg-white rounded-2xl shadow-md overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
@@ -608,7 +835,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredUsers.map((u, idx) => {
+                        {paginatedUsers.map((u, idx) => {
                           const isExpanded = expandedUserId === u.id;
                           const userBookings = bookings.filter((b) => b.userId === u.id);
                           const roleBadge =
@@ -619,7 +846,7 @@ export default function AdminDashboard() {
                             <UserRow
                               key={u.id}
                               user={u}
-                              index={idx + 1}
+                              index={(usersPage - 1) * usersPageSize + idx + 1}
                               roleBadge={roleBadge}
                               bookingCount={userBookingCountMap.get(u.id) || 0}
                               isExpanded={isExpanded}
@@ -635,6 +862,14 @@ export default function AdminDashboard() {
                     </table>
                   </div>
                 </div>
+                <Pagination
+                  currentPage={usersPage}
+                  totalItems={filteredUsers.length}
+                  itemsPerPage={usersPageSize}
+                  onPageChange={setUsersPage}
+                  onItemsPerPageChange={(size) => setUsersPageSize(size)}
+                />
+                </>
               )}
             </div>
           )}
@@ -700,6 +935,306 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+
+          {/* ─── TAB: HOMEPAGE ─── */}
+          {activeTab === "homepage" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">Homepage Settings</h2>
+                <p className="text-gray-500 text-sm mt-1">Control what appears on the public homepage</p>
+              </div>
+
+              {homeConfigQuery.isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  {/* ── Hero Section Editor ── */}
+                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+                    <h3 className="text-lg font-bold text-gray-800">Hero Section</h3>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hero Title</label>
+                      <input
+                        type="text"
+                        value={hcHeroTitle}
+                        onChange={(e) => setHcHeroTitle(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                        placeholder="Where do you want to fly?"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hero Subtitle</label>
+                      <input
+                        type="text"
+                        value={hcHeroSubtitle}
+                        onChange={(e) => setHcHeroSubtitle(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                        placeholder="Search and book flights at the best prices"
+                      />
+                    </div>
+                  </div>
+
+                  {/* ── Popular Routes Manager ── */}
+                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-bold text-gray-800">Popular Routes</h3>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Source</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Destination</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Label</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Active</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {hcPopularRoutes.map((route, idx) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="px-4 py-3">{route.source}</td>
+                              <td className="px-4 py-3">{route.destination}</td>
+                              <td className="px-4 py-3 text-xs text-gray-500">{route.label || "—"}</td>
+                              <td className="px-4 py-3">
+                                <button
+                                  onClick={() => {
+                                    const updated = [...hcPopularRoutes];
+                                    updated[idx] = { ...updated[idx], active: !updated[idx].active };
+                                    setHcPopularRoutes(updated);
+                                  }}
+                                  className={`w-10 h-6 rounded-full transition relative ${
+                                    route.active ? "bg-green-500" : "bg-gray-300"
+                                  }`}
+                                >
+                                  <span
+                                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${
+                                      route.active ? "left-4" : "left-0.5"
+                                    }`}
+                                  />
+                                </button>
+                              </td>
+                              <td className="px-4 py-3">
+                                <button
+                                  onClick={() => setHcPopularRoutes(hcPopularRoutes.filter((_, i) => i !== idx))}
+                                  className="text-red-600 hover:text-red-800 text-xs font-medium"
+                                >
+                                  🗑️ Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Add Popular Route */}
+                    <div className="flex flex-wrap items-end gap-3 border-t border-gray-100 pt-4">
+                      <div className="w-48">
+                        <CityCombobox
+                          value={addPopSource}
+                          onChange={setAddPopSource}
+                          placeholder="Select city"
+                          excludeCity={addPopDest}
+                          label="Source"
+                        />
+                      </div>
+                      <div className="w-48">
+                        <CityCombobox
+                          value={addPopDest}
+                          onChange={setAddPopDest}
+                          placeholder="Select city"
+                          excludeCity={addPopSource}
+                          label="Destination"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
+                        <input
+                          type="text"
+                          value={addPopLabel}
+                          onChange={(e) => setAddPopLabel(e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-32 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (!addPopSource || !addPopDest) {
+                            toast.error("Select both source and destination");
+                            return;
+                          }
+                          if (addPopSource === addPopDest) {
+                            toast.error("Source and destination cannot be same");
+                            return;
+                          }
+                          setHcPopularRoutes([
+                            ...hcPopularRoutes,
+                            { source: addPopSource, destination: addPopDest, label: addPopLabel, active: true },
+                          ]);
+                          setAddPopSource("");
+                          setAddPopDest("");
+                          setAddPopLabel("Popular");
+                        }}
+                        className="bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-600 transition"
+                      >
+                        + Add Route
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── Deal Routes Manager ── */}
+                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-800">Deal Routes</h3>
+                        <p className="text-xs text-gray-500">Shown in Hot Deals section — max 6 recommended</p>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Source</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Destination</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Label</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Active</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {hcDealRoutes.map((route, idx) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="px-4 py-3">{route.source}</td>
+                              <td className="px-4 py-3">{route.destination}</td>
+                              <td className="px-4 py-3 text-xs text-gray-500">{route.label || "—"}</td>
+                              <td className="px-4 py-3">
+                                <button
+                                  onClick={() => {
+                                    const updated = [...hcDealRoutes];
+                                    updated[idx] = { ...updated[idx], active: !updated[idx].active };
+                                    setHcDealRoutes(updated);
+                                  }}
+                                  className={`w-10 h-6 rounded-full transition relative ${
+                                    route.active ? "bg-green-500" : "bg-gray-300"
+                                  }`}
+                                >
+                                  <span
+                                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${
+                                      route.active ? "left-4" : "left-0.5"
+                                    }`}
+                                  />
+                                </button>
+                              </td>
+                              <td className="px-4 py-3">
+                                <button
+                                  onClick={() => setHcDealRoutes(hcDealRoutes.filter((_, i) => i !== idx))}
+                                  className="text-red-600 hover:text-red-800 text-xs font-medium"
+                                >
+                                  🗑️ Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Add Deal Route */}
+                    <div className="flex flex-wrap items-end gap-3 border-t border-gray-100 pt-4">
+                      <div className="w-48">
+                        <CityCombobox
+                          value={addDealSource}
+                          onChange={setAddDealSource}
+                          placeholder="Select city"
+                          excludeCity={addDealDest}
+                          label="Source"
+                        />
+                      </div>
+                      <div className="w-48">
+                        <CityCombobox
+                          value={addDealDest}
+                          onChange={setAddDealDest}
+                          placeholder="Select city"
+                          excludeCity={addDealSource}
+                          label="Destination"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
+                        <input
+                          type="text"
+                          value={addDealLabel}
+                          onChange={(e) => setAddDealLabel(e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-32 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (!addDealSource || !addDealDest) {
+                            toast.error("Select both source and destination");
+                            return;
+                          }
+                          if (addDealSource === addDealDest) {
+                            toast.error("Source and destination cannot be same");
+                            return;
+                          }
+                          setHcDealRoutes([
+                            ...hcDealRoutes,
+                            { source: addDealSource, destination: addDealDest, label: addDealLabel, active: true },
+                          ]);
+                          setAddDealSource("");
+                          setAddDealDest("");
+                          setAddDealLabel("Hot Deal");
+                        }}
+                        className="bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-600 transition"
+                      >
+                        + Add Route
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── Save Changes ── */}
+                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+                    <button
+                      disabled={homeConfigMutation.isPending}
+                      onClick={() => {
+                        // Validation
+                        const activePopular = hcPopularRoutes.filter((r) => r.active);
+                        const activeDeals = hcDealRoutes.filter((r) => r.active);
+                        if (activePopular.length === 0) {
+                          toast.error("At least 1 popular route must be active");
+                          return;
+                        }
+                        if (activeDeals.length === 0) {
+                          toast.error("At least 1 deal route must be active");
+                          return;
+                        }
+                        homeConfigMutation.mutate({
+                          id: homeConfigQuery.data?.id,
+                          heroTitle: hcHeroTitle,
+                          heroSubtitle: hcHeroSubtitle,
+                          popularRoutes: hcPopularRoutes,
+                          dealRoutes: hcDealRoutes,
+                        });
+                      }}
+                      className="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-8 py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {homeConfigMutation.isPending ? "Saving..." : "💾 Save All Changes"}
+                    </button>
+                    {homeConfigQuery.data?.updatedBy && (
+                      <p className="text-xs text-gray-400">
+                        Last updated by {homeConfigQuery.data.updatedBy} at{" "}
+                        {homeConfigQuery.data.updatedAt
+                          ? new Date(homeConfigQuery.data.updatedAt).toLocaleString("en-IN")
+                          : "—"}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>
@@ -751,6 +1286,9 @@ function UserRow({
   onToggleExpand: () => void;
   onStatusSaved: () => void;
 }) {
+  const [showAll, setShowAll] = useState(false);
+  const visibleBookings = showAll ? userBookings : userBookings.slice(0, 5);
+
   return (
     <>
       <tr className="border-b border-gray-200 hover:bg-gray-50">
@@ -790,7 +1328,7 @@ function UserRow({
                   </tr>
                 </thead>
                 <tbody>
-                  {userBookings.map((b) => {
+                  {visibleBookings.map((b) => {
                     return (
                       <tr key={b.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="px-4 py-2 font-mono text-xs">{b.flightNumber}</td>
@@ -816,6 +1354,16 @@ function UserRow({
                   })}
                 </tbody>
               </table>
+              {userBookings.length > 5 && (
+                <div className="px-4 py-2 border-t border-gray-100 text-center">
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="text-xs text-sky-600 hover:text-sky-800 font-medium"
+                  >
+                    {showAll ? `▲ Show less` : `▼ Show all ${userBookings.length} bookings`}
+                  </button>
+                </div>
+              )}
             </div>
           </td>
         </tr>

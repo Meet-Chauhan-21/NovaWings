@@ -2,7 +2,7 @@
 // Booking form page — shows flight summary and allows seat selection
 
 import { useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage as FormikError } from "formik";
 import * as Yup from "yup";
 import { useQuery } from "@tanstack/react-query";
@@ -13,10 +13,13 @@ import ErrorMsg from "../components/ErrorMessage";
 /**
  * BookFlight page displays a flight summary and a form to select number of seats.
  * On submit, navigates to the seat selection page.
+ * Pre-fills seat count from passengers query param if available.
  */
 export default function BookFlight() {
   const { flightId } = useParams<{ flightId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const defaultSeats = parseInt(searchParams.get("passengers") || "1");
 
   const { data: flight, isLoading, isError } = useQuery({
     queryKey: ["flight", flightId],
@@ -74,7 +77,7 @@ export default function BookFlight() {
         <h2 className="text-lg font-bold text-gray-800 mb-4">Book Your Seats</h2>
 
         <Formik
-          initialValues={{ numberOfSeats: 1 }}
+          initialValues={{ numberOfSeats: defaultSeats }}
           validationSchema={bookingSchema}
           onSubmit={async (values, { setSubmitting }) => {
             navigate(`/select-seats/${flight.id}?seats=${values.numberOfSeats}`);

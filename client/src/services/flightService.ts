@@ -2,7 +2,7 @@
 // Service for all flight-related API calls
 
 import axiosInstance from "../api/axiosInstance";
-import type { Flight, FlightFormValues } from "../types";
+import type { Flight, FlightFormValues, PageResponse } from "../types";
 
 /**
  * Fetches all available flights (public).
@@ -63,4 +63,23 @@ export async function updateFlight(id: string, data: FlightFormValues): Promise<
  */
 export async function deleteFlight(id: string): Promise<void> {
   await axiosInstance.delete(`/flights/${id}`);
+}
+
+/**
+ * Admin search: server-side paginated, filtered, searchable flights.
+ * @param params - Search parameters
+ * @returns Page of Flight objects
+ */
+export async function searchAdmin(params: {
+  q?: string;
+  source?: string;
+  destination?: string;
+  airline?: string;
+  page?: number;
+  size?: number;
+}): Promise<PageResponse<Flight>> {
+  const response = await axiosInstance.get<PageResponse<Flight>>("/flights/search-admin", {
+    params,
+  });
+  return response.data;
 }

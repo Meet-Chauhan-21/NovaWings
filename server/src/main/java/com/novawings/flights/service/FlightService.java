@@ -6,8 +6,16 @@ import com.novawings.flights.exception.ResourceNotFoundException;
 import com.novawings.flights.model.Flight;
 import com.novawings.flights.repository.FlightRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -15,6 +23,9 @@ import java.util.List;
 public class FlightService {
 
     private final FlightRepository flightRepository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public List<Flight> getAllFlights() {
         return flightRepository.findAll();
@@ -25,7 +36,11 @@ public class FlightService {
                 .orElseThrow(() -> new ResourceNotFoundException("Flight", "id", id));
     }
 
-    public List<Flight> searchFlights(String source, String destination) {
+    public List<Flight> searchFlights(String source, String destination, LocalDate date) {
+        if (date != null) {
+            return flightRepository.findBySourceIgnoreCaseAndDestinationIgnoreCaseAndDepartureDate(
+                    source, destination, date);
+        }
         return flightRepository.findBySourceIgnoreCaseAndDestinationIgnoreCase(source, destination);
     }
 
@@ -66,5 +81,38 @@ public class FlightService {
     public void deleteFlight(String id) {
         Flight flight = getFlightById(id);
         flightRepository.delete(flight);
+    }
+
+    public List<String> getDistinctAirlines() {
+        return flightRepository.findDistinctAirlineNames();
+    }
+
+    public Page<Flight> searchFlightsAdmin(
+            String q, String source, String destination,
+            String airline, Pageable pageable) {
+        Query query = new Query();
+
+        if (q != null && !q.isEmpty()) {
+            Criteria criteria = new Criteria().orOperator(
+                    Criteria.where("flightNumber").regex(q, "i"),
+                    Criteria.where("airlineName").regex(q, "i")
+            );
+            query.addCriteria(criteria);
+        }
+        if (source != null && !source.isEmpty()) {
+            query.addCriteria(Criteria.where("source").regex(source, "i"));
+        }
+        if (destination != null && !destination.isEmpty()) {
+            query.addCriteria(Criteria.where("destination").regex(destination, "i"));
+        }
+        if (airline != null && !airline.isEmpty()) {
+            query.addCriteria(Criteria.where("airlineName").regex(airline, "i"));
+        }
+
+        long total = mongoTemplate.count(query, Flight.class);
+        query.with(pageable);
+        List<Flight> results = mongoTemplate.find(query, Flight.class);
+
+        return new PageImpl<>(results, pageable, total);
     }
 }

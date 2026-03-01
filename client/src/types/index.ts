@@ -84,3 +84,33 @@ export interface UserResponse {
   email: string;
   role: "USER" | "ADMIN";
 }
+
+/** Route configuration for homepage sections */
+export interface RouteConfig {
+  source: string;
+  destination: string;
+  label?: string;
+  active: boolean;
+}
+
+/** Homepage configuration managed by admin */
+export interface HomeConfig {
+  id?: string;
+  popularRoutes: RouteConfig[];
+  dealRoutes: RouteConfig[];
+  heroTitle: string;
+  heroSubtitle: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+/** Spring Page response wrapper */
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
