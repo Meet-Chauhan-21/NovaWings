@@ -14,7 +14,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
-const Flights = lazy(() => import("./pages/Flights"));
+const ExplorePage = lazy(() => import("./pages/ExplorePage"));
 const FlightDetail = lazy(() => import("./pages/FlightDetail"));
 const SearchResults = lazy(() => import("./pages/SearchResults"));
 const BookFlight = lazy(() => import("./pages/BookFlight"));
@@ -43,7 +43,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/flights" element={<Flights />} />
+                <Route path="/explore" element={<ExplorePage />} />
                 <Route path="/flights/:id" element={<FlightDetail />} />
                 <Route path="/search" element={<SearchResults />} />
 

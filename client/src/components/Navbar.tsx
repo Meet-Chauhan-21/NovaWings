@@ -44,8 +44,8 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-6">
-          <Link to="/flights" className="text-gray-700 hover:text-sky-600 transition font-medium">
-            Flights
+          <Link to="/explore" className="text-gray-700 hover:text-sky-600 transition font-medium">
+            Explore
           </Link>
           <Link to="/search" className="text-gray-700 hover:text-sky-600 transition font-medium">
             Search
@@ -108,8 +108,8 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t px-4 pb-4 space-y-2">
-          <button onClick={() => handleNavigate("/flights")} className="block w-full text-left py-2 text-gray-700 hover:text-sky-600">
-            Flights
+          <button onClick={() => handleNavigate("/explore")} className="block w-full text-left py-2 text-gray-700 hover:text-sky-600">
+            Explore
           </button>
           <button onClick={() => handleNavigate("/search")} className="block w-full text-left py-2 text-gray-700 hover:text-sky-600">
             Search
