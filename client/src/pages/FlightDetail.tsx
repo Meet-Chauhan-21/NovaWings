@@ -1,12 +1,13 @@
 // src/pages/FlightDetail.tsx
 // Professional MakeMyTrip-style flight detail page with fare summary
 
-import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getFlightById } from "../services/flightService";
 import { useAuthContext } from "../context/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import BackButton from "../components/ui/BackButton";
 
 /* ───────── Helper functions ───────── */
 
@@ -47,7 +48,6 @@ function formatPrice(price: number): string {
 export default function FlightDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuthContext();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const passengers = parseInt(searchParams.get("passengers") || "1");
 
@@ -83,15 +83,12 @@ export default function FlightDetail() {
         : "text-red-500";
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 page-enter">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* ── Back ── */}
-        <button
-          onClick={() => navigate(-1)}
-          className="text-sky-600 hover:text-sky-800 flex items-center gap-1 text-sm font-medium mb-4 transition"
-        >
-          ← Back to Results
-        </button>
+        <div className="mb-4">
+          <BackButton label="Back to Results" />
+        </div>
 
         {/* ═══════ Flight Header Card ═══════ */}
         <div className="bg-gradient-to-r from-sky-600 to-blue-700 rounded-2xl text-white p-6 md:p-8 mb-6">

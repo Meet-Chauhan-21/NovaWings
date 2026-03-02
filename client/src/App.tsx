@@ -33,7 +33,26 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              borderRadius: "12px",
+              padding: "14px 20px",
+              fontSize: "14px",
+              background: "#fff",
+              color: "#1f2937",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+            },
+            success: {
+              iconTheme: { primary: "#10b981", secondary: "#fff" },
+            },
+            error: {
+              iconTheme: { primary: "#ef4444", secondary: "#fff" },
+            },
+          }}
+        />
         <div className="min-h-screen bg-gray-50 flex flex-col">
           <Navbar />
           <main className="flex-1">

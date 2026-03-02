@@ -104,6 +104,26 @@ export interface HomeConfig {
   updatedBy?: string;
 }
 
+/** Location entity returned from the API */
+export interface Location {
+  id: string;
+  city: string;
+  state: string;
+  country: string;
+  airportCode: string;
+  airportName: string;
+  type: "metro" | "city" | "town";
+  active: boolean;
+  displayOrder: number;
+  showOnExplore: boolean;
+  showOnHome: boolean;
+  totalFlights: number;
+  activeFlights: number;
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
 /** Spring Page response wrapper */
 export interface PageResponse<T> {
   content: T[];

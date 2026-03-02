@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getBookingById, cancelBooking } from "../services/bookingService";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import BackButton from "../components/ui/BackButton";
 
 /**
  * BookingDetail page fetches a single booking by ID, shows all details,
@@ -57,7 +58,10 @@ export default function BookingDetail() {
       : "bg-red-100 text-red-700";
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-auto px-4 py-8 page-enter">
+      <div className="mb-4">
+        <BackButton to="/my-bookings" label="My Bookings" />
+      </div>
       <div className="bg-white rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Booking #{booking.id}</h1>

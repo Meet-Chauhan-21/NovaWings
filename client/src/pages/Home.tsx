@@ -1,13 +1,15 @@
 // src/pages/Home.tsx
 // Fully dynamic landing page — all data fetched from backend
 
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import homeService from "../services/homeService";
 import { searchFlights } from "../services/flightService";
 import CityCombobox from "../components/CityCombobox";
+import DateInput from "../components/ui/DateInput";
+import NumberInput from "../components/ui/NumberInput";
 import type { Flight, RouteConfig } from "../types";
 
 const AIRLINE_COLORS: Record<string, string> = {
@@ -22,10 +24,22 @@ const AIRLINE_COLORS: Record<string, string> = {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [source, setSource] = useState("");
-  const [destination, setDestination] = useState("");
-  const [date, setDate] = useState("");
-  const [passengers, setPassengers] = useState(1);
+  const [searchParams] = useSearchParams();
+
+  const [source, setSource] = useState(searchParams.get("source") || "");
+  const [destination, setDestination] = useState(searchParams.get("destination") || "");
+  const [date, setDate] = useState(searchParams.get("date") || "");
+  const [passengers, setPassengers] = useState(
+    parseInt(searchParams.get("passengers") || "1")
+  );
+
+  // Sync if URL changes (e.g. user uses back button to home)
+  useEffect(() => {
+    setSource(searchParams.get("source") || "");
+    setDestination(searchParams.get("destination") || "");
+    setDate(searchParams.get("date") || "");
+    setPassengers(parseInt(searchParams.get("passengers") || "1"));
+  }, [searchParams]);
 
   // ── Fetch homepage config ──
   const { data: config, isLoading: configLoading } = useQuery({
@@ -77,7 +91,7 @@ export default function Home() {
   );
 
   return (
-    <div>
+    <div className="page-enter">
       {/* ─── Hero Section ─── */}
       <section className="bg-gradient-to-br from-sky-500 to-sky-700 text-white py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -129,27 +143,21 @@ export default function Home() {
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-left">
                   📅 Date
                 </label>
-                <input
-                  type="date"
+                <DateInput
                   value={date}
-                  onChange={(e) => setDate(e.target.value)}
+                  onChange={setDate}
                   min={today}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-400 text-gray-800 text-sm bg-gray-50"
                 />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-left">
                   👤 Passengers
                 </label>
-                <input
-                  type="number"
+                <NumberInput
                   value={passengers}
-                  onChange={(e) =>
-                    setPassengers(Math.max(1, Math.min(9, Number(e.target.value))))
-                  }
+                  onChange={setPassengers}
                   min={1}
                   max={9}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-400 text-gray-800 text-sm bg-gray-50 text-center"
                 />
               </div>
             </div>

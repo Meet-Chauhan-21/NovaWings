@@ -1,29 +1,19 @@
 // src/pages/ExplorePage.tsx
 // Smart flight browser — never loads all flights at once.
 // User picks from → to progressively; works like Google Flights browse mode.
+// All cities are fetched from the API — NO hardcoded data.
 
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { searchFlights } from "../services/flightService";
+import locationService from "../services/locationService";
 import CityCombobox from "../components/CityCombobox";
 import FlightCard from "../components/FlightCard";
+import BackButton from "../components/ui/BackButton";
+import DateInput from "../components/ui/DateInput";
 import type { Flight } from "../types";
-
-/** The 10 major cities shown as quick-pick cards */
-const CITIES = [
-  "Delhi",
-  "Mumbai",
-  "Bangalore",
-  "Chennai",
-  "Kolkata",
-  "Hyderabad",
-  "Ahmedabad",
-  "Jaipur",
-  "Pune",
-  "Surat",
-];
 
 /** Route summary returned by the select transform in useQueries */
 interface RouteSummary {
@@ -38,13 +28,41 @@ type SortKey = "cheapest" | "earliest" | "fastest";
 
 export default function ExplorePage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // ── State ──
-  const [fromCity, setFromCity] = useState("");
-  const [toCity, setToCity] = useState("");
-  const [dateFilter, setDateFilter] = useState("");
+  // ── State — initialized from URL so reload restores selections ──
+  const [fromCity, setFromCity] = useState(searchParams.get("source") || "");
+  const [toCity, setToCity] = useState(searchParams.get("destination") || "");
+  const [dateFilter, setDateFilter] = useState(searchParams.get("date") || "");
   const [sortBy, setSortBy] = useState<SortKey>("cheapest");
   const [visibleCount, setVisibleCount] = useState(10);
+
+  // Sync URL → state (browser back/forward, external URL change)
+  useEffect(() => {
+    setFromCity(searchParams.get("source") || "");
+    setToCity(searchParams.get("destination") || "");
+    setDateFilter(searchParams.get("date") || "");
+  }, [searchParams]);
+
+  // Sync state → URL (user clicks persist to URL for reload survival)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (fromCity) params.set("source", fromCity);
+    if (toCity) params.set("destination", toCity);
+    if (dateFilter) params.set("date", dateFilter);
+
+    // Only update URL if params actually changed
+    if (searchParams.toString() !== params.toString()) {
+      setSearchParams(params, { replace: true });
+    }
+  }, [fromCity, toCity, dateFilter, searchParams, setSearchParams]);
+
+  // ── Fetch explore cities from API (dynamic) ──
+  const { data: exploreCities = [], isLoading: citiesLoading } = useQuery({
+    queryKey: ["exploreCities"],
+    queryFn: locationService.getExploreCities,
+    staleTime: 10 * 60 * 1000,
+  });
 
   // Reset visible count when filters change
   useEffect(() => {
@@ -61,21 +79,21 @@ export default function ExplorePage() {
 
   // ── State B: fetch cheapest flight per destination ──
   const destinationCities = useMemo(
-    () => CITIES.filter((c) => c.toLowerCase() !== fromCity.toLowerCase()),
-    [fromCity],
+    () => exploreCities.filter((c) => c.city.toLowerCase() !== fromCity.toLowerCase()),
+    [fromCity, exploreCities],
   );
 
   const routeQueries = useQueries({
-    queries: destinationCities.map((dest) => ({
-      queryKey: ["explore", fromCity, dest],
-      queryFn: () => searchFlights(fromCity, dest),
+    queries: destinationCities.map((loc) => ({
+      queryKey: ["explore", fromCity, loc.city],
+      queryFn: () => searchFlights(fromCity, loc.city),
       staleTime: 10 * 60 * 1000,
       enabled: pageState === "ROUTE_SELECT",
       select: (data: Flight[]): RouteSummary | null => {
         if (!data || data.length === 0) return null;
         const cheapest = [...data].sort((a, b) => a.price - b.price)[0];
         return {
-          destination: dest,
+          destination: loc.city,
           cheapestPrice: cheapest.price,
           airline: cheapest.airlineName,
           flightCount: data.length,
@@ -155,7 +173,7 @@ export default function ExplorePage() {
   };
 
   return (
-    <div>
+    <div className="page-enter">
       {/* ─── Hero Header ─── */}
       <section className="bg-gradient-to-r from-sky-600 to-blue-700 text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -170,7 +188,11 @@ export default function ExplorePage() {
 
       {/* ─── Quick Filter Bar ─── */}
       <div className="max-w-5xl mx-auto px-4">
-        <div className="bg-white rounded-2xl shadow-lg p-4 -mt-6 relative z-10 flex flex-wrap gap-3 items-end">
+        <div className="bg-white rounded-2xl shadow-lg p-4 -mt-6 relative z-10">
+          <div className="mb-3">
+            <BackButton to="/" label="Home" />
+          </div>
+          <div className="flex flex-wrap gap-3 items-end">
           <div className="flex-1 min-w-[160px]">
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">
               🏙️ From
@@ -197,12 +219,10 @@ export default function ExplorePage() {
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">
               📅 Date
             </label>
-            <input
-              type="date"
+            <DateInput
               value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
+              onChange={setDateFilter}
               min={today}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-400 text-gray-800 text-sm bg-gray-50"
             />
           </div>
           <button
@@ -223,6 +243,7 @@ export default function ExplorePage() {
               Search Full Results
             </button>
           )}
+          </div>
         </div>
       </div>
 
@@ -272,23 +293,33 @@ export default function ExplorePage() {
             <h2 className="text-xl font-bold text-gray-800 mb-6">
               Where are you flying from?
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {CITIES.map((city) => (
-                <button
-                  key={city}
-                  onClick={() => setFromCity(city)}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-sky-300 hover:-translate-y-1 transition-all cursor-pointer p-5 text-center"
-                >
-                  <span className="text-3xl block mb-2">🏙️</span>
-                  <span className="font-bold text-gray-800 block">
-                    {city}
-                  </span>
-                  <span className="text-xs text-gray-400 mt-1 block">
-                    9 routes from here
-                  </span>
-                </button>
-              ))}
-            </div>
+            {citiesLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="animate-pulse bg-gray-200 rounded-2xl h-28" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {exploreCities.map((loc) => (
+                  <button
+                    key={loc.id}
+                    onClick={() => setFromCity(loc.city)}
+                    className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-sky-300 hover:-translate-y-1 transition-all cursor-pointer p-5 text-center"
+                  >
+                    <span className="text-3xl block mb-2">
+                      {loc.type === "metro" ? "🌆" : "🏙️"}
+                    </span>
+                    <span className="font-bold text-gray-800 block">
+                      {loc.city}
+                    </span>
+                    <span className="text-xs text-gray-400 mt-1 block">
+                      {loc.activeFlights ?? 0} routes from here
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

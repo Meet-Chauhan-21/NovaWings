@@ -24,15 +24,16 @@ import { getAllFlights, deleteFlight, searchAdmin } from "../../services/flightS
 import { getAllBookings } from "../../services/bookingService";
 import { getAllUsers } from "../../services/userService";
 import homeService from "../../services/homeService";
+import locationService from "../../services/locationService";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import BookingStatusDropdown from "../../components/BookingStatusDropdown";
 import Pagination from "../../components/Pagination";
 import CityCombobox from "../../components/CityCombobox";
 import { useAuthContext } from "../../context/AuthContext";
 import useDebounce from "../../hooks/useDebounce";
-import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight } from "../../types";
+import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight, Location } from "../../types";
 
-type TabType = "overview" | "flights" | "bookings" | "users" | "analytics" | "homepage";
+type TabType = "overview" | "flights" | "bookings" | "users" | "locations" | "analytics" | "homepage";
 
 /** Sidebar tab definition */
 interface Tab {
@@ -46,6 +47,7 @@ const tabs: Tab[] = [
   { id: "flights", icon: "✈", label: "Flights" },
   { id: "bookings", icon: "📋", label: "All Bookings" },
   { id: "users", icon: "👥", label: "Users" },
+  { id: "locations", icon: "📍", label: "Locations" },
   { id: "analytics", icon: "📈", label: "Analytics" },
   { id: "homepage", icon: "🏠", label: "Homepage" },
 ];
@@ -94,6 +96,20 @@ export default function AdminDashboard() {
   const [addDealSource, setAddDealSource] = useState("");
   const [addDealDest, setAddDealDest] = useState("");
   const [addDealLabel, setAddDealLabel] = useState("Hot Deal");
+
+  // Locations tab state
+  const [locSearch, setLocSearch] = useState("");
+  const [locTypeFilter, setLocTypeFilter] = useState<"all" | "metro" | "city" | "town">("all");
+  const [locStatusFilter, setLocStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [locPage, setLocPage] = useState(1);
+  const [locPageSize, setLocPageSize] = useState(20);
+  const [locPanelOpen, setLocPanelOpen] = useState(false);
+  const [editingLocation, setEditingLocation] = useState<Location | null>(null);
+  const [locForm, setLocForm] = useState({
+    city: "", state: "", country: "India", airportCode: "", airportName: "",
+    type: "city" as "metro" | "city" | "town",
+    active: true, showOnExplore: false, showOnHome: false, displayOrder: 0,
+  });
 
   // Parallel queries for flights & bookings
   const [flightsQuery, bookingsQuery] = useQueries({
@@ -155,6 +171,117 @@ export default function AdminDashboard() {
       toast.error("Failed to save changes");
     },
   });
+
+  // ── Locations queries & mutations ──
+  const locationsQuery = useQuery({
+    queryKey: ["locationsAdmin"],
+    queryFn: locationService.getAllAdmin,
+    staleTime: 5 * 60 * 1000,
+  });
+  const allLocations: Location[] = locationsQuery.data ?? [];
+
+  const filteredLocations = useMemo(() => {
+    let result = allLocations;
+    if (locTypeFilter !== "all") result = result.filter((l) => l.type === locTypeFilter);
+    if (locStatusFilter === "active") result = result.filter((l) => l.active);
+    if (locStatusFilter === "inactive") result = result.filter((l) => !l.active);
+    if (locSearch) {
+      const q = locSearch.toLowerCase();
+      result = result.filter(
+        (l) =>
+          l.city.toLowerCase().includes(q) ||
+          l.state.toLowerCase().includes(q) ||
+          l.airportCode.toLowerCase().includes(q) ||
+          l.country.toLowerCase().includes(q),
+      );
+    }
+    return result;
+  }, [allLocations, locTypeFilter, locStatusFilter, locSearch]);
+
+  const paginatedLocations = useMemo(() => {
+    const start = (locPage - 1) * locPageSize;
+    return filteredLocations.slice(start, start + locPageSize);
+  }, [filteredLocations, locPage, locPageSize]);
+
+  useEffect(() => { setLocPage(1); }, [locSearch, locTypeFilter, locStatusFilter, locPageSize]);
+
+  const locCreateMutation = useMutation({
+    mutationFn: (data: Partial<Location>) => locationService.create(data),
+    onSuccess: () => {
+      toast.success("Location created!");
+      queryClient.invalidateQueries({ queryKey: ["locationsAdmin"] });
+      setLocPanelOpen(false);
+      resetLocForm();
+    },
+    onError: (err: any) => toast.error(err?.response?.data?.message ?? "Failed to create location"),
+  });
+
+  const locUpdateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Location> }) => locationService.update(id, data),
+    onSuccess: () => {
+      toast.success("Location updated!");
+      queryClient.invalidateQueries({ queryKey: ["locationsAdmin"] });
+      setLocPanelOpen(false);
+      setEditingLocation(null);
+      resetLocForm();
+    },
+    onError: () => toast.error("Failed to update location"),
+  });
+
+  const locDeleteMutation = useMutation({
+    mutationFn: (id: string) => locationService.delete(id),
+    onSuccess: () => {
+      toast.success("Location deleted!");
+      queryClient.invalidateQueries({ queryKey: ["locationsAdmin"] });
+    },
+    onError: () => toast.error("Failed to delete location"),
+  });
+
+  const locToggleMutation = useMutation({
+    mutationFn: (id: string) => locationService.toggle(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["locationsAdmin"] }),
+    onError: () => toast.error("Toggle failed"),
+  });
+
+  const locRefreshCountsMutation = useMutation({
+    mutationFn: () => locationService.refreshCounts(),
+    onSuccess: () => {
+      toast.success("Flight counts refreshed!");
+      queryClient.invalidateQueries({ queryKey: ["locationsAdmin"] });
+    },
+    onError: () => toast.error("Failed to refresh counts"),
+  });
+
+  function resetLocForm() {
+    setLocForm({
+      city: "", state: "", country: "India", airportCode: "", airportName: "",
+      type: "city", active: true, showOnExplore: false, showOnHome: false, displayOrder: 0,
+    });
+  }
+
+  function openEditLocation(loc: Location) {
+    setEditingLocation(loc);
+    setLocForm({
+      city: loc.city, state: loc.state, country: loc.country,
+      airportCode: loc.airportCode, airportName: loc.airportName,
+      type: loc.type as "metro" | "city" | "town",
+      active: loc.active, showOnExplore: loc.showOnExplore, showOnHome: loc.showOnHome,
+      displayOrder: loc.displayOrder,
+    });
+    setLocPanelOpen(true);
+  }
+
+  function handleLocFormSave() {
+    if (!locForm.city || !locForm.state || !locForm.airportCode || !locForm.airportName) {
+      toast.error("Fill all required fields");
+      return;
+    }
+    if (editingLocation) {
+      locUpdateMutation.mutate({ id: editingLocation.id, data: locForm });
+    } else {
+      locCreateMutation.mutate(locForm);
+    }
+  }
 
   // Users query
   const usersQuery = useQuery({
@@ -373,7 +500,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* ─── MAIN CONTENT ─── */}
-      <main className="flex-1 ml-64 overflow-auto">
+      <main className="flex-1 ml-64 overflow-auto page-enter">
         <div className="p-8 space-y-8">
           {/* ─── TAB: OVERVIEW ─── */}
           {activeTab === "overview" && (
@@ -874,6 +1001,344 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* ─── TAB: LOCATIONS ─── */}
+          {activeTab === "locations" && (
+            <div className="space-y-6 relative">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-800">Manage Locations</h2>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => locRefreshCountsMutation.mutate()}
+                    disabled={locRefreshCountsMutation.isPending}
+                    className="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-200 transition font-medium text-sm disabled:opacity-50"
+                  >
+                    {locRefreshCountsMutation.isPending ? "Refreshing..." : "🔄 Refresh Counts"}
+                  </button>
+                  <button
+                    onClick={() => { setEditingLocation(null); resetLocForm(); setLocPanelOpen(true); }}
+                    className="bg-sky-500 text-white px-6 py-2.5 rounded-xl hover:bg-sky-600 transition font-medium"
+                  >
+                    + Add Location
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl shadow-sm p-5 border-l-4 border-sky-500">
+                  <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">Total</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1">{allLocations.length}</p>
+                </div>
+                <div className="bg-white rounded-2xl shadow-sm p-5 border-l-4 border-green-500">
+                  <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">Active</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1">{allLocations.filter((l) => l.active).length}</p>
+                </div>
+                <div className="bg-white rounded-2xl shadow-sm p-5 border-l-4 border-purple-500">
+                  <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">Metro</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1">{allLocations.filter((l) => l.type === "metro").length}</p>
+                </div>
+                <div className="bg-white rounded-2xl shadow-sm p-5 border-l-4 border-amber-500">
+                  <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">On Explore</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1">{allLocations.filter((l) => l.showOnExplore).length}</p>
+                </div>
+              </div>
+
+              {/* Filter Bar */}
+              <div className="bg-white rounded-2xl shadow-md p-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <input
+                    type="text"
+                    placeholder="Search city, state, code..."
+                    value={locSearch}
+                    onChange={(e) => setLocSearch(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                  />
+                  <select
+                    value={locTypeFilter}
+                    onChange={(e) => setLocTypeFilter(e.target.value as any)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm bg-white"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="metro">Metro</option>
+                    <option value="city">City</option>
+                    <option value="town">Town</option>
+                  </select>
+                  <select
+                    value={locStatusFilter}
+                    onChange={(e) => setLocStatusFilter(e.target.value as any)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm bg-white"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Inactive Only</option>
+                  </select>
+                  {(locSearch || locTypeFilter !== "all" || locStatusFilter !== "all") && (
+                    <button
+                      onClick={() => { setLocSearch(""); setLocTypeFilter("all"); setLocStatusFilter("all"); }}
+                      className="text-sm text-sky-600 hover:text-sky-800 font-medium flex items-center justify-center"
+                    >
+                      ✕ Clear filters
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Locations Table */}
+              {locationsQuery.isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-4 py-3 font-semibold text-gray-700">#</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">City</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">State</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Country</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Code</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Airport</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Type</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700 text-center">Flights</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700 text-center">Explore</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700 text-center">Home</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700 text-center">Active</th>
+                            <th className="px-4 py-3 font-semibold text-gray-700">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paginatedLocations.length === 0 ? (
+                            <tr>
+                              <td colSpan={12} className="px-6 py-12 text-center text-gray-400">
+                                No locations found
+                              </td>
+                            </tr>
+                          ) : (
+                            paginatedLocations.map((loc, i) => {
+                              const typeBadge =
+                                loc.type === "metro"
+                                  ? "bg-purple-100 text-purple-700"
+                                  : loc.type === "city"
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "bg-gray-100 text-gray-600";
+                              return (
+                                <tr key={loc.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                  <td className="px-4 py-3 text-gray-400 text-xs">
+                                    {(locPage - 1) * locPageSize + i + 1}
+                                  </td>
+                                  <td className="px-4 py-3 font-medium">{loc.city}</td>
+                                  <td className="px-4 py-3 text-gray-600">{loc.state}</td>
+                                  <td className="px-4 py-3 text-gray-600">{loc.country}</td>
+                                  <td className="px-4 py-3 font-mono text-xs font-bold">{loc.airportCode}</td>
+                                  <td className="px-4 py-3 text-gray-600 text-xs">{loc.airportName}</td>
+                                  <td className="px-4 py-3">
+                                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeBadge}`}>
+                                      {loc.type}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 text-center font-medium">
+                                    {loc.totalFlights ?? 0}
+                                    {loc.activeFlights != null && loc.activeFlights !== loc.totalFlights && (
+                                      <span className="text-xs text-gray-400 ml-1">({loc.activeFlights})</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <ToggleSwitch
+                                      checked={loc.showOnExplore}
+                                      onChange={() => {
+                                        locUpdateMutation.mutate({
+                                          id: loc.id,
+                                          data: { ...loc, showOnExplore: !loc.showOnExplore },
+                                        });
+                                      }}
+                                    />
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <ToggleSwitch
+                                      checked={loc.showOnHome}
+                                      onChange={() => {
+                                        locUpdateMutation.mutate({
+                                          id: loc.id,
+                                          data: { ...loc, showOnHome: !loc.showOnHome },
+                                        });
+                                      }}
+                                    />
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <ToggleSwitch
+                                      checked={loc.active}
+                                      onChange={() => locToggleMutation.mutate(loc.id)}
+                                    />
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => openEditLocation(loc)}
+                                        className="text-xs px-3 py-1.5 rounded-lg font-medium bg-sky-100 text-sky-700 hover:bg-sky-200 transition"
+                                      >
+                                        ✏️ Edit
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          if (window.confirm(`Delete ${loc.city}?`)) {
+                                            locDeleteMutation.mutate(loc.id);
+                                          }
+                                        }}
+                                        className="text-xs px-3 py-1.5 rounded-lg font-medium bg-red-100 text-red-700 hover:bg-red-200 transition"
+                                      >
+                                        🗑
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <Pagination
+                    currentPage={locPage}
+                    totalItems={filteredLocations.length}
+                    itemsPerPage={locPageSize}
+                    onPageChange={setLocPage}
+                    onItemsPerPageChange={(size) => setLocPageSize(size)}
+                  />
+                </>
+              )}
+
+              {/* ─── Slide-in Add/Edit Panel ─── */}
+              {locPanelOpen && (
+                <div className="fixed inset-0 z-50 flex justify-end">
+                  <div className="absolute inset-0 bg-black/30" onClick={() => { setLocPanelOpen(false); setEditingLocation(null); }} />
+                  <div className="relative w-full max-w-md bg-white shadow-2xl h-full overflow-y-auto animate-slideIn">
+                    <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+                      <h3 className="text-lg font-bold text-gray-800">
+                        {editingLocation ? "Edit Location" : "Add Location"}
+                      </h3>
+                      <button
+                        onClick={() => { setLocPanelOpen(false); setEditingLocation(null); }}
+                        className="text-gray-400 hover:text-gray-600 text-xl"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="p-6 space-y-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                        <input
+                          value={locForm.city}
+                          onChange={(e) => setLocForm({ ...locForm, city: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+                        <input
+                          value={locForm.state}
+                          onChange={(e) => setLocForm({ ...locForm, state: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                        <input
+                          value={locForm.country}
+                          onChange={(e) => setLocForm({ ...locForm, country: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Airport Code *</label>
+                          <input
+                            value={locForm.airportCode}
+                            onChange={(e) => setLocForm({ ...locForm, airportCode: e.target.value.toUpperCase() })}
+                            maxLength={4}
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                          <select
+                            value={locForm.type}
+                            onChange={(e) => setLocForm({ ...locForm, type: e.target.value as any })}
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm bg-white"
+                          >
+                            <option value="metro">Metro</option>
+                            <option value="city">City</option>
+                            <option value="town">Town</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Airport Name *</label>
+                        <input
+                          value={locForm.airportName}
+                          onChange={(e) => setLocForm({ ...locForm, airportName: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Display Order</label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={locForm.displayOrder}
+                          onChange={(e) => setLocForm({ ...locForm, displayOrder: Number(e.target.value) || 0 })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                        />
+                      </div>
+                      <div className="space-y-3 pt-2">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={locForm.active}
+                            onChange={(e) => setLocForm({ ...locForm, active: e.target.checked })}
+                            className="w-5 h-5 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+                          />
+                          <span className="text-sm text-gray-700">Active</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={locForm.showOnExplore}
+                            onChange={(e) => setLocForm({ ...locForm, showOnExplore: e.target.checked })}
+                            className="w-5 h-5 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+                          />
+                          <span className="text-sm text-gray-700">Show on Explore page</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={locForm.showOnHome}
+                            onChange={(e) => setLocForm({ ...locForm, showOnHome: e.target.checked })}
+                            className="w-5 h-5 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+                          />
+                          <span className="text-sm text-gray-700">Show on Home page</span>
+                        </label>
+                      </div>
+                      <button
+                        onClick={handleLocFormSave}
+                        disabled={locCreateMutation.isPending || locUpdateMutation.isPending}
+                        className="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                      >
+                        {(locCreateMutation.isPending || locUpdateMutation.isPending)
+                          ? "Saving..."
+                          : editingLocation
+                            ? "💾 Update Location"
+                            : "➕ Create Location"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* ─── TAB: ANALYTICS ─── */}
           {activeTab === "analytics" && (
             <div className="space-y-6">
@@ -1369,5 +1834,23 @@ function UserRow({
         </tr>
       )}
     </>
+  );
+}
+
+/** Toggle switch used in the Locations table */
+function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+  return (
+    <button
+      onClick={onChange}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+        checked ? "bg-sky-500" : "bg-gray-300"
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          checked ? "translate-x-6" : "translate-x-1"
+        }`}
+      />
+    </button>
   );
 }

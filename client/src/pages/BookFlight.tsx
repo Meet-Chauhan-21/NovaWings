@@ -3,12 +3,14 @@
 
 import { useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { Formik, Form, Field, ErrorMessage as FormikError } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useQuery } from "@tanstack/react-query";
 import { getFlightById } from "../services/flightService";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMsg from "../components/ErrorMessage";
+import BackButton from "../components/ui/BackButton";
+import NumberInput from "../components/ui/NumberInput";
 
 /**
  * BookFlight page displays a flight summary and a form to select number of seats.
@@ -52,7 +54,10 @@ export default function BookFlight() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-auto px-4 py-8 page-enter">
+      <div className="mb-4">
+        <BackButton label="Back to Flight" />
+      </div>
       {/* Flight Summary */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
         <h2 className="text-lg font-bold text-gray-800 mb-4">Flight Summary</h2>
@@ -84,25 +89,19 @@ export default function BookFlight() {
             setSubmitting(false);
           }}
         >
-          {({ isSubmitting, values, touched, errors }) => {
+          {({ isSubmitting, values, touched, errors, setFieldValue }) => {
             const totalPrice = values.numberOfSeats * flight.price;
             return (
               <Form className="space-y-5">
                 <div>
-                  <label htmlFor="numberOfSeats" className="block text-sm font-medium text-gray-700 mb-1">
-                    Number of Seats
-                  </label>
-                  <Field
-                    id="numberOfSeats"
-                    name="numberOfSeats"
-                    type="number"
+                  <NumberInput
+                    label="Number of Seats"
+                    value={values.numberOfSeats}
+                    onChange={(val) => setFieldValue("numberOfSeats", val)}
                     min={1}
                     max={flight.availableSeats}
-                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none ${
-                      touched.numberOfSeats && errors.numberOfSeats ? "border-red-400" : "border-gray-200"
-                    }`}
+                    error={touched.numberOfSeats && errors.numberOfSeats ? String(errors.numberOfSeats) : undefined}
                   />
-                  <FormikError name="numberOfSeats" component="p" className="text-red-500 text-sm mt-1" />
                 </div>
 
                 {/* Live total price calculation */}

@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import toast from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getFlightById, updateFlight } from "../../services/flightService";
+import BackButton from "../../components/ui/BackButton";
 import type { FlightFormValues } from "../../types";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import ErrorMsg from "../../components/ErrorMessage";
@@ -75,7 +76,10 @@ export default function EditFlight() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-auto px-4 py-8 page-enter">
+      <div className="mb-4">
+        <BackButton to="/admin" label="Dashboard" />
+      </div>
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Edit Flight</h1>
 
       <div className="bg-white rounded-2xl shadow-lg p-8">

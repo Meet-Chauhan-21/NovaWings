@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import toast from "react-hot-toast";
 import { registerUser } from "../services/authService";
 import { useAuthContext } from "../context/AuthContext";
+import BackButton from "../components/ui/BackButton";
 import type { RegisterFormValues } from "../types";
 
 /** Yup validation schema for the register form */
@@ -52,8 +53,11 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 page-enter">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+        <div className="mb-4">
+          <BackButton to="/login" label="Login" />
+        </div>
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Create Account</h2>
 
         <Formik initialValues={initialValues} validationSchema={registerSchema} onSubmit={handleSubmit}>

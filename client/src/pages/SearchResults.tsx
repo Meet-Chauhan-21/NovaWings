@@ -1,13 +1,17 @@
 // src/pages/SearchResults.tsx
 // Professional IRCTC / MakeMyTrip style search results with filters, sort, and flight cards
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { searchFlights } from "../services/flightService";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
-import EmptyState from "../components/EmptyState";
+import CityCombobox from "../components/CityCombobox";
+import BackButton from "../components/ui/BackButton";
+import DateInput from "../components/ui/DateInput";
+import NumberInput from "../components/ui/NumberInput";
 import type { Flight } from "../types";
 
 /* ───────── Helper functions ───────── */
@@ -78,11 +82,68 @@ export default function SearchResults() {
   const date = searchParams.get("date") || "";
   const passengers = parseInt(searchParams.get("passengers") || "1");
 
-  /* ── API ── */
+  /* ── Editable search bar state ── */
+  const [from, setFrom] = useState(source);
+  const [to, setTo] = useState(destination);
+  const [searchDate, setSearchDate] = useState(date);
+  const [searchPassengers, setSearchPassengers] = useState(passengers);
+
+  // Sync draft inputs when URL changes (reload, back/forward)
+  useEffect(() => {
+    setFrom(searchParams.get("source") || "");
+    setTo(searchParams.get("destination") || "");
+    setSearchDate(searchParams.get("date") || "");
+    setSearchPassengers(parseInt(searchParams.get("passengers") || "1"));
+  }, [searchParams]);
+
+  // Save last search to sessionStorage as backup
+  useEffect(() => {
+    if (source && destination) {
+      sessionStorage.setItem(
+        "lastSearch",
+        JSON.stringify({ source, destination, date, passengers })
+      );
+    }
+  }, [source, destination, date, passengers]);
+
+  // On mount with NO URL params — restore from sessionStorage
+  useEffect(() => {
+    if (!source && !destination) {
+      const saved = sessionStorage.getItem("lastSearch");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          navigate(
+            `/search?source=${encodeURIComponent(parsed.source)}&destination=${encodeURIComponent(parsed.destination)}&date=${parsed.date || ""}&passengers=${parsed.passengers || 1}`,
+            { replace: true }
+          );
+        } catch {
+          sessionStorage.removeItem("lastSearch");
+        }
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleSearch() {
+    if (!from.trim()) { toast.error("Please enter departure city"); return; }
+    if (!to.trim()) { toast.error("Please enter destination city"); return; }
+    if (from.trim().toLowerCase() === to.trim().toLowerCase()) {
+      toast.error("From and To city cannot be same"); return;
+    }
+    if (!searchDate) { toast.error("Please select travel date"); return; }
+    navigate(
+      `/search?source=${encodeURIComponent(from.trim())}&destination=${encodeURIComponent(to.trim())}&date=${searchDate}&passengers=${searchPassengers}`
+    );
+  }
+
+  /* ── API — uses committed URL values as query key ── */
   const { data: flights, isLoading, isError } = useQuery({
-    queryKey: ["flights", "search", source, destination],
+    queryKey: ["flights", "search", source, destination, date, passengers],
     queryFn: () => searchFlights(source, destination),
-    enabled: !!(source || destination),
+    enabled: !!(source && destination),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: (prev: Flight[] | undefined) => prev,
   });
 
   /* ── State ── */
@@ -197,11 +258,6 @@ export default function SearchResults() {
   const toggleSection = (key: string) =>
     setOpenFilterSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  /* ── Formatted date ── */
-  const formattedDate = date
-    ? new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-    : "";
-
   /* ── Loading / Error ── */
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <ErrorMessage message="Failed to search flights. Please try again." />;
@@ -217,7 +273,8 @@ export default function SearchResults() {
         <div className="flex items-center gap-2">
           <label className="text-xs text-gray-500">Min</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
             placeholder={String(priceBounds.min)}
             value={priceRange.min || ""}
@@ -227,7 +284,8 @@ export default function SearchResults() {
         <div className="flex items-center gap-2 mt-2">
           <label className="text-xs text-gray-500">Max</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
             placeholder={String(priceBounds.max)}
             value={priceRange.max === Infinity ? "" : priceRange.max}
@@ -297,7 +355,8 @@ export default function SearchResults() {
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500">Min seats:</span>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             min={1}
             className="w-20 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
             value={minSeats}
@@ -352,34 +411,80 @@ export default function SearchResults() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ── Sticky Search Summary Bar ── */}
-      <div className="sticky top-0 z-40 bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3 text-sm font-medium text-gray-700">
-          <span>🛫 {source}</span>
-          <span className="text-sky-500 font-bold">→</span>
-          <span>🛬 {destination}</span>
-          {formattedDate && (
-            <>
-              <span className="text-gray-300">|</span>
-              <span>📅 {formattedDate}</span>
-            </>
-          )}
-          <span className="text-gray-300">|</span>
-          <span>
-            👤 {passengers} {passengers === 1 ? "Passenger" : "Passengers"}
-          </span>
-          <button
-            onClick={() => navigate("/")}
-            className="ml-auto bg-sky-50 text-sky-600 hover:bg-sky-100 px-4 py-1.5 rounded-xl font-semibold transition text-sm"
-          >
-            ✏️ Modify Search
-          </button>
+    <div className="min-h-screen bg-gray-50 page-enter">
+      {/* ── Sticky Editable Search Bar ── */}
+      <div className="sticky top-0 z-40 bg-sky-700 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-end">
+            {/* FROM */}
+            <div className="flex-1 min-w-0">
+              <CityCombobox
+                label="🛫 From"
+                labelClassName="text-xs font-semibold text-white/80 uppercase tracking-wide mb-1 block"
+                value={from}
+                onChange={setFrom}
+                excludeCity={to}
+                placeholder="Departure city"
+              />
+            </div>
+
+            {/* SWAP */}
+            <button
+              type="button"
+              onClick={() => { setFrom(to); setTo(from); }}
+              className="hidden md:flex items-center justify-center w-10 h-10 mb-0.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors shrink-0"
+              title="Swap cities"
+            >
+              ⇄
+            </button>
+
+            {/* TO */}
+            <div className="flex-1 min-w-0">
+              <CityCombobox
+                label="🛬 To"
+                labelClassName="text-xs font-semibold text-white/80 uppercase tracking-wide mb-1 block"
+                value={to}
+                onChange={setTo}
+                excludeCity={from}
+                placeholder="Destination city"
+              />
+            </div>
+
+            {/* DATE */}
+            <div className="flex flex-col gap-1 min-w-[160px]">
+              <label className="text-xs font-semibold text-white/80 uppercase tracking-wide">📅 Date</label>
+              <DateInput
+                value={searchDate}
+                onChange={setSearchDate}
+                min={new Date().toISOString().split("T")[0]}
+              />
+            </div>
+
+            {/* PASSENGERS */}
+            <div className="flex flex-col gap-1 min-w-[120px]">
+              <label className="text-xs font-semibold text-white/80 uppercase tracking-wide">👤 Passengers</label>
+              <NumberInput
+                value={searchPassengers}
+                onChange={setSearchPassengers}
+                min={1}
+                max={9}
+              />
+            </div>
+
+            {/* SEARCH BUTTON */}
+            <button
+              type="button"
+              onClick={handleSearch}
+              className="bg-white text-sky-700 font-bold px-8 py-2.5 rounded-xl hover:bg-sky-50 transition-colors shrink-0 shadow-sm flex items-center gap-2"
+            >
+              🔍 Search
+            </button>
+          </div>
         </div>
       </div>
 
       {/* ── Mobile Filter/Sort bar ── */}
-      <div className="md:hidden sticky top-[52px] z-30 bg-white border-b border-gray-200 px-4 py-2 flex gap-2">
+      <div className="md:hidden sticky top-[116px] z-30 bg-white border-b border-gray-200 px-4 py-2 flex gap-2">
         <button
           onClick={() => setMobileFilterOpen(true)}
           className="flex-1 border border-gray-300 rounded-xl py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -422,10 +527,13 @@ export default function SearchResults() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-4">
+          <BackButton to="/" label="Home" />
+        </div>
         <div className="flex gap-6">
           {/* ── Desktop Filter Sidebar ── */}
           <aside className="hidden md:block w-72 shrink-0">
-            <div className="sticky top-24 bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div className="sticky top-[100px] bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
               <h3 className="text-base font-bold text-gray-800 mb-4">Filters</h3>
               {filterPanel}
             </div>
@@ -455,12 +563,23 @@ export default function SearchResults() {
 
             {/* Results */}
             {filteredAndSortedFlights.length === 0 ? (
-              <EmptyState
-                heading="No flights found for your search"
-                subtext="Try different dates, adjust filters, or change passenger count"
-                actionLabel="Modify Search"
-                actionPath="/"
-              />
+              <div className="flex flex-col items-center justify-center py-24 text-center">
+                <div className="text-6xl mb-4">✈️</div>
+                <h3 className="text-xl font-bold text-gray-700 mb-2">No flights found</h3>
+                <p className="text-gray-500 mb-2">
+                  {source} → {destination}
+                  {date && ` on ${new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`}
+                </p>
+                <p className="text-gray-400 text-sm mb-6">
+                  Try changing your travel date or selecting a different route above
+                </p>
+                <button
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                  className="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors flex items-center gap-2"
+                >
+                  ↑ Modify Search
+                </button>
+              </div>
             ) : (
               <div className="space-y-3">
                 {filteredAndSortedFlights.map((flight) => (
