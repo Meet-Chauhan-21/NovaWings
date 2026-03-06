@@ -164,13 +164,30 @@ public class BookingService {
                 .paymentId(booking.getPaymentId())
                 .selectedSeats(booking.getSelectedSeats())
                 .status(booking.getStatus())
-                .bookingDate(booking.getBookingDate());
+                .bookingDate(booking.getBookingDate())
+                .userName(booking.getUserName())
+                .userEmail(booking.getUserEmail())
+                .arrivalTime(booking.getArrivalTime())
+                .duration(booking.getDuration())
+                .departureTimeStr(booking.getDepartureTimeStr());
 
         if (flight != null) {
             builder.flightNumber(flight.getFlightNumber())
                     .airlineName(flight.getAirlineName())
                     .source(flight.getSource())
                     .destination(flight.getDestination());
+            // Populate flight snapshot if not already stored on booking
+            if (booking.getArrivalTime() == null && flight.getArrivalTime() != null) {
+                builder.arrivalTime(flight.getArrivalTime().toString());
+            }
+            if (booking.getDepartureTimeStr() == null && flight.getDepartureTime() != null) {
+                builder.departureTimeStr(flight.getDepartureTime().toString());
+            }
+            if (booking.getDuration() == null && flight.getDurationMinutes() > 0) {
+                int hrs = flight.getDurationMinutes() / 60;
+                int mins = flight.getDurationMinutes() % 60;
+                builder.duration(hrs + "h " + mins + "m");
+            }
         } else {
             builder.flightNumber(booking.getFlightNumber())
                     .airlineName(booking.getAirlineName())

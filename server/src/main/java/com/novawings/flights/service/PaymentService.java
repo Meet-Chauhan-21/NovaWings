@@ -148,6 +148,27 @@ public class PaymentService {
             throw new RuntimeException("Payment verification failed — invalid signature");
         }
 
+        // Look up flight for snapshot data
+        Flight flightForSnapshot = flightRepository
+                .findById(payment.getFlightId()).orElse(null);
+
+        String arrivalTimeStr = null;
+        String durationStr = null;
+        String departureTimeStr = payment.getDepartureTime();
+        if (flightForSnapshot != null) {
+            if (flightForSnapshot.getArrivalTime() != null) {
+                arrivalTimeStr = flightForSnapshot.getArrivalTime().toString();
+            }
+            if (flightForSnapshot.getDepartureTime() != null) {
+                departureTimeStr = flightForSnapshot.getDepartureTime().toString();
+            }
+            if (flightForSnapshot.getDurationMinutes() > 0) {
+                int hrs = flightForSnapshot.getDurationMinutes() / 60;
+                int mins = flightForSnapshot.getDurationMinutes() % 60;
+                durationStr = hrs + "h " + mins + "m";
+            }
+        }
+
         // Signature valid — create booking
         Booking booking = Booking.builder()
                 .userId(payment.getUserId())
@@ -162,6 +183,11 @@ public class PaymentService {
                 .status(BookingStatus.CONFIRMED)
                 .paymentId(request.getRazorpayPaymentId())
                 .bookingDate(LocalDateTime.now())
+                .userName(payment.getUserName())
+                .userEmail(payment.getUserEmail())
+                .arrivalTime(arrivalTimeStr)
+                .duration(durationStr)
+                .departureTimeStr(departureTimeStr)
                 .build();
 
         Booking savedBooking = bookingRepository.save(booking);

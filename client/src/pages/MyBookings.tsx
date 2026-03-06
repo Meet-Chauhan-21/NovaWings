@@ -8,6 +8,7 @@ import ErrorMessage from "../components/ErrorMessage";
 import EmptyState from "../components/EmptyState";
 import BackButton from "../components/ui/BackButton";
 import SkeletonCard from "../components/ui/SkeletonCard";
+import DownloadTicketButton from "../components/DownloadTicketButton";
 import type { BookingResponse } from "../types";
 
 const TABS = [
@@ -329,6 +330,11 @@ function BookingCard({ booking }: { booking: BookingResponse }) {
             </span>
           </div>
         )}
+
+        {/* Download ticket */}
+        <div className="mt-3 pt-3 border-t border-gray-50 flex justify-end" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+          <DownloadTicketButton booking={booking} variant="compact" />
+        </div>
       </div>
       {/* Hover arrow */}
       <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -386,6 +392,9 @@ function BookingListRow({ booking }: { booking: BookingResponse }) {
         {booking.paymentId && (
           <p className="text-[10px] text-gray-400 font-mono mt-1 truncate max-w-[140px]">💳 {booking.paymentId}</p>
         )}
+      </div>
+      <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="shrink-0">
+        <DownloadTicketButton booking={booking} variant="icon" />
       </div>
       <svg className="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

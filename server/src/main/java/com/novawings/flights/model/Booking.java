@@ -37,6 +37,15 @@ public class Booking {
     private String source;
     private String destination;
 
+    // Passenger snapshot (for ticket generation)
+    private String userName;
+    private String userEmail;
+
+    // Flight snapshot (for ticket generation)
+    private String arrivalTime;
+    private String duration;
+    private String departureTimeStr;
+
     @Builder.Default
     private BookingStatus status = BookingStatus.CONFIRMED;
 

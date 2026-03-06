@@ -46,6 +46,41 @@ export interface BookingResponse {
   selectedSeats?: string[];
   status: "CONFIRMED" | "CANCELLED";
   bookingDate: string;
+  userName?: string;
+  userEmail?: string;
+  arrivalTime?: string;
+  duration?: string;
+  departureTimeStr?: string;
+}
+
+/** Ticket data for generating professional e-ticket / boarding pass */
+export interface TicketData {
+  bookingId: string;
+  bookingDate: string;
+  status: string;
+  passengerName: string;
+  passengerEmail: string;
+  flightNumber: string;
+  airlineName: string;
+  source: string;
+  sourceCode: string;
+  destination: string;
+  destinationCode: string;
+  departureDate: string;
+  departureTime: string;
+  arrivalTime: string;
+  duration: string;
+  numberOfSeats: number;
+  selectedSeats: string[];
+  cabinClass: string;
+  cabinBaggage: string;
+  checkInBaggage: string;
+  razorpayPaymentId: string;
+  baseFare: number;
+  taxes: number;
+  convenienceFee: number;
+  totalAmount: number;
+  currency: string;
 }
 
 /** Form values for the login form */

@@ -28,4 +28,13 @@ public class BookingResponse {
     private List<String> selectedSeats;
     private BookingStatus status;
     private LocalDateTime bookingDate;
+
+    // Passenger snapshot
+    private String userName;
+    private String userEmail;
+
+    // Flight snapshot
+    private String arrivalTime;
+    private String duration;
+    private String departureTimeStr;
 }
