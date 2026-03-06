@@ -161,6 +161,8 @@ public class BookingService {
                 .flightId(booking.getFlightId())
                 .numberOfSeats(booking.getNumberOfSeats())
                 .totalPrice(booking.getTotalPrice())
+                .paymentId(booking.getPaymentId())
+                .selectedSeats(booking.getSelectedSeats())
                 .status(booking.getStatus())
                 .bookingDate(booking.getBookingDate());
 
@@ -169,6 +171,11 @@ public class BookingService {
                     .airlineName(flight.getAirlineName())
                     .source(flight.getSource())
                     .destination(flight.getDestination());
+        } else {
+            builder.flightNumber(booking.getFlightNumber())
+                    .airlineName(booking.getAirlineName())
+                    .source(booking.getSource())
+                    .destination(booking.getDestination());
         }
 
         return builder.build();

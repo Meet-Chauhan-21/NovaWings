@@ -21,6 +21,7 @@ const BookFlight = lazy(() => import("./pages/BookFlight"));
 const SeatSelection = lazy(() => import("./pages/SeatSelection"));
 const MyBookings = lazy(() => import("./pages/MyBookings"));
 const BookingDetail = lazy(() => import("./pages/BookingDetail"));
+const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AddFlight = lazy(() => import("./pages/admin/AddFlight"));
 const EditFlight = lazy(() => import("./pages/admin/EditFlight"));
@@ -72,6 +73,7 @@ export default function App() {
                   <Route path="/select-seats/:flightId" element={<SeatSelection />} />
                   <Route path="/my-bookings" element={<MyBookings />} />
                   <Route path="/bookings/:id" element={<BookingDetail />} />
+                  <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
                 </Route>
 
                 {/* Admin-only routes */}

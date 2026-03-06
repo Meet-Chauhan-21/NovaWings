@@ -2,7 +2,7 @@
 // Professional IRCTC / MakeMyTrip style search results with filters, sort, and flight cards
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { searchFlights } from "../services/flightService";
@@ -646,6 +646,7 @@ function FlightResultCard({
   expanded: boolean;
   onToggleExpand: () => void;
 }) {
+  const navigate = useNavigate();
   const duration = getFlightDuration(flight.departureTime, flight.arrivalTime);
   const seatColor =
     flight.availableSeats > 10 ? "text-emerald-600" : flight.availableSeats >= 5 ? "text-orange-500" : "text-red-500";
@@ -654,8 +655,13 @@ function FlightResultCard({
   const tax = Math.round(baseFare * 0.18);
   const total = baseFare + tax;
 
+  const goToDetail = () => navigate(`/flights/${flight.id}?passengers=${passengers}`);
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-sky-200 transition">
+    <div
+      className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-sky-200 transition cursor-pointer"
+      onClick={goToDetail}
+    >
       <div className="p-5">
         {/* Top row: airline info */}
         <div className="flex items-center gap-3 mb-4">
@@ -711,21 +717,21 @@ function FlightResultCard({
                 <p className="text-[10px] text-gray-400">{formatPrice(totalPrice)} total</p>
               )}
             </div>
-            <Link
-              to={`/book/${flight.id}?passengers=${passengers}`}
+            <button
+              onClick={(e) => { e.stopPropagation(); goToDetail(); }}
               className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-5 py-2 text-sm font-semibold transition whitespace-nowrap"
             >
               Book Now →
-            </Link>
+            </button>
           </div>
         </div>
 
-        {/* View Details toggle */}
+        {/* Flight Details toggle */}
         <button
-          onClick={onToggleExpand}
+          onClick={(e) => { e.stopPropagation(); onToggleExpand(); }}
           className="mt-3 text-sm text-sky-600 hover:text-sky-800 font-medium transition"
         >
-          {expanded ? "Hide Details ▲" : "View Details ▼"}
+          {expanded ? "Hide Details ▲" : "Flight Details ▼"}
         </button>
       </div>
 
@@ -774,12 +780,12 @@ function FlightResultCard({
           </div>
 
           <div className="text-right mt-4">
-            <Link
-              to={`/book/${flight.id}?passengers=${passengers}`}
+            <button
+              onClick={(e) => { e.stopPropagation(); goToDetail(); }}
               className="inline-block bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-6 py-2 text-sm font-semibold transition"
             >
               Book Now →
-            </Link>
+            </button>
           </div>
         </div>
       )}

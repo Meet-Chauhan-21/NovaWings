@@ -26,15 +26,16 @@ import { getAllUsers } from "../../services/userService";
 import homeService from "../../services/homeService";
 import locationService from "../../services/locationService";
 import destinationService from "../../services/destinationService";
+import paymentService from "../../services/paymentService";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import BookingStatusDropdown from "../../components/BookingStatusDropdown";
 import Pagination from "../../components/Pagination";
 import CityCombobox from "../../components/CityCombobox";
 import { useAuthContext } from "../../context/AuthContext";
 import useDebounce from "../../hooks/useDebounce";
-import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight, Location, DestinationCard } from "../../types";
+import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight, Location, DestinationCard, PaymentRecord } from "../../types";
 
-type TabType = "overview" | "flights" | "bookings" | "users" | "locations" | "analytics" | "homepage";
+type TabType = "overview" | "flights" | "bookings" | "users" | "locations" | "analytics" | "payments" | "homepage";
 
 /** Sidebar tab definition */
 interface Tab {
@@ -50,6 +51,7 @@ const tabs: Tab[] = [
   { id: "users", icon: "👥", label: "Users" },
   { id: "locations", icon: "📍", label: "Locations" },
   { id: "analytics", icon: "📈", label: "Analytics" },
+  { id: "payments", icon: "💳", label: "Payments" },
   { id: "homepage", icon: "🏠", label: "Homepage" },
 ];
 
@@ -111,6 +113,13 @@ export default function AdminDashboard() {
     active: true,
   });
 
+  // Payments tab state
+  const [payStatusFilter, setPayStatusFilter] = useState<"all" | "SUCCESS" | "FAILED" | "PENDING">("all");
+  const [paySearch, setPaySearch] = useState("");
+  const [payPage, setPayPage] = useState(1);
+  const [payPageSize] = useState(20);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentRecord | null>(null);
+
   // Locations tab state
   const [locSearch, setLocSearch] = useState("");
   const [locTypeFilter, setLocTypeFilter] = useState<"all" | "metro" | "city" | "town">("all");
@@ -170,6 +179,67 @@ export default function AdminDashboard() {
     staleTime: 5 * 60 * 1000,
   });
   const allDestCards: DestinationCard[] = destCardsQuery.data ?? [];
+
+  // Payments queries
+  const paymentsQuery = useQuery({
+    queryKey: ["adminPayments"],
+    queryFn: paymentService.getAllPayments,
+    staleTime: 2 * 60 * 1000,
+  });
+  const revenueQuery = useQuery({
+    queryKey: ["adminRevenue"],
+    queryFn: paymentService.getTotalRevenue,
+    staleTime: 2 * 60 * 1000,
+  });
+  const allPayments: PaymentRecord[] = paymentsQuery.data ?? [];
+  const totalRevenueFromPayments: number = revenueQuery.data ?? 0;
+
+  // Filtered & paginated payments
+  const filteredPayments = useMemo(() => {
+    let result = allPayments;
+    if (payStatusFilter !== "all") result = result.filter((p) => p.status === payStatusFilter);
+    if (paySearch) {
+      const q = paySearch.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.razorpayPaymentId?.toLowerCase().includes(q) ||
+          p.razorpayOrderId?.toLowerCase().includes(q) ||
+          p.userEmail?.toLowerCase().includes(q) ||
+          p.userName?.toLowerCase().includes(q) ||
+          p.flightNumber?.toLowerCase().includes(q),
+      );
+    }
+    return result;
+  }, [allPayments, payStatusFilter, paySearch]);
+
+  const paginatedPayments = useMemo(() => {
+    const start = (payPage - 1) * payPageSize;
+    return filteredPayments.slice(start, start + payPageSize);
+  }, [filteredPayments, payPage, payPageSize]);
+
+  // Payment stats
+  const paymentStats = useMemo(() => {
+    const success = allPayments.filter((p) => p.status === "SUCCESS").length;
+    const failed = allPayments.filter((p) => p.status === "FAILED").length;
+    const pending = allPayments.filter((p) => p.status === "PENDING").length;
+    return { success, failed, pending, total: allPayments.length };
+  }, [allPayments]);
+
+  // Payment revenue over time for chart
+  const paymentRevenueData = useMemo(() => {
+    const dateMap = new Map<string, number>();
+    allPayments
+      .filter((p) => p.status === "SUCCESS")
+      .forEach((p) => {
+        const date = new Date(p.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+        dateMap.set(date, (dateMap.get(date) || 0) + p.totalAmount);
+      });
+    return Array.from(dateMap.entries())
+      .map(([date, revenue]) => ({ date, revenue }))
+      .slice(-14);
+  }, [allPayments]);
+
+  useEffect(() => { setPayPage(1); }, [payStatusFilter, paySearch]);
 
   // Filtered destination cards
   const filteredDestCards = useMemo(() => {
@@ -653,7 +723,7 @@ export default function AdminDashboard() {
           {activeTab === "overview" && (
             <div className="space-y-8">
               {/* Stat Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
                 <StatCard label="Total Flights" value={stats.totalFlights} color="bg-sky-500" icon="✈" />
                 <StatCard
                   label="Total Bookings"
@@ -664,6 +734,12 @@ export default function AdminDashboard() {
                 <StatCard label="Confirmed" value={stats.confirmed} color="bg-green-500" icon="✓" />
                 <StatCard label="Cancelled" value={stats.cancelled} color="bg-red-500" icon="✕" />
                 <StatCard label="Total Users" value={stats.totalUsers} color="bg-purple-500" icon="👥" />
+                <StatCard
+                  label="Total Revenue"
+                  value={`₹${totalRevenueFromPayments.toLocaleString("en-IN")}`}
+                  color="bg-emerald-500"
+                  icon="💰"
+                />
               </div>
 
               {/* Charts Row */}
@@ -1548,6 +1624,244 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* ─── TAB: PAYMENTS ─── */}
+          {activeTab === "payments" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">💳 Payment Management</h2>
+                <p className="text-gray-500 text-sm mt-1">Track all Razorpay transactions and revenue</p>
+              </div>
+
+              {/* Payment Stat Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
+                  <p className="text-sm font-medium opacity-80">Total Revenue</p>
+                  <p className="text-3xl font-black mt-1">₹{totalRevenueFromPayments.toLocaleString("en-IN")}</p>
+                  <p className="text-xs opacity-70 mt-2">From {paymentStats.success} successful payments</p>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                  <p className="text-sm text-gray-500">Successful</p>
+                  <p className="text-3xl font-black text-green-600 mt-1">{paymentStats.success}</p>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                  <p className="text-sm text-gray-500">Failed</p>
+                  <p className="text-3xl font-black text-red-500 mt-1">{paymentStats.failed}</p>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                  <p className="text-sm text-gray-500">Pending</p>
+                  <p className="text-3xl font-black text-amber-500 mt-1">{paymentStats.pending}</p>
+                </div>
+              </div>
+
+              {/* Revenue Chart */}
+              {paymentRevenueData.length > 0 && (
+                <div className="bg-white rounded-2xl shadow-md p-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">Payment Revenue (Last 14 days)</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={paymentRevenueData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString("en-IN")}`, "Revenue"]} />
+                      <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} dot={{ r: 5 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {/* Filters */}
+              <div className="flex flex-wrap gap-4 items-center">
+                <select
+                  value={payStatusFilter}
+                  onChange={(e) => setPayStatusFilter(e.target.value as typeof payStatusFilter)}
+                  className="px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="SUCCESS">✅ Success</option>
+                  <option value="FAILED">❌ Failed</option>
+                  <option value="PENDING">⏳ Pending</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Search by payment ID, email, flight..."
+                  value={paySearch}
+                  onChange={(e) => setPaySearch(e.target.value)}
+                  className="flex-1 min-w-[250px] px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                />
+                <span className="text-sm text-gray-500">
+                  {filteredPayments.length} payment{filteredPayments.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+
+              {/* Payments Table */}
+              <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 font-semibold text-gray-700">Payment ID</th>
+                        <th className="px-6 py-3 font-semibold text-gray-700">User</th>
+                        <th className="px-6 py-3 font-semibold text-gray-700">Flight</th>
+                        <th className="px-6 py-3 font-semibold text-gray-700">Amount</th>
+                        <th className="px-6 py-3 font-semibold text-gray-700">Status</th>
+                        <th className="px-6 py-3 font-semibold text-gray-700">Date</th>
+                        <th className="px-6 py-3 font-semibold text-gray-700">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paymentsQuery.isLoading ? (
+                        <tr>
+                          <td colSpan={7} className="px-6 py-12 text-center text-gray-400">Loading payments...</td>
+                        </tr>
+                      ) : paginatedPayments.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="px-6 py-12 text-center text-gray-400">No payments found</td>
+                        </tr>
+                      ) : (
+                        paginatedPayments.map((payment) => {
+                          const statusStyles: Record<string, string> = {
+                            SUCCESS: "bg-green-100 text-green-700",
+                            FAILED: "bg-red-100 text-red-700",
+                            PENDING: "bg-amber-100 text-amber-700",
+                          };
+                          return (
+                            <tr key={payment.id} className="border-b border-gray-100 hover:bg-gray-50">
+                              <td className="px-6 py-3 font-mono text-xs text-gray-700 max-w-[160px] truncate">
+                                {payment.razorpayPaymentId || payment.razorpayOrderId}
+                              </td>
+                              <td className="px-6 py-3">
+                                <p className="font-medium text-gray-800 text-sm">{payment.userName}</p>
+                                <p className="text-xs text-gray-400">{payment.userEmail}</p>
+                              </td>
+                              <td className="px-6 py-3 font-mono text-xs">{payment.flightNumber}</td>
+                              <td className="px-6 py-3 font-bold text-sky-600">
+                                ₹{payment.totalAmount.toLocaleString("en-IN")}
+                              </td>
+                              <td className="px-6 py-3">
+                                <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[payment.status] || "bg-gray-100 text-gray-600"}`}>
+                                  {payment.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-3 text-gray-600 text-xs">
+                                {new Date(payment.createdAt).toLocaleDateString("en-IN")}
+                              </td>
+                              <td className="px-6 py-3">
+                                <button
+                                  onClick={() => setSelectedPayment(payment)}
+                                  className="text-sky-600 hover:text-sky-800 text-xs font-medium"
+                                >
+                                  View
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Payments Pagination */}
+              {filteredPayments.length > payPageSize && (
+                <Pagination
+                  currentPage={payPage}
+                  totalItems={filteredPayments.length}
+                  itemsPerPage={payPageSize}
+                  onPageChange={setPayPage}
+                />
+              )}
+
+              {/* Payment Detail Modal */}
+              {selectedPayment && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedPayment(null)}>
+                  <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                    <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+                      <h3 className="text-lg font-bold text-gray-800">Payment Details</h3>
+                      <button onClick={() => setSelectedPayment(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-xs text-gray-500">Razorpay Order ID</p>
+                          <p className="font-mono text-sm break-all">{selectedPayment.razorpayOrderId}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Razorpay Payment ID</p>
+                          <p className="font-mono text-sm break-all">{selectedPayment.razorpayPaymentId || "—"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Status</p>
+                          <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium mt-1 ${
+                            selectedPayment.status === "SUCCESS" ? "bg-green-100 text-green-700" :
+                            selectedPayment.status === "FAILED" ? "bg-red-100 text-red-700" :
+                            "bg-amber-100 text-amber-700"
+                          }`}>
+                            {selectedPayment.status}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Amount</p>
+                          <p className="text-xl font-black text-sky-600 mt-1">₹{selectedPayment.totalAmount.toLocaleString("en-IN")}</p>
+                        </div>
+                      </div>
+                      <hr />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-xs text-gray-500">User</p>
+                          <p className="font-medium text-sm">{selectedPayment.userName}</p>
+                          <p className="text-xs text-gray-400">{selectedPayment.userEmail}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Flight</p>
+                          <p className="font-mono text-sm">{selectedPayment.flightNumber}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Route</p>
+                          <p className="text-sm">{selectedPayment.source} → {selectedPayment.destination}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Seats</p>
+                          <p className="text-sm">{selectedPayment.numberOfSeats} seat{selectedPayment.numberOfSeats !== 1 ? "s" : ""}</p>
+                          {selectedPayment.selectedSeats?.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {selectedPayment.selectedSeats.map((s: string) => (
+                                <span key={s} className="bg-sky-100 text-sky-700 text-xs px-2 py-0.5 rounded-full font-mono">{s}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <hr />
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-xs text-gray-500">Base Price</p>
+                          <p>₹{selectedPayment.baseFare.toLocaleString("en-IN")}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Taxes</p>
+                          <p>₹{selectedPayment.taxes.toLocaleString("en-IN")}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Convenience Fee</p>
+                          <p>₹{selectedPayment.convenienceFee.toLocaleString("en-IN")}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Booking ID</p>
+                          <p className="font-mono text-xs break-all">{selectedPayment.bookingId || "—"}</p>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 pt-2">
+                        Created: {new Date(selectedPayment.createdAt).toLocaleString("en-IN")}
+                        {selectedPayment.updatedAt && <> · Updated: {new Date(selectedPayment.updatedAt).toLocaleString("en-IN")}</>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* ─── TAB: HOMEPAGE ─── */}
           {activeTab === "homepage" && (
             <div className="space-y-8">
@@ -2009,7 +2323,7 @@ function StatCard({
   icon,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   color: string;
   icon: string;
 }) {
@@ -2018,7 +2332,7 @@ function StatCard({
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">{label}</p>
-          <p className="text-3xl font-bold text-gray-800 mt-2">{value.toLocaleString("en-IN")}</p>
+          <p className="text-3xl font-bold text-gray-800 mt-2">{typeof value === "number" ? value.toLocaleString("en-IN") : value}</p>
         </div>
         <div className={`${color} text-white p-3 rounded-lg text-xl`}>{icon}</div>
       </div>

@@ -317,6 +317,18 @@ function BookingCard({ booking }: { booking: BookingResponse }) {
           </div>
           <p className="text-xl font-black text-gray-900">₹{booking.totalPrice.toLocaleString("en-IN")}</p>
         </div>
+
+        {/* Payment info */}
+        {booking.paymentId && (
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+            <span className="text-[11px] text-gray-400 font-mono truncate max-w-[60%]">
+              Payment: {booking.paymentId}
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-600 text-[10px] font-bold border border-green-100">
+              💳 Paid
+            </span>
+          </div>
+        )}
       </div>
       {/* Hover arrow */}
       <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -371,6 +383,9 @@ function BookingListRow({ booking }: { booking: BookingResponse }) {
         <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold mt-1 ${s.bg} ${s.text} ${s.border}`}>
           <div className={`w-1 h-1 rounded-full ${s.dot}`} />{booking.status}
         </div>
+        {booking.paymentId && (
+          <p className="text-[10px] text-gray-400 font-mono mt-1 truncate max-w-[140px]">💳 {booking.paymentId}</p>
+        )}
       </div>
       <svg className="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

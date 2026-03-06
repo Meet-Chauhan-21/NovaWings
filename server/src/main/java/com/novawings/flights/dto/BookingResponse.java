@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,6 +24,8 @@ public class BookingResponse {
     private String destination;
     private int numberOfSeats;
     private double totalPrice;
+    private String paymentId;
+    private List<String> selectedSeats;
     private BookingStatus status;
     private LocalDateTime bookingDate;
 }

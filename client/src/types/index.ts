@@ -42,6 +42,8 @@ export interface BookingResponse {
   destination: string;
   numberOfSeats: number;
   totalPrice: number;
+  paymentId?: string;
+  selectedSeats?: string[];
   status: "CONFIRMED" | "CANCELLED";
   bookingDate: string;
 }
@@ -151,4 +153,44 @@ export interface DestinationCard {
   displayOrder: number;
   updatedAt?: string;
   updatedBy?: string;
+}
+
+/** Response from create Razorpay order endpoint */
+export interface CreateOrderResponse {
+  razorpayOrderId: string;
+  currency: string;
+  amountInPaise: number;
+  keyId: string;
+  flightNumber: string;
+  source: string;
+  destination: string;
+  totalAmount: number;
+  userEmail: string;
+  userName: string;
+}
+
+/** Payment record from the backend */
+export interface PaymentRecord {
+  id: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  bookingId: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  flightNumber: string;
+  airlineName: string;
+  source: string;
+  destination: string;
+  departureTime: string;
+  numberOfSeats: number;
+  selectedSeats: string[];
+  baseFare: number;
+  taxes: number;
+  convenienceFee: number;
+  totalAmount: number;
+  status: "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED";
+  createdAt: string;
+  updatedAt?: string;
+  paidAt?: string;
 }

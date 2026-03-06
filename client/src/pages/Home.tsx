@@ -465,8 +465,12 @@ export default function Home() {
 /** Deal card showing real cheapest flight data */
 function DealCard({ flight, route }: { flight: Flight; route: RouteConfig }) {
   const navigate = useNavigate();
+  const goToDetail = () => navigate(`/flights/${flight.id}`);
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100 overflow-hidden">
+    <div
+      className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100 overflow-hidden cursor-pointer"
+      onClick={goToDetail}
+    >
       <div className="bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2">
         <span className="text-white text-xs font-bold uppercase tracking-wide">
           {route.label || "Hot Deal"}
@@ -486,7 +490,7 @@ function DealCard({ flight, route }: { flight: Flight; route: RouteConfig }) {
             </p>
           </div>
           <button
-            onClick={() => navigate(`/book/${flight.id}?passengers=1`)}
+            onClick={(e) => { e.stopPropagation(); goToDetail(); }}
             className="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
           >
             Book Now

@@ -2,11 +2,11 @@
 // Airplane seat selection page with visual cabin layout
 
 import { useState, useMemo, useCallback } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { getFlightById } from "../services/flightService";
-import { createBooking } from "../services/bookingService";
+import { useRazorpay } from "../hooks/useRazorpay";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 
@@ -80,8 +80,7 @@ function generateSeats(totalSeats: number, flightId: string): SeatInfo[] {
 export default function SeatSelection() {
   const { flightId } = useParams<{ flightId: string }>();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { initiatePayment, isProcessing } = useRazorpay();
 
   const numberOfSeats = parseInt(searchParams.get("seats") || "1");
   const [selectedSeats, setSelectedSeats] = useState<Set<string>>(new Set());
@@ -97,18 +96,31 @@ export default function SeatSelection() {
     [flight?.availableSeats, flightId]
   );
 
-  const bookMutation = useMutation({
-    mutationFn: () =>
-      createBooking({ flightId: flightId!, numberOfSeats }),
-    onSuccess: () => {
-      toast.success("Booking confirmed!");
-      queryClient.invalidateQueries({ queryKey: ["myBookings"] });
-      navigate("/my-bookings");
-    },
-    onError: () => {
-      toast.error("Booking failed. Please try again.");
-    },
-  });
+  const totalPrice = (flight?.price ?? 0) * numberOfSeats;
+  const taxPrice = Math.ceil(totalPrice * 0.18);
+  const convenienceFee = 199;
+  const grandTotal = totalPrice + taxPrice + convenienceFee;
+
+  const handleConfirmBooking = useCallback(async () => {
+    if (selectedSeats.size !== numberOfSeats) {
+      toast.error(`Please select exactly ${numberOfSeats} seats`);
+      return;
+    }
+    if (!flight) return;
+
+    await initiatePayment({
+      flightId: flightId!,
+      numberOfSeats,
+      selectedSeats: Array.from(selectedSeats).sort(),
+      totalAmount: grandTotal,
+      flightDetails: {
+        flightNumber: flight.flightNumber,
+        source: flight.source,
+        destination: flight.destination,
+        airlineName: flight.airlineName,
+      },
+    });
+  }, [selectedSeats, numberOfSeats, flight, flightId, initiatePayment, grandTotal]);
 
   const handleSeatClick = useCallback(
     (seatId: string, isBooked: boolean) => {
@@ -135,9 +147,6 @@ export default function SeatSelection() {
   );
 
   const isFull = selectedSeats.size === numberOfSeats;
-  const totalPrice = (flight?.price ?? 0) * numberOfSeats;
-  const taxPrice = Math.ceil(totalPrice * 0.18);
-  const grandTotal = totalPrice + taxPrice;
 
   if (isLoading) return <LoadingSpinner />;
   if (isError || !flight) return <ErrorMessage message="Failed to load flight details." />;
@@ -284,6 +293,10 @@ export default function SeatSelection() {
                 <span className="text-gray-600">Taxes & Fees (18%):</span>
                 <span className="font-medium">₹{taxPrice.toLocaleString("en-IN")}</span>
               </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Convenience Fee:</span>
+                <span className="font-medium">₹{convenienceFee.toLocaleString("en-IN")}</span>
+              </div>
               <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                 <span>Total:</span>
                 <span className="text-sky-600">₹{grandTotal.toLocaleString("en-IN")}</span>
@@ -292,16 +305,33 @@ export default function SeatSelection() {
 
             {/* Confirm button */}
             <button
-              onClick={() => bookMutation.mutate()}
-              disabled={!isFull || bookMutation.isPending}
-              className={`w-full py-3 rounded-xl font-medium transition-all ${
-                isFull && !bookMutation.isPending
-                  ? "bg-sky-500 text-white hover:bg-sky-600 active:scale-95"
+              onClick={handleConfirmBooking}
+              disabled={!isFull || isProcessing}
+              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
+                isFull && !isProcessing
+                  ? "bg-sky-600 text-white hover:bg-sky-700 active:scale-95"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              {bookMutation.isPending ? "Confirming..." : `Confirm Booking (${selectedSeats.size}/${numberOfSeats})`}
+              {isProcessing ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>Pay ₹{grandTotal.toLocaleString("en-IN")} Securely</>
+              )}
             </button>
+
+            {/* Trust badges */}
+            <div className="flex items-center justify-center gap-4 mt-3">
+              <span className="text-xs text-gray-500 flex items-center gap-1">256-bit SSL</span>
+              <span className="text-xs text-gray-500 flex items-center gap-1">Razorpay Secured</span>
+              <span className="text-xs text-gray-500 flex items-center gap-1">All cards accepted</span>
+            </div>
 
             {!isFull && selectedSeats.size > 0 && (
               <p className="text-xs text-amber-600 text-center">
