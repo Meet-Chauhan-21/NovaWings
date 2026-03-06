@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import homeService from "../services/homeService";
 import { searchFlights } from "../services/flightService";
+import destinationService from "../services/destinationService";
 import CityCombobox from "../components/CityCombobox";
 import DateInput from "../components/ui/DateInput";
 import NumberInput from "../components/ui/NumberInput";
@@ -48,6 +49,36 @@ export default function Home() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // ── Fetch destination cards ──
+  const { data: allCards = [], isLoading: cardsLoading } = useQuery({
+    queryKey: ["destinationCards"],
+    queryFn: destinationService.getAll,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  // ── Category filter state ──
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  // ── Filter cards by category ──
+  const filteredCards =
+    activeCategory === "All"
+      ? allCards
+      : allCards.filter((c) => c.category === activeCategory);
+
+  const featuredCards = filteredCards.filter((c) => c.featured);
+  const regularCards = filteredCards.filter((c) => !c.featured);
+
+  const categories = [
+    "All",
+    "Beach",
+    "Hills",
+    "Heritage",
+    "Honeymoon",
+    "Adventure",
+    "Spiritual",
+    "Weekend Getaway",
+  ];
+
   // ── Fetch distinct airlines ──
   const { data: airlines = [], isLoading: airlinesLoading } = useQuery({
     queryKey: ["airlines"],
@@ -71,7 +102,6 @@ export default function Home() {
     })),
   });
 
-  const activeRoutes = config?.popularRoutes?.filter((r) => r.active) ?? [];
   const today = new Date().toISOString().split("T")[0];
 
   const handleSearch = useCallback(
@@ -88,6 +118,17 @@ export default function Home() {
       );
     },
     [source, destination, date, passengers, navigate]
+  );
+
+  const openDestinationSearch = useCallback(
+    (destinationCity: string) => {
+      navigate(
+        `/search?destination=${encodeURIComponent(
+          destinationCity
+        )}&date=${today}&passengers=1`
+      );
+    },
+    [navigate, today]
   );
 
   return (
@@ -172,35 +213,170 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Popular Routes Section ─── */}
+      {/* ─── Destination Cards Section ─── */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">Popular Routes</h2>
-        <p className="text-gray-500 text-center mb-10">Most searched flight routes by our travellers</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {configLoading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="animate-pulse bg-gray-200 rounded-2xl h-32"
-                />
-              ))
-            : activeRoutes.map((route, index) => (
-                <RouteCard
-                  key={index}
-                  source={route.source}
-                  destination={route.destination}
-                  label={route.label}
-                  onClick={() =>
-                    navigate(
-                      `/search?source=${encodeURIComponent(route.source)}&destination=${encodeURIComponent(route.destination)}&date=${today}&passengers=1`
-                    )
-                  }
-                />
-              ))}
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
+          ✈ Top Destinations
+        </h2>
+        <p className="text-gray-500 text-center mb-8">
+          Handpicked places for every kind of traveller
+        </p>
+
+        {/* Category Filter Tabs */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                activeCategory === category
+                  ? "bg-sky-600 text-white shadow-md"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-sky-300"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
-        {!configLoading && activeRoutes.length === 0 && (
-          <p className="text-gray-400 text-center mt-4">No popular routes configured yet.</p>
+
+        {/* Loading Skeletons */}
+        {cardsLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-gray-200 animate-pulse rounded-2xl h-64"
+              />
+            ))}
+          </div>
         )}
+
+        {/* Featured Cards (Larger) */}
+        {!cardsLoading && featuredCards.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {featuredCards.map((card) => (
+              <div
+                key={card.id}
+                className="relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-64"
+                onClick={() => openDestinationSearch(card.destination)}
+              >
+                {/* Background image */}
+                <img
+                  src={card.imageUrl}
+                  alt={card.title}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80";
+                  }}
+                />
+
+                {/* Dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                {/* Badge top-left */}
+                <div className="absolute top-3 left-3">
+                  <span className="bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                    {card.badge}
+                  </span>
+                </div>
+
+                {/* Category top-right */}
+                <div className="absolute top-3 right-3">
+                  <span className="bg-sky-600/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full">
+                    {card.category}
+                  </span>
+                </div>
+
+                {/* Content bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-white font-bold text-lg leading-tight mb-1">
+                    {card.title}
+                  </h3>
+                  <p className="text-white/80 text-xs mb-3">{card.tagline}</p>
+                  <button
+                    type="button"
+                    className="bg-white text-sky-700 text-xs font-bold px-4 py-2 rounded-full hover:bg-sky-50 transition-colors flex items-center gap-1 w-fit"
+                  >
+                    Search Flights ✈
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Regular Cards (Smaller grid) */}
+        {!cardsLoading && regularCards.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {regularCards.map((card) => (
+              <div
+                key={card.id}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+                onClick={() => openDestinationSearch(card.destination)}
+              >
+                {/* Image */}
+                <div className="relative h-44 overflow-hidden">
+                  <img
+                    src={card.imageUrl}
+                    alt={card.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80";
+                    }}
+                  />
+                  {/* Badge */}
+                  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {card.badge}
+                  </span>
+                  {/* Category */}
+                  <span className="absolute top-3 right-3 bg-sky-600 text-white text-xs px-2 py-0.5 rounded-full">
+                    {card.category}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-800 text-base leading-tight mb-1">
+                    {card.title}
+                  </h3>
+                  <p className="text-gray-500 text-xs mb-1 line-clamp-1">
+                    {card.tagline}
+                  </p>
+                  <p className="text-gray-400 text-xs mb-4">{card.state}</p>
+                  <button
+                    type="button"
+                    className="w-full bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    ✈ Search Flights
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!cardsLoading && allCards.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-gray-400">
+              No destinations available. Admin can add destinations from the
+              dashboard.
+            </p>
+          </div>
+        )}
+
+        {/* No Results for Filter */}
+        {!cardsLoading &&
+          allCards.length > 0 &&
+          filteredCards.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-gray-400">
+                No destinations found in "{activeCategory}" category.
+              </p>
+            </div>
+          )}
       </section>
 
       {/* ─── Hot Deals Section ─── */}
@@ -283,41 +459,6 @@ export default function Home() {
         </div>
       </section>
     </div>
-  );
-}
-
-/** Route card for popular routes */
-function RouteCard({
-  source,
-  destination,
-  label,
-  onClick,
-}: {
-  source: string;
-  destination: string;
-  label?: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all hover:scale-[1.02] p-5 text-left border border-gray-100 group"
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-sky-500 text-lg">✈</span>
-        <span className="font-bold text-gray-800 text-sm">
-          {source} → {destination}
-        </span>
-      </div>
-      {label && (
-        <span className="inline-block bg-sky-100 text-sky-700 text-xs font-medium px-2 py-0.5 rounded-full">
-          {label}
-        </span>
-      )}
-      <p className="text-xs text-gray-400 mt-2 group-hover:text-sky-600 transition">
-        View flights →
-      </p>
-    </button>
   );
 }
 

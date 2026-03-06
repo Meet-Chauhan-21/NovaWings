@@ -25,13 +25,14 @@ import { getAllBookings } from "../../services/bookingService";
 import { getAllUsers } from "../../services/userService";
 import homeService from "../../services/homeService";
 import locationService from "../../services/locationService";
+import destinationService from "../../services/destinationService";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import BookingStatusDropdown from "../../components/BookingStatusDropdown";
 import Pagination from "../../components/Pagination";
 import CityCombobox from "../../components/CityCombobox";
 import { useAuthContext } from "../../context/AuthContext";
 import useDebounce from "../../hooks/useDebounce";
-import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight, Location } from "../../types";
+import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight, Location, DestinationCard } from "../../types";
 
 type TabType = "overview" | "flights" | "bookings" | "users" | "locations" | "analytics" | "homepage";
 
@@ -90,12 +91,25 @@ export default function AdminDashboard() {
   const [hcHeroSubtitle, setHcHeroSubtitle] = useState("");
   const [hcPopularRoutes, setHcPopularRoutes] = useState<RouteConfig[]>([]);
   const [hcDealRoutes, setHcDealRoutes] = useState<RouteConfig[]>([]);
-  const [addPopSource, setAddPopSource] = useState("");
-  const [addPopDest, setAddPopDest] = useState("");
-  const [addPopLabel, setAddPopLabel] = useState("Popular");
-  const [addDealSource, setAddDealSource] = useState("");
-  const [addDealDest, setAddDealDest] = useState("");
-  const [addDealLabel, setAddDealLabel] = useState("Hot Deal");
+
+  // Destination cards state
+  const [destPanelOpen, setDestPanelOpen] = useState(false);
+  const [editingDestCard, setEditingDestCard] = useState<DestinationCard | null>(null);
+  const [destCategoryFilter, setDestCategoryFilter] = useState<string>("all");
+  const [destStatusFilter, setDestStatusFilter] = useState<"all" | "active" | "inactive" | "featured">("all");
+  const [destForm, setDestForm] = useState({
+    title: "",
+    destination: "",
+    state: "",
+    tagline: "",
+    description: "",
+    imageUrl: "",
+    category: "Beach",
+    badge: "🔥 Trending",
+    displayOrder: 0,
+    featured: false,
+    active: true,
+  });
 
   // Locations tab state
   const [locSearch, setLocSearch] = useState("");
@@ -148,6 +162,139 @@ export default function AdminDashboard() {
     queryFn: homeService.getConfig,
     staleTime: 5 * 60 * 1000,
   });
+
+  // Destination cards query
+  const destCardsQuery = useQuery({
+    queryKey: ["destinationsAdmin"],
+    queryFn: destinationService.getAllAdmin,
+    staleTime: 5 * 60 * 1000,
+  });
+  const allDestCards: DestinationCard[] = destCardsQuery.data ?? [];
+
+  // Filtered destination cards
+  const filteredDestCards = useMemo(() => {
+    let result = allDestCards;
+    if (destStatusFilter === "active") result = result.filter((c) => c.active);
+    if (destStatusFilter === "inactive") result = result.filter((c) => !c.active);
+    if (destStatusFilter === "featured") result = result.filter((c) => c.featured);
+    if (destCategoryFilter !== "all") result = result.filter((c) => c.category === destCategoryFilter);
+    return result;
+  }, [allDestCards, destStatusFilter, destCategoryFilter]);
+
+  // Destination card mutations
+  const destCreateMutation = useMutation({
+    mutationFn: (card: Partial<DestinationCard>) => destinationService.create(card),
+    onSuccess: () => {
+      toast.success("Destination card created!");
+      queryClient.invalidateQueries({ queryKey: ["destinationsAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["destinationCards"] });
+      setDestPanelOpen(false);
+      resetDestForm();
+    },
+    onError: () => toast.error("Failed to create destination card"),
+  });
+
+  const destUpdateMutation = useMutation({
+    mutationFn: ({ id, card }: { id: string; card: Partial<DestinationCard> }) =>
+      destinationService.update(id, card),
+    onSuccess: () => {
+      toast.success("Destination card updated!");
+      queryClient.invalidateQueries({ queryKey: ["destinationsAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["destinationCards"] });
+      setDestPanelOpen(false);
+      setEditingDestCard(null);
+      resetDestForm();
+    },
+    onError: () => toast.error("Failed to update destination card"),
+  });
+
+  const destDeleteMutation = useMutation({
+    mutationFn: (id: string) => destinationService.delete(id),
+    onSuccess: () => {
+      toast.success("Destination card deleted!");
+      queryClient.invalidateQueries({ queryKey: ["destinationsAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["destinationCards"] });
+    },
+    onError: () => toast.error("Failed to delete destination card"),
+  });
+
+  const destToggleMutation = useMutation({
+    mutationFn: (id: string) => destinationService.toggle(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["destinationsAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["destinationCards"] });
+    },
+    onError: () => toast.error("Failed to toggle status"),
+  });
+
+  const destFeatureMutation = useMutation({
+    mutationFn: (id: string) => destinationService.toggleFeatured(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["destinationsAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["destinationCards"] });
+    },
+    onError: () => toast.error("Failed to toggle featured status"),
+  });
+
+  const destOrderMutation = useMutation({
+    mutationFn: ({ id, order }: { id: string; order: number }) =>
+      destinationService.updateOrder(id, order),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["destinationsAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["destinationCards"] });
+    },
+    onError: () => toast.error("Failed to update order"),
+  });
+
+  // Helper to reset destination form
+  const resetDestForm = () => {
+    setDestForm({
+      title: "",
+      destination: "",
+      state: "",
+      tagline: "",
+      description: "",
+      imageUrl: "",
+      category: "Beach",
+      badge: "🔥 Trending",
+      displayOrder: 0,
+      featured: false,
+      active: true,
+    });
+    setEditingDestCard(null);
+  };
+
+  // Load destination card into form for editing
+  const handleEditDestCard = (card: DestinationCard) => {
+    setEditingDestCard(card);
+    setDestForm({
+      title: card.title,
+      destination: card.destination,
+      state: card.state,
+      tagline: card.tagline,
+      description: card.description,
+      imageUrl: card.imageUrl,
+      category: card.category,
+      badge: card.badge,
+      displayOrder: card.displayOrder,
+      featured: card.featured,
+      active: card.active,
+    });
+    setDestPanelOpen(true);
+  };
+
+  // Submit destination card form
+  const handleSubmitDestCard = () => {
+    if (!destForm.title || !destForm.destination || !destForm.state || !destForm.tagline || !destForm.description || !destForm.imageUrl) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    if (editingDestCard) {
+      destUpdateMutation.mutate({ id: editingDestCard.id, card: destForm });
+    } else {
+      destCreateMutation.mutate(destForm);
+    }
+  };
 
   // Sync homepage config to local state when loaded
   useEffect(() => {
@@ -1436,245 +1583,9 @@ export default function AdminDashboard() {
                         placeholder="Search and book flights at the best prices"
                       />
                     </div>
-                  </div>
-
-                  {/* ── Popular Routes Manager ── */}
-                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-bold text-gray-800">Popular Routes</h3>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                          <tr>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Source</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Destination</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Label</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Active</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {hcPopularRoutes.map((route, idx) => (
-                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
-                              <td className="px-4 py-3">{route.source}</td>
-                              <td className="px-4 py-3">{route.destination}</td>
-                              <td className="px-4 py-3 text-xs text-gray-500">{route.label || "—"}</td>
-                              <td className="px-4 py-3">
-                                <button
-                                  onClick={() => {
-                                    const updated = [...hcPopularRoutes];
-                                    updated[idx] = { ...updated[idx], active: !updated[idx].active };
-                                    setHcPopularRoutes(updated);
-                                  }}
-                                  className={`w-10 h-6 rounded-full transition relative ${
-                                    route.active ? "bg-green-500" : "bg-gray-300"
-                                  }`}
-                                >
-                                  <span
-                                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${
-                                      route.active ? "left-4" : "left-0.5"
-                                    }`}
-                                  />
-                                </button>
-                              </td>
-                              <td className="px-4 py-3">
-                                <button
-                                  onClick={() => setHcPopularRoutes(hcPopularRoutes.filter((_, i) => i !== idx))}
-                                  className="text-red-600 hover:text-red-800 text-xs font-medium"
-                                >
-                                  🗑️ Delete
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Add Popular Route */}
-                    <div className="flex flex-wrap items-end gap-3 border-t border-gray-100 pt-4">
-                      <div className="w-48">
-                        <CityCombobox
-                          value={addPopSource}
-                          onChange={setAddPopSource}
-                          placeholder="Select city"
-                          excludeCity={addPopDest}
-                          label="Source"
-                        />
-                      </div>
-                      <div className="w-48">
-                        <CityCombobox
-                          value={addPopDest}
-                          onChange={setAddPopDest}
-                          placeholder="Select city"
-                          excludeCity={addPopSource}
-                          label="Destination"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
-                        <input
-                          type="text"
-                          value={addPopLabel}
-                          onChange={(e) => setAddPopLabel(e.target.value)}
-                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-32 focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                        />
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (!addPopSource || !addPopDest) {
-                            toast.error("Select both source and destination");
-                            return;
-                          }
-                          if (addPopSource === addPopDest) {
-                            toast.error("Source and destination cannot be same");
-                            return;
-                          }
-                          setHcPopularRoutes([
-                            ...hcPopularRoutes,
-                            { source: addPopSource, destination: addPopDest, label: addPopLabel, active: true },
-                          ]);
-                          setAddPopSource("");
-                          setAddPopDest("");
-                          setAddPopLabel("Popular");
-                        }}
-                        className="bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-600 transition"
-                      >
-                        + Add Route
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* ── Deal Routes Manager ── */}
-                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-800">Deal Routes</h3>
-                        <p className="text-xs text-gray-500">Shown in Hot Deals section — max 6 recommended</p>
-                      </div>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                          <tr>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Source</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Destination</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Label</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Active</th>
-                            <th className="px-4 py-3 font-semibold text-gray-700">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {hcDealRoutes.map((route, idx) => (
-                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
-                              <td className="px-4 py-3">{route.source}</td>
-                              <td className="px-4 py-3">{route.destination}</td>
-                              <td className="px-4 py-3 text-xs text-gray-500">{route.label || "—"}</td>
-                              <td className="px-4 py-3">
-                                <button
-                                  onClick={() => {
-                                    const updated = [...hcDealRoutes];
-                                    updated[idx] = { ...updated[idx], active: !updated[idx].active };
-                                    setHcDealRoutes(updated);
-                                  }}
-                                  className={`w-10 h-6 rounded-full transition relative ${
-                                    route.active ? "bg-green-500" : "bg-gray-300"
-                                  }`}
-                                >
-                                  <span
-                                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${
-                                      route.active ? "left-4" : "left-0.5"
-                                    }`}
-                                  />
-                                </button>
-                              </td>
-                              <td className="px-4 py-3">
-                                <button
-                                  onClick={() => setHcDealRoutes(hcDealRoutes.filter((_, i) => i !== idx))}
-                                  className="text-red-600 hover:text-red-800 text-xs font-medium"
-                                >
-                                  🗑️ Delete
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Add Deal Route */}
-                    <div className="flex flex-wrap items-end gap-3 border-t border-gray-100 pt-4">
-                      <div className="w-48">
-                        <CityCombobox
-                          value={addDealSource}
-                          onChange={setAddDealSource}
-                          placeholder="Select city"
-                          excludeCity={addDealDest}
-                          label="Source"
-                        />
-                      </div>
-                      <div className="w-48">
-                        <CityCombobox
-                          value={addDealDest}
-                          onChange={setAddDealDest}
-                          placeholder="Select city"
-                          excludeCity={addDealSource}
-                          label="Destination"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
-                        <input
-                          type="text"
-                          value={addDealLabel}
-                          onChange={(e) => setAddDealLabel(e.target.value)}
-                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-32 focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                        />
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (!addDealSource || !addDealDest) {
-                            toast.error("Select both source and destination");
-                            return;
-                          }
-                          if (addDealSource === addDealDest) {
-                            toast.error("Source and destination cannot be same");
-                            return;
-                          }
-                          setHcDealRoutes([
-                            ...hcDealRoutes,
-                            { source: addDealSource, destination: addDealDest, label: addDealLabel, active: true },
-                          ]);
-                          setAddDealSource("");
-                          setAddDealDest("");
-                          setAddDealLabel("Hot Deal");
-                        }}
-                        className="bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-600 transition"
-                      >
-                        + Add Route
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* ── Save Changes ── */}
-                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
                     <button
                       disabled={homeConfigMutation.isPending}
                       onClick={() => {
-                        // Validation
-                        const activePopular = hcPopularRoutes.filter((r) => r.active);
-                        const activeDeals = hcDealRoutes.filter((r) => r.active);
-                        if (activePopular.length === 0) {
-                          toast.error("At least 1 popular route must be active");
-                          return;
-                        }
-                        if (activeDeals.length === 0) {
-                          toast.error("At least 1 deal route must be active");
-                          return;
-                        }
                         homeConfigMutation.mutate({
                           id: homeConfigQuery.data?.id,
                           heroTitle: hcHeroTitle,
@@ -1683,20 +1594,404 @@ export default function AdminDashboard() {
                           dealRoutes: hcDealRoutes,
                         });
                       }}
-                      className="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-8 py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-6 py-2.5 rounded-xl transition disabled:opacity-50"
                     >
-                      {homeConfigMutation.isPending ? "Saving..." : "💾 Save All Changes"}
+                      {homeConfigMutation.isPending ? "Saving..." : "💾 Save Hero"}
                     </button>
-                    {homeConfigQuery.data?.updatedBy && (
-                      <p className="text-xs text-gray-400">
-                        Last updated by {homeConfigQuery.data.updatedBy} at{" "}
-                        {homeConfigQuery.data.updatedAt
-                          ? new Date(homeConfigQuery.data.updatedAt).toLocaleString("en-IN")
-                          : "—"}
-                      </p>
+                  </div>
+
+                  {/* ── Destination Cards Manager ── */}
+                  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-800">Destination Cards</h3>
+                        <p className="text-xs text-gray-500">Control cards shown on homepage</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          resetDestForm();
+                          setDestPanelOpen(true);
+                        }}
+                        className="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-700 transition"
+                      >
+                        + Add New Card
+                      </button>
+                    </div>
+
+                    {/* Filters */}
+                    <div className="flex flex-wrap gap-3">
+                      <select
+                        value={destStatusFilter}
+                        onChange={(e) => setDestStatusFilter(e.target.value as any)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                      >
+                        <option value="all">All Status</option>
+                        <option value="active">Active Only</option>
+                        <option value="inactive">Inactive Only</option>
+                        <option value="featured">Featured Only</option>
+                      </select>
+                      <select
+                        value={destCategoryFilter}
+                        onChange={(e) => setDestCategoryFilter(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                      >
+                        <option value="all">All Categories</option>
+                        <option value="Beach">Beach</option>
+                        <option value="Hills">Hills</option>
+                        <option value="Heritage">Heritage</option>
+                        <option value="Honeymoon">Honeymoon</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Spiritual">Spiritual</option>
+                        <option value="Wildlife">Wildlife</option>
+                        <option value="City Break">City Break</option>
+                        <option value="Weekend Getaway">Weekend Getaway</option>
+                      </select>
+                    </div>
+
+                    {/* Cards Grid */}
+                    {destCardsQuery.isLoading ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                          <div key={i} className="bg-gray-200 animate-pulse rounded-2xl h-64" />
+                        ))}
+                      </div>
+                    ) : filteredDestCards.length === 0 ? (
+                      <p className="text-gray-400 text-center py-8">No destination cards found.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredDestCards.map((card) => (
+                          <div
+                            key={card.id}
+                            className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
+                          >
+                            {/* Image */}
+                            <div className="relative h-32">
+                              <img
+                                src={card.imageUrl}
+                                alt={card.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80";
+                                }}
+                              />
+                              <div className="absolute top-2 right-2 flex gap-1">
+                                {card.featured && (
+                                  <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full font-bold">
+                                    ⭐ Featured
+                                  </span>
+                                )}
+                                {card.active ? (
+                                  <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-bold">
+                                    ✅ Active
+                                  </span>
+                                ) : (
+                                  <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full font-bold">
+                                    Inactive
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-4 space-y-2">
+                              <h4 className="font-bold text-gray-800 text-sm line-clamp-1">
+                                {card.title}
+                              </h4>
+                              <div className="flex items-center gap-2 text-xs">
+                                <span className="bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">
+                                  {card.category}
+                                </span>
+                                <span className="text-gray-500">{card.badge}</span>
+                              </div>
+                              <p className="text-xs text-gray-500">{card.state}</p>
+                              <div className="flex items-center gap-2 text-xs">
+                                <label className="text-gray-600">Order:</label>
+                                <input
+                                  type="number"
+                                  value={card.displayOrder}
+                                  onChange={(e) => {
+                                    const order = parseInt(e.target.value);
+                                    if (!isNaN(order)) {
+                                      destOrderMutation.mutate({ id: card.id, order });
+                                    }
+                                  }}
+                                  className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
+                                />
+                              </div>
+
+                              {/* Actions */}
+                              <div className="grid grid-cols-2 gap-2 pt-2">
+                                <button
+                                  onClick={() => destFeatureMutation.mutate(card.id)}
+                                  className={`text-xs font-medium px-3 py-1.5 rounded-lg transition ${
+                                    card.featured
+                                      ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  ⭐ Feature
+                                </button>
+                                <button
+                                  onClick={() => destToggleMutation.mutate(card.id)}
+                                  className={`text-xs font-medium px-3 py-1.5 rounded-lg transition ${
+                                    card.active
+                                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  👁 Toggle
+                                </button>
+                                <button
+                                  onClick={() => handleEditDestCard(card)}
+                                  className="bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                                >
+                                  ✏️ Edit
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (window.confirm(`Delete "${card.title}"?`)) {
+                                      destDeleteMutation.mutate(card.id);
+                                    }
+                                  }}
+                                  className="bg-red-100 text-red-700 hover:bg-red-200 text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                                >
+                                  🗑️ Delete
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </>
+              )}
+
+              {/* ─── Destination Card Add/Edit Panel ─── */}
+              {destPanelOpen && (
+                <div className="fixed inset-0 z-50 flex justify-end">
+                  <div
+                    className="absolute inset-0 bg-black/30"
+                    onClick={() => {
+                      setDestPanelOpen(false);
+                      setEditingDestCard(null);
+                      resetDestForm();
+                    }}
+                  />
+                  <div className="relative w-full max-w-md bg-white shadow-2xl h-full overflow-y-auto animate-slideIn">
+                    <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+                      <h3 className="text-lg font-bold text-gray-800">
+                        {editingDestCard ? "Edit Destination Card" : "Add Destination Card"}
+                      </h3>
+                      <button
+                        onClick={() => {
+                          setDestPanelOpen(false);
+                          setEditingDestCard(null);
+                          resetDestForm();
+                        }}
+                        className="text-gray-400 hover:text-gray-600 text-xl"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="p-6 space-y-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Title *
+                        </label>
+                        <input
+                          value={destForm.title}
+                          onChange={(e) =>
+                            setDestForm({ ...destForm, title: e.target.value })
+                          }
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                          placeholder="Goa — Beach Paradise"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Destination City *
+                        </label>
+                        <CityCombobox
+                          value={destForm.destination}
+                          onChange={(val) =>
+                            setDestForm({ ...destForm, destination: val })
+                          }
+                          placeholder="Select destination city"
+                          label=""
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          City name that links to flight search
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          State *
+                        </label>
+                        <input
+                          value={destForm.state}
+                          onChange={(e) =>
+                            setDestForm({ ...destForm, state: e.target.value })
+                          }
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                          placeholder="Goa"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Tagline *
+                        </label>
+                        <input
+                          value={destForm.tagline}
+                          onChange={(e) =>
+                            setDestForm({ ...destForm, tagline: e.target.value })
+                          }
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                          placeholder="Sun, sand & sea awaits"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Short catchy line</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Description *
+                        </label>
+                        <textarea
+                          value={destForm.description}
+                          onChange={(e) =>
+                            setDestForm({ ...destForm, description: e.target.value })
+                          }
+                          rows={3}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                          placeholder="2-3 sentences about the destination..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Image URL *
+                        </label>
+                        <input
+                          value={destForm.imageUrl}
+                          onChange={(e) =>
+                            setDestForm({ ...destForm, imageUrl: e.target.value })
+                          }
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                          placeholder="https://images.unsplash.com/..."
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Use Unsplash: https://images.unsplash.com/photo-ID?w=800&q=80
+                        </p>
+                        {destForm.imageUrl && (
+                          <img
+                            src={destForm.imageUrl}
+                            alt="Preview"
+                            className="rounded-xl h-32 w-full object-cover mt-2"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Category *
+                          </label>
+                          <select
+                            value={destForm.category}
+                            onChange={(e) =>
+                              setDestForm({ ...destForm, category: e.target.value })
+                            }
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm bg-white"
+                          >
+                            <option value="Beach">Beach</option>
+                            <option value="Hills">Hills</option>
+                            <option value="Heritage">Heritage</option>
+                            <option value="Honeymoon">Honeymoon</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Spiritual">Spiritual</option>
+                            <option value="Wildlife">Wildlife</option>
+                            <option value="City Break">City Break</option>
+                            <option value="Weekend Getaway">Weekend Getaway</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Display Order
+                          </label>
+                          <input
+                            type="number"
+                            value={destForm.displayOrder}
+                            onChange={(e) =>
+                              setDestForm({
+                                ...destForm,
+                                displayOrder: parseInt(e.target.value) || 0,
+                              })
+                            }
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Badge *
+                        </label>
+                        <input
+                          value={destForm.badge}
+                          onChange={(e) =>
+                            setDestForm({ ...destForm, badge: e.target.value })
+                          }
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none text-sm"
+                          placeholder="🔥 Trending"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Examples: 🔥 Trending, 💕 Honeymoon Special, 🏔 Adventure
+                        </p>
+                      </div>
+                      <div className="space-y-3 pt-2">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={destForm.featured}
+                            onChange={(e) =>
+                              setDestForm({ ...destForm, featured: e.target.checked })
+                            }
+                            className="w-5 h-5 text-sky-600 focus:ring-sky-500 rounded"
+                          />
+                          <span className="text-sm font-medium text-gray-700">
+                            ⭐ Featured (larger card on homepage)
+                          </span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={destForm.active}
+                            onChange={(e) =>
+                              setDestForm({ ...destForm, active: e.target.checked })
+                            }
+                            className="w-5 h-5 text-sky-600 focus:ring-sky-500 rounded"
+                          />
+                          <span className="text-sm font-medium text-gray-700">
+                            ✅ Active (visible on homepage)
+                          </span>
+                        </label>
+                      </div>
+                      <button
+                        onClick={handleSubmitDestCard}
+                        disabled={
+                          destCreateMutation.isPending || destUpdateMutation.isPending
+                        }
+                        className="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                      >
+                        {destCreateMutation.isPending || destUpdateMutation.isPending
+                          ? "Saving..."
+                          : editingDestCard
+                          ? "💾 Update Card"
+                          : "➕ Create Card"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           )}

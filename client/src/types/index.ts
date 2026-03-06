@@ -134,3 +134,21 @@ export interface PageResponse<T> {
   first: boolean;
   last: boolean;
 }
+
+/** Destination card for homepage */
+export interface DestinationCard {
+  id: string;
+  title: string;
+  destination: string;
+  state: string;
+  tagline: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+  badge: string;
+  active: boolean;
+  featured: boolean;
+  displayOrder: number;
+  updatedAt?: string;
+  updatedBy?: string;
+}
