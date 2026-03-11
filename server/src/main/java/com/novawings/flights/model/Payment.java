@@ -46,6 +46,11 @@ public class Payment {
     private int numberOfSeats;
     private List<String> selectedSeats;
 
+    // Meal data captured before payment.
+    private List<FoodOrder> foodOrders;
+    private double foodTotal;
+    private boolean mealSkipped;
+
     // Status: PENDING, SUCCESS, FAILED, REFUNDED
     private String status;
 

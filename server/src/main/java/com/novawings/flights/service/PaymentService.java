@@ -22,6 +22,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -55,7 +56,8 @@ public class PaymentService {
         double baseFare = flight.getPrice() * request.getNumberOfSeats();
         double taxes = Math.round(baseFare * 0.18 * 100.0) / 100.0;
         double convenience = 199.0;
-        double total = baseFare + taxes + convenience;
+        double sanitizedFoodTotal = Math.max(0.0, request.getFoodTotal());
+        double total = baseFare + taxes + convenience + sanitizedFoodTotal;
 
         // Razorpay uses paise (1 INR = 100 paise)
         int amountInPaise = (int) (total * 100);
@@ -94,6 +96,9 @@ public class PaymentService {
                 .currency("INR")
                 .numberOfSeats(request.getNumberOfSeats())
                 .selectedSeats(request.getSelectedSeats())
+                .foodOrders(request.getFoodOrders() != null ? request.getFoodOrders() : Collections.emptyList())
+                .foodTotal(sanitizedFoodTotal)
+                .mealSkipped(request.isMealSkipped())
                 .baseFare(baseFare)
                 .taxes(taxes)
                 .convenienceFee(convenience)
@@ -180,6 +185,12 @@ public class PaymentService {
                 .numberOfSeats(payment.getNumberOfSeats())
                 .selectedSeats(payment.getSelectedSeats())
                 .totalPrice(payment.getTotalAmount())
+                .foodOrders(payment.getFoodOrders())
+                .foodTotal(payment.getFoodTotal())
+                .mealSkipped(payment.isMealSkipped())
+                .baseFlightFare(payment.getBaseFare())
+                .taxes(payment.getTaxes())
+                .convenienceFee(payment.getConvenienceFee())
                 .status(BookingStatus.CONFIRMED)
                 .paymentId(request.getRazorpayPaymentId())
                 .bookingDate(LocalDateTime.now())

@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/locations/home").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/destinations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/destinations/featured").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/food/menu").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

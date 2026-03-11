@@ -2,13 +2,13 @@
 // Airplane seat selection page with visual cabin layout
 
 import { useState, useMemo, useCallback } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { getFlightById } from "../services/flightService";
-import { useRazorpay } from "../hooks/useRazorpay";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import BookingProgress from "../components/BookingProgress";
 
 const SEATS_PER_ROW = 6;
 const BUSINESS_ROWS = 2;
@@ -78,9 +78,9 @@ function generateSeats(totalSeats: number, flightId: string): SeatInfo[] {
  * SeatSelection page — interactive airplane seat picker before confirming booking.
  */
 export default function SeatSelection() {
+  const navigate = useNavigate();
   const { flightId } = useParams<{ flightId: string }>();
   const [searchParams] = useSearchParams();
-  const { initiatePayment, isProcessing } = useRazorpay();
 
   const numberOfSeats = parseInt(searchParams.get("seats") || "1");
   const [selectedSeats, setSelectedSeats] = useState<Set<string>>(new Set());
@@ -101,26 +101,29 @@ export default function SeatSelection() {
   const convenienceFee = 199;
   const grandTotal = totalPrice + taxPrice + convenienceFee;
 
-  const handleConfirmBooking = useCallback(async () => {
+  const handleConfirmBooking = useCallback(() => {
     if (selectedSeats.size !== numberOfSeats) {
       toast.error(`Please select exactly ${numberOfSeats} seats`);
       return;
     }
     if (!flight) return;
 
-    await initiatePayment({
-      flightId: flightId!,
-      numberOfSeats,
-      selectedSeats: Array.from(selectedSeats).sort(),
-      totalAmount: grandTotal,
-      flightDetails: {
+    navigate(`/select-food/${flightId}`, {
+      state: {
+        flightId,
         flightNumber: flight.flightNumber,
+        airlineName: flight.airlineName,
         source: flight.source,
         destination: flight.destination,
-        airlineName: flight.airlineName,
+        departureTime: flight.departureTime,
+        numberOfSeats,
+        selectedSeats: Array.from(selectedSeats).sort(),
+        cabinClass: "Economy",
+        basePrice: flight.price,
+        totalBeforeFood: grandTotal,
       },
     });
-  }, [selectedSeats, numberOfSeats, flight, flightId, initiatePayment, grandTotal]);
+  }, [selectedSeats, numberOfSeats, flight, flightId, navigate, grandTotal]);
 
   const handleSeatClick = useCallback(
     (seatId: string, isBooked: boolean) => {
@@ -153,6 +156,7 @@ export default function SeatSelection() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <BookingProgress activeStep={2} />
       <h1 className="text-3xl font-bold text-gray-800 mb-2">Select Your Seats</h1>
       <p className="text-gray-600 mb-8">Choose {numberOfSeats} seat{numberOfSeats > 1 ? "s" : ""} for your flight</p>
 
@@ -306,24 +310,14 @@ export default function SeatSelection() {
             {/* Confirm button */}
             <button
               onClick={handleConfirmBooking}
-              disabled={!isFull || isProcessing}
+              disabled={!isFull}
               className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
-                isFull && !isProcessing
+                isFull
                   ? "bg-sky-600 text-white hover:bg-sky-700 active:scale-95"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              {isProcessing ? (
-                <>
-                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Processing...
-                </>
-              ) : (
-                <>Pay ₹{grandTotal.toLocaleString("en-IN")} Securely</>
-              )}
+              <>Continue to Meals</>
             </button>
 
             {/* Trust badges */}

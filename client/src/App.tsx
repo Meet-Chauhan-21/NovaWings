@@ -19,6 +19,8 @@ const FlightDetail = lazy(() => import("./pages/FlightDetail"));
 const SearchResults = lazy(() => import("./pages/SearchResults"));
 const BookFlight = lazy(() => import("./pages/BookFlight"));
 const SeatSelection = lazy(() => import("./pages/SeatSelection"));
+const FoodSelection = lazy(() => import("./pages/FoodSelection"));
+const PaymentPreview = lazy(() => import("./pages/PaymentPreview"));
 const MyBookings = lazy(() => import("./pages/MyBookings"));
 const BookingDetail = lazy(() => import("./pages/BookingDetail"));
 const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
@@ -71,6 +73,8 @@ export default function App() {
                 <Route element={<ProtectedRoute />}>
                   <Route path="/book/:flightId" element={<BookFlight />} />
                   <Route path="/select-seats/:flightId" element={<SeatSelection />} />
+                  <Route path="/select-food/:flightId" element={<FoodSelection />} />
+                  <Route path="/payment-preview" element={<PaymentPreview />} />
                   <Route path="/my-bookings" element={<MyBookings />} />
                   <Route path="/bookings/:id" element={<BookingDetail />} />
                   <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />

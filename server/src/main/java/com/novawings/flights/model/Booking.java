@@ -29,6 +29,20 @@ public class Booking {
 
     private double totalPrice;
 
+    // Food total across all passengers.
+    private double foodTotal;
+
+    // One food order per seat/passenger.
+    private List<FoodOrder> foodOrders;
+
+    // True when user explicitly skips meal selection.
+    private boolean mealSkipped;
+
+    // Price breakdown used for ticket and admin views.
+    private double baseFlightFare;
+    private double taxes;
+    private double convenienceFee;
+
     // Payment & seat fields
     private String paymentId;
     private List<String> selectedSeats;

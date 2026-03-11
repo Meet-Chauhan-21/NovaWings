@@ -1,0 +1,541 @@
+// src/pages/Home.tsx
+// Professional landing page with 3D airplane animation
+
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import destinationService from "../services/destinationService";
+import CityCombobox from "../components/CityCombobox";
+
+export default function Home() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // ── Search form state ──
+  const [source, setSource] = useState(searchParams.get("source") || "");
+  const [destination, setDestination] = useState(searchParams.get("destination") || "");
+  const [date, setDate] = useState(searchParams.get("date") || "");
+  const [passengers, setPassengers] = useState(parseInt(searchParams.get("passengers") || "1"));
+  const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
+  const [infants, setInfants] = useState(0);
+
+  const today = new Date().toISOString().split("T")[0];
+
+  // ── Sync if URL changes ──
+  useEffect(() => {
+    setSource(searchParams.get("source") || "");
+    setDestination(searchParams.get("destination") || "");
+    setDate(searchParams.get("date") || "");
+    setPassengers(parseInt(searchParams.get("passengers") || "1"));
+  }, [searchParams]);
+
+  // ── Fetch destination cards ──
+  const { data: allCards = [], isLoading: cardsLoading } = useQuery({
+    queryKey: ["destinationCards"],
+    queryFn: destinationService.getAll,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  // ── Category filter state ──
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  // ── Filter cards by category ──
+  const filteredCards =
+    activeCategory === "All"
+      ? allCards
+      : allCards.filter((c) => c.category === activeCategory);
+
+  const featuredCards = filteredCards.filter((c) => c.featured);
+  const regularCards = filteredCards.filter((c) => !c.featured);
+
+  const categories = [
+    "All",
+    "Beach",
+    "Hills",
+    "Heritage",
+    "Honeymoon",
+    "Adventure",
+    "Spiritual",
+    "Weekend Getaway",
+  ];
+
+  // ── Handle search ──
+  const handleSearch = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!source.trim()) {
+        toast.error("Please enter departure city");
+        return;
+      }
+      if (!destination.trim()) {
+        toast.error("Please enter destination city");
+        return;
+      }
+      if (source.trim().toLowerCase() === destination.trim().toLowerCase()) {
+        toast.error("From and To cannot be same city");
+        return;
+      }
+      if (!date) {
+        toast.error("Please select a travel date");
+        return;
+      }
+      navigate(
+        `/search?source=${encodeURIComponent(source.trim())}&destination=${encodeURIComponent(destination.trim())}&date=${encodeURIComponent(date)}&passengers=${passengers}`
+      );
+    },
+    [source, destination, date, passengers, navigate]
+  );
+
+  // ── Swap cities ──
+  const swapCities = () => {
+    const temp = source;
+    setSource(destination);
+    setDestination(temp);
+  };
+
+  // ── Open destination search ──
+  const openDestinationSearch = useCallback(
+    (destinationCity: string) => {
+      navigate(
+        `/search?destination=${encodeURIComponent(destinationCity)}&date=${today}&passengers=1`
+      );
+    },
+    [navigate, today]
+  );
+
+  // ── Generate stars for background ──
+  const stars = useMemo(() => {
+    return Array(25)
+      .fill(0)
+      .map((_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 2 + 1,
+        delay: Math.random() * 4,
+        duration: Math.random() * 3 + 2,
+      }));
+  }, []);
+
+  return (
+    <div className="page-enter">
+      {/* ═══════════════════════════════════════════ */}
+      {/* HERO SECTION */}
+      {/* ═══════════════════════════════════════════ */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          minHeight: "calc(100vh - 80px)",
+          background: "#0A0A0A",
+        }}
+      >
+        {/* Background overlays */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 60% 40%, rgba(249,115,22,0.12) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        {/* Star particles */}
+        {stars.map((star) => (
+          <div
+            key={star.id}
+            className="absolute rounded-full bg-white pointer-events-none"
+            style={{
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              width: star.size,
+              height: star.size,
+              opacity: 0.6,
+              animation: `starTwinkle ${star.duration}s ease-in-out ${star.delay}s infinite`,
+            }}
+          />
+        ))}
+
+          {/* Search Form */}
+          <form
+            onSubmit={handleSearch}
+            className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 max-w-4xl mx-auto"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-left">
+                  🛫 From
+                </label>
+                <CityCombobox
+                  value={source}
+                  onChange={setSource}
+                  placeholder="Enter city or airport"
+                  excludeCity={destination}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-left">
+                  🛬 To
+                </label>
+                <CityCombobox
+                  value={destination}
+                  onChange={setDestination}
+                  placeholder="Enter city or airport"
+                  excludeCity={source}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-left">
+                  📅 Date
+                </label>
+                <DateInput
+                  value={date}
+                  onChange={setDate}
+                  min={today}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-left">
+                  👤 Passengers
+                </label>
+                <NumberInput
+                  value={passengers}
+                  onChange={setPassengers}
+                  min={1}
+                  max={9}
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={!source.trim() || !destination.trim()}
+              className="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-8 py-3 rounded-xl transition w-full mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              🔍 Search Flights
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* ─── Destination Cards Section ─── */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
+          ✈ Top Destinations
+        </h2>
+        <p className="text-gray-500 text-center mb-8">
+          Handpicked places for every kind of traveller
+        </p>
+
+        {/* Category Filter Tabs */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                activeCategory === category
+                  ? "bg-sky-600 text-white shadow-md"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-sky-300"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* Loading Skeletons */}
+        {cardsLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-gray-200 animate-pulse rounded-2xl h-64"
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Featured Cards (Larger) */}
+        {!cardsLoading && featuredCards.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {featuredCards.map((card) => (
+              <div
+                key={card.id}
+                className="relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-64"
+                onClick={() => openDestinationSearch(card.destination)}
+              >
+                {/* Background image */}
+                <img
+                  src={card.imageUrl}
+                  alt={card.title}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80";
+                  }}
+                />
+
+                {/* Dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                {/* Badge top-left */}
+                <div className="absolute top-3 left-3">
+                  <span className="bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                    {card.badge}
+                  </span>
+                </div>
+
+                {/* Category top-right */}
+                <div className="absolute top-3 right-3">
+                  <span className="bg-sky-600/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full">
+                    {card.category}
+                  </span>
+                </div>
+
+                {/* Content bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-white font-bold text-lg leading-tight mb-1">
+                    {card.title}
+                  </h3>
+                  <p className="text-white/80 text-xs mb-3">{card.tagline}</p>
+                  <button
+                    type="button"
+                    className="bg-white text-sky-700 text-xs font-bold px-4 py-2 rounded-full hover:bg-sky-50 transition-colors flex items-center gap-1 w-fit"
+                  >
+                    Search Flights ✈
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Regular Cards (Smaller grid) */}
+        {!cardsLoading && regularCards.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {regularCards.map((card) => (
+              <div
+                key={card.id}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+                onClick={() => openDestinationSearch(card.destination)}
+              >
+                {/* Image */}
+                <div className="relative h-44 overflow-hidden">
+                  <img
+                    src={card.imageUrl}
+                    alt={card.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80";
+                    }}
+                  />
+                  {/* Badge */}
+                  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {card.badge}
+                  </span>
+                  {/* Category */}
+                  <span className="absolute top-3 right-3 bg-sky-600 text-white text-xs px-2 py-0.5 rounded-full">
+                    {card.category}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-800 text-base leading-tight mb-1">
+                    {card.title}
+                  </h3>
+                  <p className="text-gray-500 text-xs mb-1 line-clamp-1">
+                    {card.tagline}
+                  </p>
+                  <p className="text-gray-400 text-xs mb-4">{card.state}</p>
+                  <button
+                    type="button"
+                    className="w-full bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    ✈ Search Flights
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!cardsLoading && allCards.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-gray-400">
+              No destinations available. Admin can add destinations from the
+              dashboard.
+            </p>
+          </div>
+        )}
+
+        {/* No Results for Filter */}
+        {!cardsLoading &&
+          allCards.length > 0 &&
+          filteredCards.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-gray-400">
+                No destinations found in "{activeCategory}" category.
+              </p>
+            </div>
+          )}
+      </section>
+
+      {/* ─── Hot Deals Section ─── */}
+      {dealRoutes.length > 0 && (
+        <section className="bg-gray-50 py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">🔥 Hot Deals</h2>
+            <p className="text-gray-500 text-center mb-10">
+              Cheapest flights on trending routes — prices from real-time data
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {dealQueries.map((query, index) => {
+                if (query.isLoading) return <DealCardSkeleton key={index} />;
+                if (!query.data) return null;
+                return (
+                  <DealCard
+                    key={index}
+                    flight={query.data}
+                    route={dealRoutes[index]}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── Airlines Section ─── */}
+      {(airlinesLoading || airlines.length > 0) && (
+        <section className="max-w-7xl mx-auto px-4 py-16">
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">Our Airlines</h2>
+          <p className="text-gray-500 text-center mb-10">
+            Browse flights from top airlines operating on NovaWings
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {airlinesLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="animate-pulse bg-gray-200 rounded-2xl h-24"
+                  />
+                ))
+              : airlines.map((airline) => (
+                  <button
+                    key={airline}
+                    onClick={() =>
+                      navigate(`/search?source=Delhi&destination=Mumbai`)
+                    }
+                    className={`${
+                      AIRLINE_COLORS[airline] ?? "bg-sky-600"
+                    } text-white rounded-2xl p-5 text-center font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all`}
+                  >
+                    <span className="text-2xl block mb-1">✈</span>
+                    <span className="text-sm">{airline}</span>
+                  </button>
+                ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Features Section ─── */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-10">Why Choose NovaWings?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <FeatureCard
+            icon="⚡"
+            title="Fast Booking"
+            description="Book your flight in just a few clicks with our streamlined booking process."
+          />
+          <FeatureCard
+            icon="💰"
+            title="Best Prices"
+            description="We offer competitive prices and transparent pricing with no hidden fees."
+          />
+          <FeatureCard
+            icon="❌"
+            title="Easy Cancellation"
+            description="Plans changed? Cancel your booking hassle-free from your dashboard."
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/** Deal card showing real cheapest flight data */
+function DealCard({ flight, route }: { flight: Flight; route: RouteConfig }) {
+  const navigate = useNavigate();
+  const goToDetail = () => navigate(`/flights/${flight.id}`);
+  return (
+    <div
+      className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100 overflow-hidden cursor-pointer"
+      onClick={goToDetail}
+    >
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2">
+        <span className="text-white text-xs font-bold uppercase tracking-wide">
+          {route.label || "Hot Deal"}
+        </span>
+      </div>
+      <div className="p-5">
+        <p className="text-xs text-gray-500 font-medium mb-1">{flight.airlineName}</p>
+        <p className="font-bold text-gray-800 mb-1">
+          {route.source} → {route.destination}
+        </p>
+        <p className="text-xs text-gray-400 mb-3">Flight {flight.flightNumber}</p>
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-xs text-gray-500">Starting from</p>
+            <p className="text-xl font-bold text-sky-600">
+              ₹{flight.price.toLocaleString("en-IN")}
+            </p>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); goToDetail(); }}
+            className="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+          >
+            Book Now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Skeleton placeholder for deal cards */
+function DealCardSkeleton() {
+  return (
+    <div className="animate-pulse bg-gray-200 rounded-2xl h-48" />
+  );
+}
+
+/** Feature highlight card */
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition p-8 text-center">
+      <span className="text-4xl mb-4 block">{icon}</span>
+      <h3 className="text-lg font-bold text-gray-800 mb-2">{title}</h3>
+      <p className="text-gray-500 text-sm">{description}</p>
+    </div>
+  );
+}

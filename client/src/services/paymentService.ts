@@ -2,7 +2,7 @@
 // Service for all payment-related API calls
 
 import axiosInstance from "../api/axiosInstance";
-import type { CreateOrderResponse, PaymentRecord } from "../types";
+import type { CreateOrderResponse, FoodOrder, PaymentRecord } from "../types";
 
 const paymentService = {
   createOrder: async (data: {
@@ -10,6 +10,9 @@ const paymentService = {
     numberOfSeats: number;
     selectedSeats: string[];
     totalAmount: number;
+    foodOrders?: FoodOrder[];
+    foodTotal?: number;
+    mealSkipped?: boolean;
   }): Promise<CreateOrderResponse> => {
     const res = await axiosInstance.post("/payments/create-order", data);
     return res.data;

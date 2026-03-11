@@ -42,6 +42,12 @@ export interface BookingResponse {
   destination: string;
   numberOfSeats: number;
   totalPrice: number;
+  foodTotal?: number;
+  foodOrders?: FoodOrder[];
+  mealSkipped?: boolean;
+  baseFlightFare?: number;
+  taxes?: number;
+  convenienceFee?: number;
   paymentId?: string;
   selectedSeats?: string[];
   status: "CONFIRMED" | "CANCELLED";
@@ -72,6 +78,9 @@ export interface TicketData {
   duration: string;
   numberOfSeats: number;
   selectedSeats: string[];
+  foodOrders?: FoodOrder[];
+  foodTotal?: number;
+  mealSkipped?: boolean;
   cabinClass: string;
   cabinBaggage: string;
   checkInBaggage: string;
@@ -220,6 +229,9 @@ export interface PaymentRecord {
   departureTime: string;
   numberOfSeats: number;
   selectedSeats: string[];
+  foodOrders?: FoodOrder[];
+  foodTotal?: number;
+  mealSkipped?: boolean;
   baseFare: number;
   taxes: number;
   convenienceFee: number;
@@ -228,4 +240,65 @@ export interface PaymentRecord {
   createdAt: string;
   updatedAt?: string;
   paidAt?: string;
+}
+
+export interface FoodCategory {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  active: boolean;
+  displayOrder: number;
+  airlineNames: string[];
+  cabinClasses: string[];
+}
+
+export interface FoodItem {
+  id: string;
+  categoryId: string;
+  categoryName: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  dietType: "VEG" | "NON_VEG" | "VEGAN" | "JAIN";
+  economyPrice: number;
+  businessPrice: number;
+  firstClassPrice: number;
+  calories: number;
+  weight: string;
+  allergens: string[];
+  available: boolean;
+  popular: boolean;
+  newItem: boolean;
+  airlineNames: string[];
+  cabinClasses: string[];
+  mealTiming: string[];
+  displayOrder?: number;
+}
+
+export interface FoodOrderItem {
+  foodItemId: string;
+  foodItemName: string;
+  categoryName: string;
+  dietType: string;
+  price: number;
+  quantity: number;
+  imageUrl: string;
+}
+
+export interface FoodOrder {
+  seatNumber: string;
+  passengerLabel: string;
+  items: FoodOrderItem[];
+  subtotal: number;
+}
+
+export interface FoodMenuResponse {
+  categories: {
+    category: FoodCategory;
+    items: FoodItem[];
+  }[];
+  airline: string;
+  cabinClass: string;
+  hasComplimentaryMeals: boolean;
 }

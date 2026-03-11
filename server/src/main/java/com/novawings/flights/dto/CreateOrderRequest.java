@@ -1,5 +1,6 @@
 package com.novawings.flights.dto;
 
+import com.novawings.flights.model.FoodOrder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,7 @@ public class CreateOrderRequest {
     private int numberOfSeats;
     private List<String> selectedSeats;
     private double totalAmount;
+    private List<FoodOrder> foodOrders;
+    private double foodTotal;
+    private boolean mealSkipped;
 }

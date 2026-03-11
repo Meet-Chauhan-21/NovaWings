@@ -27,15 +27,33 @@ import homeService from "../../services/homeService";
 import locationService from "../../services/locationService";
 import destinationService from "../../services/destinationService";
 import paymentService from "../../services/paymentService";
+import foodService from "../../services/foodService";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import BookingStatusDropdown from "../../components/BookingStatusDropdown";
 import Pagination from "../../components/Pagination";
 import CityCombobox from "../../components/CityCombobox";
 import { useAuthContext } from "../../context/AuthContext";
 import useDebounce from "../../hooks/useDebounce";
-import type { UserResponse, BookingResponse, HomeConfig, RouteConfig, Flight, Location, DestinationCard, PaymentRecord } from "../../types";
+import type {
+  UserResponse,
+  BookingResponse,
+  HomeConfig,
+  RouteConfig,
+  Flight,
+  Location,
+  DestinationCard,
+  PaymentRecord,
+  FoodCategory,
+  FoodItem,
+} from "../../types";
 
-type TabType = "overview" | "flights" | "bookings" | "users" | "locations" | "analytics" | "payments" | "homepage";
+type TabType = "overview" | "flights" | "bookings" | "users" | "locations" | "food" | "analytics" | "payments" | "homepage";
+type FoodSubTab = "categories" | "items";
+
+const FOOD_AIRLINES = ["IndiGo", "Air India", "Vistara", "SpiceJet", "Akasa Air"];
+const FOOD_CABINS = ["Economy", "Business", "First Class"];
+const FOOD_ALLERGENS = ["Gluten", "Dairy", "Nuts", "Eggs", "Soy", "Fish"];
+const FOOD_MEAL_TIMINGS = ["Breakfast", "Lunch", "Dinner", "Anytime"];
 
 /** Sidebar tab definition */
 interface Tab {
@@ -50,6 +68,7 @@ const tabs: Tab[] = [
   { id: "bookings", icon: "📋", label: "All Bookings" },
   { id: "users", icon: "👥", label: "Users" },
   { id: "locations", icon: "📍", label: "Locations" },
+  { id: "food", icon: "🍽", label: "Food Menu" },
   { id: "analytics", icon: "📈", label: "Analytics" },
   { id: "payments", icon: "💳", label: "Payments" },
   { id: "homepage", icon: "🏠", label: "Homepage" },
@@ -119,6 +138,50 @@ export default function AdminDashboard() {
   const [payPage, setPayPage] = useState(1);
   const [payPageSize] = useState(20);
   const [selectedPayment, setSelectedPayment] = useState<PaymentRecord | null>(null);
+
+  // Food tab state
+  const [foodSubTab, setFoodSubTab] = useState<FoodSubTab>("categories");
+  const [categoryFormOpen, setCategoryFormOpen] = useState(false);
+  const [itemFormOpen, setItemFormOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<FoodCategory | null>(null);
+  const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
+  const [selectedFoodItemIds, setSelectedFoodItemIds] = useState<string[]>([]);
+  const [foodCategoryFilter, setFoodCategoryFilter] = useState("all");
+  const [foodDietFilter, setFoodDietFilter] = useState("all");
+  const [foodAirlineFilter, setFoodAirlineFilter] = useState("all");
+  const [foodSearch, setFoodSearch] = useState("");
+
+  const [categoryForm, setCategoryForm] = useState<Partial<FoodCategory>>({
+    name: "",
+    icon: "🍱",
+    description: "",
+    active: true,
+    displayOrder: 1,
+    airlineNames: [],
+    cabinClasses: [],
+  });
+
+  const [itemForm, setItemForm] = useState<Partial<FoodItem>>({
+    categoryId: "",
+    categoryName: "",
+    name: "",
+    description: "",
+    imageUrl: "",
+    dietType: "VEG",
+    economyPrice: 0,
+    businessPrice: 0,
+    firstClassPrice: 0,
+    calories: 0,
+    weight: "",
+    allergens: [],
+    airlineNames: [],
+    cabinClasses: [],
+    mealTiming: ["Anytime"],
+    popular: false,
+    newItem: false,
+    available: true,
+    displayOrder: 1,
+  });
 
   // Locations tab state
   const [locSearch, setLocSearch] = useState("");
@@ -209,7 +272,7 @@ export default function AdminDashboard() {
           p.flightNumber?.toLowerCase().includes(q),
       );
     }
-    return result;
+    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [allPayments, payStatusFilter, paySearch]);
 
   const paginatedPayments = useMemo(() => {
@@ -238,6 +301,194 @@ export default function AdminDashboard() {
       .map(([date, revenue]) => ({ date, revenue }))
       .slice(-14);
   }, [allPayments]);
+
+  const foodCategoriesQuery = useQuery({
+    queryKey: ["foodCategories"],
+    queryFn: foodService.getAllCategories,
+    staleTime: 60 * 1000,
+  });
+
+  const foodItemsQuery = useQuery({
+    queryKey: ["foodItems"],
+    queryFn: foodService.getAllItems,
+    staleTime: 60 * 1000,
+  });
+
+  const foodCategories = foodCategoriesQuery.data ?? [];
+  const foodItems = foodItemsQuery.data ?? [];
+
+  const filteredFoodItems = useMemo(() => {
+    let result = foodItems;
+    if (foodCategoryFilter !== "all") {
+      result = result.filter((item) => item.categoryId === foodCategoryFilter);
+    }
+    if (foodDietFilter !== "all") {
+      result = result.filter((item) => item.dietType === foodDietFilter);
+    }
+    if (foodAirlineFilter !== "all") {
+      result = result.filter((item) =>
+        item.airlineNames.length === 0 || item.airlineNames.includes(foodAirlineFilter)
+      );
+    }
+    if (foodSearch) {
+      const q = foodSearch.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.name.toLowerCase().includes(q) ||
+          item.description.toLowerCase().includes(q) ||
+          item.categoryName.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [foodItems, foodCategoryFilter, foodDietFilter, foodAirlineFilter, foodSearch]);
+
+  const foodStats = useMemo(() => {
+    const total = foodItems.length;
+    const available = foodItems.filter((item) => item.available).length;
+    const veg = foodItems.filter((item) => item.dietType === "VEG" || item.dietType === "VEGAN" || item.dietType === "JAIN").length;
+    const nonVeg = foodItems.filter((item) => item.dietType === "NON_VEG").length;
+    const avgEconomy =
+      total === 0 ? 0 : Math.round(foodItems.reduce((sum, item) => sum + item.economyPrice, 0) / total);
+    return { total, available, veg, nonVeg, avgEconomy };
+  }, [foodItems]);
+
+  const createCategoryMutation = useMutation({
+    mutationFn: (payload: Partial<FoodCategory>) => foodService.createCategory(payload),
+    onSuccess: () => {
+      toast.success("Food category created");
+      queryClient.invalidateQueries({ queryKey: ["foodCategories"] });
+      setCategoryFormOpen(false);
+      setEditingCategory(null);
+    },
+    onError: () => toast.error("Failed to create category"),
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<FoodCategory> }) =>
+      foodService.updateCategory(id, payload),
+    onSuccess: () => {
+      toast.success("Food category updated");
+      queryClient.invalidateQueries({ queryKey: ["foodCategories"] });
+      setCategoryFormOpen(false);
+      setEditingCategory(null);
+    },
+    onError: () => toast.error("Failed to update category"),
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: (id: string) => foodService.deleteCategory(id),
+    onSuccess: () => {
+      toast.success("Food category deleted");
+      queryClient.invalidateQueries({ queryKey: ["foodCategories"] });
+      queryClient.invalidateQueries({ queryKey: ["foodItems"] });
+    },
+    onError: () => toast.error("Failed to delete category"),
+  });
+
+  const createItemMutation = useMutation({
+    mutationFn: (payload: Partial<FoodItem>) => foodService.createItem(payload),
+    onSuccess: () => {
+      toast.success("Food item created");
+      queryClient.invalidateQueries({ queryKey: ["foodItems"] });
+      setItemFormOpen(false);
+      setEditingItem(null);
+    },
+    onError: () => toast.error("Failed to create food item"),
+  });
+
+  const updateItemMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<FoodItem> }) =>
+      foodService.updateItem(id, payload),
+    onSuccess: () => {
+      toast.success("Food item updated");
+      queryClient.invalidateQueries({ queryKey: ["foodItems"] });
+      setItemFormOpen(false);
+      setEditingItem(null);
+    },
+    onError: () => toast.error("Failed to update food item"),
+  });
+
+  const deleteItemMutation = useMutation({
+    mutationFn: (id: string) => foodService.deleteItem(id),
+    onSuccess: () => {
+      toast.success("Food item deleted");
+      queryClient.invalidateQueries({ queryKey: ["foodItems"] });
+    },
+    onError: () => toast.error("Failed to delete food item"),
+  });
+
+  const toggleItemMutation = useMutation({
+    mutationFn: (id: string) => foodService.toggleItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["foodItems"] });
+    },
+    onError: () => toast.error("Failed to toggle availability"),
+  });
+
+  const resetCategoryForm = () => {
+    setCategoryForm({
+      name: "",
+      icon: "🍱",
+      description: "",
+      active: true,
+      displayOrder: 1,
+      airlineNames: [],
+      cabinClasses: [],
+    });
+    setEditingCategory(null);
+  };
+
+  const resetItemForm = () => {
+    setItemForm({
+      categoryId: foodCategories[0]?.id || "",
+      categoryName: foodCategories[0]?.name || "",
+      name: "",
+      description: "",
+      imageUrl: "",
+      dietType: "VEG",
+      economyPrice: 0,
+      businessPrice: 0,
+      firstClassPrice: 0,
+      calories: 0,
+      weight: "",
+      allergens: [],
+      airlineNames: [],
+      cabinClasses: [],
+      mealTiming: ["Anytime"],
+      popular: false,
+      newItem: false,
+      available: true,
+      displayOrder: 1,
+    });
+    setEditingItem(null);
+  };
+
+  const submitCategory = () => {
+    if (!categoryForm.name || !categoryForm.icon) {
+      toast.error("Category name and icon are required");
+      return;
+    }
+    if (editingCategory) {
+      updateCategoryMutation.mutate({ id: editingCategory.id, payload: categoryForm });
+      return;
+    }
+    createCategoryMutation.mutate(categoryForm);
+  };
+
+  const submitItem = () => {
+    if (!itemForm.name || !itemForm.categoryId || !itemForm.description) {
+      toast.error("Category, name and description are required");
+      return;
+    }
+    const category = foodCategories.find((cat) => cat.id === itemForm.categoryId);
+    const payload = { ...itemForm, categoryName: category?.name || itemForm.categoryName || "" };
+
+    if (editingItem) {
+      updateItemMutation.mutate({ id: editingItem.id, payload });
+      return;
+    }
+    createItemMutation.mutate(payload);
+  };
 
   useEffect(() => { setPayPage(1); }, [payStatusFilter, paySearch]);
 
@@ -629,7 +880,7 @@ export default function AdminDashboard() {
         return u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
       });
     }
-    return result;
+    return result.sort((a, b) => new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime());
   }, [bookings, seatFilter, searchTerm, bookingUserSearch, userMap]);
 
   // ─── Filtered Users (Users tab) ───
@@ -644,7 +895,7 @@ export default function AdminDashboard() {
         (u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
       );
     }
-    return result;
+    return [...result].reverse();
   }, [users, userRoleFilter, userSearch]);
 
   // Reset bookings page when filters change
@@ -668,8 +919,9 @@ export default function AdminDashboard() {
   // Flights tab: determine what to display
   const flightsClientPage = useMemo(() => {
     if (hasSearchFilters) return [];
+    const sorted = [...flights].sort((a, b) => new Date(b.departureTime).getTime() - new Date(a.departureTime).getTime());
     const start = (searchPage - 1) * searchPageSize;
-    return flights.slice(start, start + searchPageSize);
+    return sorted.slice(start, start + searchPageSize);
   }, [flights, searchPage, searchPageSize, hasSearchFilters]);
 
   if (isLoading) return <LoadingSpinner />;
@@ -1855,6 +2107,433 @@ export default function AdminDashboard() {
                         Created: {new Date(selectedPayment.createdAt).toLocaleString("en-IN")}
                         {selectedPayment.updatedAt && <> · Updated: {new Date(selectedPayment.updatedAt).toLocaleString("en-IN")}</>}
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ─── TAB: FOOD MENU ─── */}
+          {activeTab === "food" && (
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Food Menu Management</h2>
+                  <p className="text-gray-500 text-sm mt-1">Manage in-flight meals by categories and menu items</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setFoodSubTab("categories");
+                      resetCategoryForm();
+                      setCategoryFormOpen(true);
+                    }}
+                    className="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-700"
+                  >
+                    + Add Category
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFoodSubTab("items");
+                      resetItemForm();
+                      setItemFormOpen(true);
+                    }}
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700"
+                  >
+                    + Add Item
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <StatCard label="Total Items" value={foodStats.total} color="bg-sky-500" icon="🍽" />
+                <StatCard label="Available" value={foodStats.available} color="bg-green-500" icon="✅" />
+                <StatCard label="Veg Items" value={foodStats.veg} color="bg-emerald-500" icon="🥗" />
+                <StatCard label="Non-Veg Items" value={foodStats.nonVeg} color="bg-red-500" icon="🍗" />
+                <StatCard label="Avg Economy Price" value={`₹${foodStats.avgEconomy}`} color="bg-indigo-500" icon="💸" />
+              </div>
+
+              <div className="bg-white border border-gray-200 rounded-2xl p-2 inline-flex gap-2">
+                <button
+                  onClick={() => setFoodSubTab("categories")}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium ${
+                    foodSubTab === "categories" ? "bg-sky-600 text-white" : "text-gray-600"
+                  }`}
+                >
+                  📂 Categories
+                </button>
+                <button
+                  onClick={() => setFoodSubTab("items")}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium ${
+                    foodSubTab === "items" ? "bg-sky-600 text-white" : "text-gray-600"
+                  }`}
+                >
+                  🍱 Menu Items
+                </button>
+              </div>
+
+              {foodSubTab === "categories" && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">
+                  <table className="w-full text-sm min-w-[900px]">
+                    <thead className="bg-gray-50 text-gray-600">
+                      <tr>
+                        <th className="text-left px-4 py-3">Icon</th>
+                        <th className="text-left px-4 py-3">Name</th>
+                        <th className="text-left px-4 py-3">Airlines</th>
+                        <th className="text-left px-4 py-3">Cabin Classes</th>
+                        <th className="text-left px-4 py-3">Items</th>
+                        <th className="text-left px-4 py-3">Active</th>
+                        <th className="text-left px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {foodCategories.map((category) => {
+                        const count = foodItems.filter((item) => item.categoryId === category.id).length;
+                        return (
+                          <tr key={category.id} className="border-t border-gray-100">
+                            <td className="px-4 py-3 text-xl">{category.icon}</td>
+                            <td className="px-4 py-3 font-medium text-gray-800">{category.name}</td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {category.airlineNames.length ? category.airlineNames.join(", ") : "All"}
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {category.cabinClasses.length ? category.cabinClasses.join(", ") : "All"}
+                            </td>
+                            <td className="px-4 py-3">{count}</td>
+                            <td className="px-4 py-3">{category.active ? "✅" : "❌"}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    setEditingCategory(category);
+                                    setCategoryForm(category);
+                                    setCategoryFormOpen(true);
+                                  }}
+                                  className="px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (window.confirm(`Delete category ${category.name}?`)) {
+                                      deleteCategoryMutation.mutate(category.id);
+                                    }
+                                  }}
+                                  className="px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {foodSubTab === "items" && (
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl border border-gray-200 p-4 flex flex-wrap gap-3">
+                    <select
+                      value={foodCategoryFilter}
+                      onChange={(e) => setFoodCategoryFilter(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    >
+                      <option value="all">All Categories</option>
+                      {foodCategories.map((category) => (
+                        <option key={category.id} value={category.id}>{category.name}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={foodDietFilter}
+                      onChange={(e) => setFoodDietFilter(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    >
+                      <option value="all">All Diet Types</option>
+                      <option value="VEG">VEG</option>
+                      <option value="NON_VEG">NON_VEG</option>
+                      <option value="VEGAN">VEGAN</option>
+                      <option value="JAIN">JAIN</option>
+                    </select>
+                    <select
+                      value={foodAirlineFilter}
+                      onChange={(e) => setFoodAirlineFilter(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    >
+                      <option value="all">All Airlines</option>
+                      {FOOD_AIRLINES.map((airline) => (
+                        <option key={airline} value={airline}>{airline}</option>
+                      ))}
+                    </select>
+                    <input
+                      value={foodSearch}
+                      onChange={(e) => setFoodSearch(e.target.value)}
+                      placeholder="Search items..."
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[220px]"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => {
+                        selectedFoodItemIds.forEach((id) => {
+                          const target = foodItems.find((item) => item.id === id);
+                          if (target && !target.available) toggleItemMutation.mutate(id);
+                        });
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 text-sm"
+                    >
+                      Enable All
+                    </button>
+                    <button
+                      onClick={() => {
+                        selectedFoodItemIds.forEach((id) => {
+                          const target = foodItems.find((item) => item.id === id);
+                          if (target && target.available) toggleItemMutation.mutate(id);
+                        });
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-sm"
+                    >
+                      Disable All
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!selectedFoodItemIds.length) return;
+                        if (!window.confirm(`Delete ${selectedFoodItemIds.length} selected item(s)?`)) return;
+                        selectedFoodItemIds.forEach((id) => deleteItemMutation.mutate(id));
+                        setSelectedFoodItemIds([]);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredFoodItems.map((item) => (
+                      <div key={item.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedFoodItemIds.includes(item.id)}
+                              onChange={(e) => {
+                                setSelectedFoodItemIds((prev) =>
+                                  e.target.checked ? [...prev, item.id] : prev.filter((id) => id !== item.id)
+                                );
+                              }}
+                              className="mt-1"
+                            />
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="w-20 h-20 rounded-xl object-cover border border-gray-200"
+                            />
+                          </div>
+                          <div className="flex flex-wrap gap-1 justify-end">
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-700">{item.dietType}</span>
+                            {item.popular && <span className="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-700">Popular</span>}
+                            {item.newItem && <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-700">New</span>}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800">{item.name}</p>
+                          <p className="text-xs text-gray-500">{item.categoryName}</p>
+                          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</p>
+                        </div>
+                        <div className="text-xs text-gray-600 space-y-1">
+                          <p>Economy: ₹{item.economyPrice}</p>
+                          <p>Business: ₹{item.businessPrice} {item.businessPrice === 0 ? "(FREE)" : ""}</p>
+                          <p>{item.calories} cal • {item.weight}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          <button
+                            onClick={() => toggleItemMutation.mutate(item.id)}
+                            className={`px-2 py-1 text-xs rounded ${item.available ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}
+                          >
+                            {item.available ? "Available" : "Unavailable"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingItem(item);
+                              setItemForm(item);
+                              setItemFormOpen(true);
+                            }}
+                            className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Delete ${item.name}?`)) deleteItemMutation.mutate(item.id);
+                            }}
+                            className="px-2 py-1 text-xs rounded bg-red-100 text-red-700"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {categoryFormOpen && (
+                <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-2xl w-full max-w-lg p-6 space-y-4">
+                    <h3 className="text-lg font-bold text-gray-800">{editingCategory ? "Edit Category" : "Add Category"}</h3>
+                    <input value={categoryForm.name || ""} onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })} placeholder="Name" className="w-full px-3 py-2 border rounded-lg" />
+                    <input value={categoryForm.icon || ""} onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value })} placeholder="Icon" className="w-full px-3 py-2 border rounded-lg" />
+                    <input value={categoryForm.description || ""} onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })} placeholder="Description" className="w-full px-3 py-2 border rounded-lg" />
+                    <input type="number" value={categoryForm.displayOrder ?? 1} onChange={(e) => setCategoryForm({ ...categoryForm, displayOrder: parseInt(e.target.value) || 0 })} placeholder="Display Order" className="w-full px-3 py-2 border rounded-lg" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Airlines</p>
+                      <div className="flex flex-wrap gap-2">
+                        {FOOD_AIRLINES.map((airline) => (
+                          <label key={airline} className="text-xs flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                            <input
+                              type="checkbox"
+                              checked={(categoryForm.airlineNames || []).includes(airline)}
+                              onChange={(e) => {
+                                const current = categoryForm.airlineNames || [];
+                                setCategoryForm({
+                                  ...categoryForm,
+                                  airlineNames: e.target.checked
+                                    ? [...current, airline]
+                                    : current.filter((a) => a !== airline),
+                                });
+                              }}
+                            />
+                            {airline}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Cabin Classes</p>
+                      <div className="flex flex-wrap gap-2">
+                        {FOOD_CABINS.map((cabin) => (
+                          <label key={cabin} className="text-xs flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                            <input
+                              type="checkbox"
+                              checked={(categoryForm.cabinClasses || []).includes(cabin)}
+                              onChange={(e) => {
+                                const current = categoryForm.cabinClasses || [];
+                                setCategoryForm({
+                                  ...categoryForm,
+                                  cabinClasses: e.target.checked
+                                    ? [...current, cabin]
+                                    : current.filter((a) => a !== cabin),
+                                });
+                              }}
+                            />
+                            {cabin}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <label className="text-sm flex items-center gap-2">
+                      <input type="checkbox" checked={categoryForm.active ?? true} onChange={(e) => setCategoryForm({ ...categoryForm, active: e.target.checked })} /> Active
+                    </label>
+                    <div className="flex justify-end gap-2 pt-2">
+                      <button onClick={() => { setCategoryFormOpen(false); resetCategoryForm(); }} className="px-4 py-2 border rounded-lg">Cancel</button>
+                      <button onClick={submitCategory} className="px-4 py-2 bg-sky-600 text-white rounded-lg">Save</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {itemFormOpen && (
+                <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-2xl w-full max-w-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                    <h3 className="text-lg font-bold text-gray-800">{editingItem ? "Edit Food Item" : "Add Food Item"}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <select
+                        value={itemForm.categoryId || ""}
+                        onChange={(e) => {
+                          const selected = foodCategories.find((category) => category.id === e.target.value);
+                          setItemForm({ ...itemForm, categoryId: e.target.value, categoryName: selected?.name || "" });
+                        }}
+                        className="px-3 py-2 border rounded-lg"
+                      >
+                        <option value="">Select Category</option>
+                        {foodCategories.map((category) => (
+                          <option key={category.id} value={category.id}>{category.name}</option>
+                        ))}
+                      </select>
+                      <input value={itemForm.name || ""} onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })} placeholder="Item name" className="px-3 py-2 border rounded-lg" />
+                      <input value={itemForm.imageUrl || ""} onChange={(e) => setItemForm({ ...itemForm, imageUrl: e.target.value })} placeholder="Image URL" className="px-3 py-2 border rounded-lg" />
+                      <select value={itemForm.dietType || "VEG"} onChange={(e) => setItemForm({ ...itemForm, dietType: e.target.value as FoodItem["dietType"] })} className="px-3 py-2 border rounded-lg">
+                        <option value="VEG">VEG</option>
+                        <option value="NON_VEG">NON_VEG</option>
+                        <option value="VEGAN">VEGAN</option>
+                        <option value="JAIN">JAIN</option>
+                      </select>
+                      <input type="number" value={itemForm.economyPrice || 0} onChange={(e) => setItemForm({ ...itemForm, economyPrice: parseInt(e.target.value) || 0 })} placeholder="Economy Price" className="px-3 py-2 border rounded-lg" />
+                      <input type="number" value={itemForm.businessPrice || 0} onChange={(e) => setItemForm({ ...itemForm, businessPrice: parseInt(e.target.value) || 0 })} placeholder="Business Price" className="px-3 py-2 border rounded-lg" />
+                      <input type="number" value={itemForm.firstClassPrice || 0} onChange={(e) => setItemForm({ ...itemForm, firstClassPrice: parseInt(e.target.value) || 0 })} placeholder="First Class Price" className="px-3 py-2 border rounded-lg" />
+                      <input type="number" value={itemForm.calories || 0} onChange={(e) => setItemForm({ ...itemForm, calories: parseInt(e.target.value) || 0 })} placeholder="Calories" className="px-3 py-2 border rounded-lg" />
+                      <input value={itemForm.weight || ""} onChange={(e) => setItemForm({ ...itemForm, weight: e.target.value })} placeholder="Weight (e.g. 350g)" className="px-3 py-2 border rounded-lg" />
+                      <input type="number" value={itemForm.displayOrder || 1} onChange={(e) => setItemForm({ ...itemForm, displayOrder: parseInt(e.target.value) || 1 })} placeholder="Display Order" className="px-3 py-2 border rounded-lg" />
+                    </div>
+                    <textarea value={itemForm.description || ""} onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })} rows={3} placeholder="Description" className="w-full px-3 py-2 border rounded-lg" />
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-700">Allergens</p>
+                      <div className="flex flex-wrap gap-2">
+                        {FOOD_ALLERGENS.map((allergen) => (
+                          <label key={allergen} className="text-xs flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                            <input
+                              type="checkbox"
+                              checked={(itemForm.allergens || []).includes(allergen)}
+                              onChange={(e) => {
+                                const current = itemForm.allergens || [];
+                                setItemForm({
+                                  ...itemForm,
+                                  allergens: e.target.checked
+                                    ? [...current, allergen]
+                                    : current.filter((value) => value !== allergen),
+                                });
+                              }}
+                            />
+                            {allergen}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-700">Meal Timing</p>
+                      <div className="flex flex-wrap gap-2">
+                        {FOOD_MEAL_TIMINGS.map((timing) => (
+                          <label key={timing} className="text-xs flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                            <input
+                              type="checkbox"
+                              checked={(itemForm.mealTiming || []).includes(timing)}
+                              onChange={(e) => {
+                                const current = itemForm.mealTiming || [];
+                                setItemForm({
+                                  ...itemForm,
+                                  mealTiming: e.target.checked
+                                    ? [...current, timing]
+                                    : current.filter((value) => value !== timing),
+                                });
+                              }}
+                            />
+                            {timing}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={itemForm.popular || false} onChange={(e) => setItemForm({ ...itemForm, popular: e.target.checked })} /> Popular</label>
+                      <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={itemForm.newItem || false} onChange={(e) => setItemForm({ ...itemForm, newItem: e.target.checked })} /> New Item</label>
+                      <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={itemForm.available ?? true} onChange={(e) => setItemForm({ ...itemForm, available: e.target.checked })} /> Available</label>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                      <button onClick={() => { setItemFormOpen(false); resetItemForm(); }} className="px-4 py-2 border rounded-lg">Cancel</button>
+                      <button onClick={submitItem} className="px-4 py-2 bg-sky-600 text-white rounded-lg">Save Item</button>
                     </div>
                   </div>
                 </div>

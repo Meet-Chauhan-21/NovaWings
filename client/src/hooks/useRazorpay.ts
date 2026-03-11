@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import paymentService from "../services/paymentService";
+import type { FoodOrder } from "../types";
 
 export function useRazorpay() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -15,6 +16,9 @@ export function useRazorpay() {
     numberOfSeats: number;
     selectedSeats: string[];
     totalAmount: number;
+    foodOrders?: FoodOrder[];
+    foodTotal?: number;
+    mealSkipped?: boolean;
     flightDetails: {
       flightNumber: string;
       source: string;
@@ -31,6 +35,9 @@ export function useRazorpay() {
         numberOfSeats: params.numberOfSeats,
         selectedSeats: params.selectedSeats,
         totalAmount: params.totalAmount,
+        foodOrders: params.foodOrders,
+        foodTotal: params.foodTotal,
+        mealSkipped: params.mealSkipped,
       });
 
       // Step 2: Configure Razorpay options

@@ -1,6 +1,7 @@
 package com.novawings.flights.dto;
 
 import com.novawings.flights.model.BookingStatus;
+import com.novawings.flights.model.FoodOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,12 @@ public class BookingResponse {
     private String destination;
     private int numberOfSeats;
     private double totalPrice;
+    private double foodTotal;
+    private List<FoodOrder> foodOrders;
+    private boolean mealSkipped;
+    private double baseFlightFare;
+    private double taxes;
+    private double convenienceFee;
     private String paymentId;
     private List<String> selectedSeats;
     private BookingStatus status;

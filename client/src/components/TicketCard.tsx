@@ -299,6 +299,48 @@ const TicketCard = forwardRef<HTMLDivElement, TicketCardProps>(
           </div>
         </div>
 
+        {/* ═══ SECTION 3B — MEAL SUMMARY ═══ */}
+        <div
+          style={{
+            background: "#fffbeb",
+            borderTop: "1px solid #fde68a",
+            borderBottom: "1px solid #fde68a",
+            padding: "12px 28px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "#b45309",
+              letterSpacing: 1,
+              textTransform: "uppercase" as const,
+              marginBottom: 6,
+            }}
+          >
+            In-Flight Meals Selected
+          </p>
+
+          {ticket.mealSkipped || !ticket.foodOrders || ticket.foodOrders.length === 0 ? (
+            <p style={{ fontSize: 12, color: "#6b7280" }}>No meals selected for this flight</p>
+          ) : (
+            <div style={{ display: "grid", gap: 6 }}>
+              {ticket.foodOrders
+                .filter((order) => order.items.length > 0)
+                .map((order) => (
+                  <div key={order.seatNumber} className="flex items-center justify-between" style={{ fontSize: 12 }}>
+                    <span style={{ color: "#334155" }}>
+                      <strong>Seat {order.seatNumber}</strong> {order.passengerLabel} - {order.items.map((item) => item.foodItemName).join(", ")}
+                    </span>
+                    <span style={{ color: "#92400e", fontWeight: 700 }}>
+                      ₹{order.subtotal.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
         {/* ═══ TEAR LINE 2 ═══ */}
         <TearLine />
 
@@ -340,6 +382,7 @@ const TicketCard = forwardRef<HTMLDivElement, TicketCardProps>(
               <PriceRow label="Base Fare" amount={ticket.baseFare} />
               <PriceRow label="Taxes & Fees" amount={ticket.taxes} />
               <PriceRow label="Convenience Fee" amount={ticket.convenienceFee} />
+              {!!ticket.foodTotal && <PriceRow label="Meals" amount={ticket.foodTotal} />}
               <div
                 className="flex justify-between"
                 style={{
