@@ -1,40 +1,123 @@
 // src/components/EmptyState.tsx
-// Displays a "no results" illustration with heading, subtext, and optional CTA
+// Centered empty-state container with MUI icon, title, description, and optional action
 
-import { Link } from "react-router-dom";
+import { type ReactNode } from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 
 interface EmptyStateProps {
-  icon?: string;
-  heading: string;
-  subtext: string;
+  /** MUI SvgIcon element, e.g. <FlightOffIcon /> */
+  icon?: ReactNode;
+  /** Bold heading */
+  title: string;
+  /** Supporting description */
+  description: string;
+  /** Optional action button label */
   actionLabel?: string;
-  actionPath?: string;
+  /** Called when the action button is clicked */
+  onAction?: () => void;
 }
 
 /**
  * EmptyState renders a centered placeholder when there are no items to display.
- * Optionally shows an action button linking to a given path.
+ * Accepts a MUI SvgIcon and an optional action button.
  */
 export default function EmptyState({
-  icon = "✈️",
-  heading,
-  subtext,
+  icon,
+  title,
+  description,
   actionLabel,
-  actionPath,
+  onAction,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <span className="text-6xl mb-4">{icon}</span>
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{heading}</h3>
-      <p className="text-gray-500 mb-6 max-w-md">{subtext}</p>
-      {actionLabel && actionPath && (
-        <Link
-          to={actionPath}
-          className="bg-sky-500 text-white px-6 py-2.5 rounded-xl hover:bg-sky-600 transition hover:scale-105 font-medium"
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        py: 10,
+        px: 3,
+        position: "relative",
+      }}
+    >
+      {/* Subtle radial glow */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 320,
+          height: 320,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(255,255,255,0.025) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Icon */}
+      {icon && (
+        <Box
+          sx={{
+            mb: 3,
+            "& svg": { fontSize: "80px !important", color: "#374151" },
+          }}
+        >
+          {icon}
+        </Box>
+      )}
+
+      {/* Title */}
+      <Typography
+        sx={{
+          color: "#FFFFFF",
+          fontSize: "1.25rem",
+          fontWeight: 700,
+          mb: 1,
+        }}
+      >
+        {title}
+      </Typography>
+
+      {/* Description */}
+      <Typography
+        sx={{
+          color: "#6B7280",
+          fontSize: "0.9375rem",
+          lineHeight: 1.7,
+          maxWidth: 420,
+          mb: actionLabel ? 3.5 : 0,
+        }}
+      >
+        {description}
+      </Typography>
+
+      {/* Action button */}
+      {actionLabel && onAction && (
+        <Button
+          variant="contained"
+          onClick={onAction}
+          sx={{
+            px: 3.5,
+            py: 1.25,
+            fontWeight: 600,
+            borderRadius: "10px",
+            background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
+            boxShadow: "0 4px 14px rgba(249,115,22,0.35)",
+            "&:hover": {
+              background: "linear-gradient(135deg, #FB923C 0%, #F97316 100%)",
+              boxShadow: "0 6px 20px rgba(249,115,22,0.5)",
+              transform: "translateY(-1px)",
+            },
+          }}
         >
           {actionLabel}
-        </Link>
+        </Button>
       )}
-    </div>
+    </Box>
   );
 }

@@ -1,12 +1,28 @@
+// src/pages/FoodSelection.tsx
+// Meal selection page for booking flow — dark theme with MUI components
+
 import { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import BackButton from "../components/ui/BackButton";
+import { motion } from "framer-motion";
 import ErrorMessage from "../components/ErrorMessage";
 import BookingProgress from "../components/BookingProgress";
 import foodService from "../services/foodService";
 import type { FoodItem, FoodOrder, FoodOrderItem } from "../types";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 
 interface FoodSelectionState {
   flightId: string;
@@ -22,18 +38,11 @@ interface FoodSelectionState {
   totalBeforeFood: number;
 }
 
-function getDietBadge(dietType: FoodItem["dietType"]) {
-  if (dietType === "VEG") return "bg-green-100 text-green-700";
-  if (dietType === "NON_VEG") return "bg-red-100 text-red-700";
-  if (dietType === "VEGAN") return "bg-gray-100 text-gray-700";
-  return "bg-yellow-100 text-yellow-700";
-}
-
-function getDietDot(dietType: FoodItem["dietType"]) {
-  if (dietType === "VEG") return "🟢";
-  if (dietType === "NON_VEG") return "🔴";
-  if (dietType === "VEGAN") return "⚪";
-  return "🟡";
+function getDietColor(dietType: FoodItem["dietType"]) {
+  if (dietType === "VEG") return { bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.3)", text: "#22C55E" };
+  if (dietType === "NON_VEG") return { bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.3)", text: "#EF4444" };
+  if (dietType === "VEGAN") return { bg: "rgba(156,163,175,0.1)", border: "rgba(156,163,175,0.3)", text: "#9CA3AF" };
+  return { bg: "rgba(234,179,8,0.1)", border: "rgba(234,179,8,0.3)", text: "#EAB308" };
 }
 
 function getCabinPrice(item: FoodItem, cabinClass: string) {
@@ -105,8 +114,6 @@ export default function FoodSelection() {
     gcTime: 0,
   });
 
-  // ⚠️ CRITICAL: All hooks must be at the top, before any conditional returns
-  // Move useMemo hooks here with safe defaults
   const categories = menuQuery.data?.categories || [];
   const currentOrder = foodOrders[selectedPassenger] || { items: [], subtotal: 0, seatNumber: '', passengerLabel: '' };
 
@@ -132,78 +139,78 @@ export default function FoodSelection() {
   console.log("FoodSelection - bookingState:", bookingState);
   console.log("FoodSelection - menuQuery:", { isLoading: menuQuery.isLoading, isError: menuQuery.isError, data: menuQuery.data });
 
-  // NOW we can do conditional returns after all hooks are called
+  // Conditional returns after all hooks
   if (!bookingState || !flightId) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <p className="text-red-600 font-semibold mb-4">Booking information not available</p>
-        <p className="text-gray-600 mb-6">Please select seats again to proceed with meal selection.</p>
-        <button 
-          onClick={() => navigate("/explore")} 
-          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
-        >
+      <Box sx={{ maxWidth: 600, mx: "auto", px: 3, py: 12, textAlign: "center" }}>
+        <Typography sx={{ color: "#EF4444", fontWeight: 600, mb: 2 }}>Booking information not available</Typography>
+        <Typography sx={{ color: "#6B7280", mb: 4, fontSize: "0.9rem" }}>Please select seats again to proceed with meal selection.</Typography>
+        <Button variant="contained" onClick={() => navigate("/explore")} sx={{ borderRadius: "10px" }}>
           Go to Flights
-        </button>
-      </div>
+        </Button>
+      </Box>
     );
   }
 
   const confirmedState = bookingState;
 
-  // Show loading spinner while fetching menu
   if (menuQuery.isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border border-sky-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-700 font-semibold">Loading meal options...</p>
-          <p className="text-sm text-gray-500 mt-2">Airline: {confirmedState.airlineName} | Class: {confirmedState.cabinClass}</p>
-        </div>
-      </div>
+      <Box sx={{ minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            border: "3px solid rgba(249,115,22,0.2)",
+            borderTop: "3px solid #F97316",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+            mb: 3,
+            "@keyframes spin": { "100%": { transform: "rotate(360deg)" } },
+          }}
+        />
+        <Typography sx={{ color: "#FFFFFF", fontWeight: 600 }}>Loading meal options...</Typography>
+        <Typography sx={{ color: "#6B7280", fontSize: "0.85rem", mt: 1 }}>
+          {confirmedState.airlineName} | {confirmedState.cabinClass}
+        </Typography>
+      </Box>
     );
   }
 
-  // Show error message if menu fetch failed
   if (menuQuery.isError) {
     console.error("Menu query error:", menuQuery.error);
     const errorMsg = menuQuery.error instanceof Error ? menuQuery.error.message : 'Unknown error';
     return (
-      <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <p className="text-red-600 font-semibold mb-4">⚠️ Failed to Load Menu</p>
-        <p className="text-gray-600 mb-6">{errorMsg}</p>
-        <div className="space-y-2">
-          <button 
-            onClick={() => window.location.reload()} 
-            className="w-full px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
-          >
+      <Box sx={{ maxWidth: 480, mx: "auto", px: 3, py: 12, textAlign: "center" }}>
+        <Typography sx={{ color: "#EF4444", fontWeight: 600, mb: 2 }}>Failed to Load Menu</Typography>
+        <Typography sx={{ color: "#6B7280", mb: 4, fontSize: "0.9rem" }}>{errorMsg}</Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+          <Button variant="contained" fullWidth onClick={() => window.location.reload()} sx={{ borderRadius: "10px" }}>
             Retry
-          </button>
-          <button 
-            onClick={() => navigate(`/select-seats/${flightId}?seats=${confirmedState.numberOfSeats}`)} 
-            className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+          </Button>
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={() => navigate(`/select-seats/${flightId}?seats=${confirmedState.numberOfSeats}`)}
+            sx={{ borderRadius: "10px" }}
           >
             Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
-  // Validate menu data structure
-  if (!menuQuery.data) {
-    console.error("Menu data is empty");
-    return (
-      <ErrorMessage message="No menu data received from server. Please try again." />
+          </Button>
+        </Box>
+      </Box>
     );
   }
 
+  if (!menuQuery.data) {
+    console.error("Menu data is empty");
+    return <ErrorMessage message="No menu data received from server. Please try again." />;
+  }
+
   const menu = menuQuery.data;
-  
+
   if (!Array.isArray(menu.categories)) {
     console.error("Invalid menu structure - categories is not an array:", menu);
-    return (
-      <ErrorMessage message="Invalid menu data structure. Please refresh and try again." />
-    );
+    return <ErrorMessage message="Invalid menu data structure. Please refresh and try again." />;
   }
 
   function updatePassengerItem(item: FoodItem, delta: number) {
@@ -271,176 +278,419 @@ export default function FoodSelection() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      <BackButton to={`/select-seats/${flightId}?seats=${bookingState.numberOfSeats}`} label="Back to Seat Selection" />
+    <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 3 }, py: { xs: 3, md: 5 }, pb: 16 }}>
+      {/* Back button */}
+      <IconButton
+        onClick={() => navigate(`/select-seats/${flightId}?seats=${bookingState.numberOfSeats}`)}
+        sx={{
+          mb: 2,
+          color: "#9CA3AF",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          "&:hover": { background: "rgba(249,115,22,0.1)", color: "#F97316" },
+        }}
+      >
+        <ArrowBackIcon fontSize="small" />
+      </IconButton>
+
       <BookingProgress activeStep={3} />
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900">Add Meals to Your Flight</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          {bookingState.airlineName} {bookingState.flightNumber} | {bookingState.source} to {bookingState.destination} | {bookingState.numberOfSeats} Passenger(s)
-        </p>
-      </div>
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <Paper
+          sx={{
+            background: "#111111",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: "16px",
+            p: { xs: 2.5, sm: 3.5 },
+            mb: 3,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
+            <RestaurantMenuIcon sx={{ color: "#F97316", fontSize: 24 }} />
+            <Typography sx={{ fontSize: { xs: "1.2rem", md: "1.4rem" }, fontWeight: 800, color: "#FFFFFF" }}>
+              Add Meals to Your Flight
+            </Typography>
+          </Box>
+          <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+            {bookingState.airlineName} {bookingState.flightNumber} | {bookingState.source} to {bookingState.destination} | {bookingState.numberOfSeats} Passenger(s)
+          </Typography>
+        </Paper>
+      </motion.div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-4">
-        <p className="text-sm font-semibold text-gray-700 mb-3">Select meals for each passenger</p>
-        <div className="flex flex-wrap gap-2">
+      {/* Passenger tabs */}
+      <Paper
+        sx={{
+          background: "#111111",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: "16px",
+          p: 2.5,
+          mb: 3,
+        }}
+      >
+        <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 2 }}>
+          Select meals for each passenger
+        </Typography>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           {foodOrders.map((order, index) => {
             const hasItems = order.items.length > 0;
             const active = index === selectedPassenger;
             return (
-              <button
+              <Chip
                 key={order.seatNumber}
+                label={`Seat ${order.seatNumber} ${hasItems ? "•" : ""} ${order.passengerLabel}`}
                 onClick={() => setSelectedPassenger(index)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
-                  active
-                    ? "bg-sky-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Seat {order.seatNumber} {hasItems ? "●" : ""} - {order.passengerLabel}
-              </button>
+                sx={{
+                  borderRadius: "10px",
+                  fontWeight: active ? 600 : 400,
+                  fontSize: "0.8rem",
+                  background: active
+                    ? "linear-gradient(135deg, #F97316, #EA580C)"
+                    : "rgba(255,255,255,0.04)",
+                  color: active ? "#FFFFFF" : "#9CA3AF",
+                  border: active ? "none" : "1px solid rgba(255,255,255,0.08)",
+                  "&:hover": {
+                    background: active
+                      ? "linear-gradient(135deg, #F97316, #EA580C)"
+                      : "rgba(255,255,255,0.08)",
+                  },
+                }}
+              />
             );
           })}
-        </div>
-      </div>
+        </Box>
+      </Paper>
 
-      <div className="flex flex-wrap items-center gap-3">
+      {/* Diet + Category Filters */}
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
         {[
           { key: "all", label: "All" },
-          { key: "VEG", label: "🟢 Veg" },
-          { key: "NON_VEG", label: "🔴 Non-Veg" },
-          { key: "VEGAN", label: "⚪ Vegan" },
+          { key: "VEG", label: "Veg" },
+          { key: "NON_VEG", label: "Non-Veg" },
+          { key: "VEGAN", label: "Vegan" },
         ].map((filter) => (
-          <button
+          <Chip
             key={filter.key}
+            label={filter.label}
             onClick={() => setDietFilter(filter.key)}
-            className={`px-3 py-1.5 rounded-full text-sm ${dietFilter === filter.key ? "bg-sky-600 text-white" : "bg-gray-100 text-gray-600"}`}
-          >
-            {filter.label}
-          </button>
+            size="small"
+            sx={{
+              borderRadius: "8px",
+              fontSize: "0.8rem",
+              background: dietFilter === filter.key
+                ? "linear-gradient(135deg, #F97316, #EA580C)"
+                : "rgba(255,255,255,0.04)",
+              color: dietFilter === filter.key ? "#FFFFFF" : "#9CA3AF",
+              border: dietFilter === filter.key ? "none" : "1px solid rgba(255,255,255,0.08)",
+              "&:hover": {
+                background: dietFilter === filter.key
+                  ? "linear-gradient(135deg, #F97316, #EA580C)"
+                  : "rgba(255,255,255,0.08)",
+              },
+            }}
+          />
         ))}
-      </div>
+      </Box>
 
-      <div className="flex flex-wrap gap-2">
-        <button
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
+        <Chip
+          label="All Categories"
           onClick={() => setActiveCategory("all")}
-          className={`px-3 py-2 rounded-lg text-sm ${activeCategory === "all" ? "bg-sky-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}
-        >
-          All Categories
-        </button>
+          size="small"
+          sx={{
+            borderRadius: "8px",
+            fontSize: "0.8rem",
+            background: activeCategory === "all"
+              ? "linear-gradient(135deg, #F97316, #EA580C)"
+              : "rgba(255,255,255,0.04)",
+            color: activeCategory === "all" ? "#FFFFFF" : "#9CA3AF",
+            border: activeCategory === "all" ? "none" : "1px solid rgba(255,255,255,0.08)",
+            "&:hover": {
+              background: activeCategory === "all"
+                ? "linear-gradient(135deg, #F97316, #EA580C)"
+                : "rgba(255,255,255,0.08)",
+            },
+          }}
+        />
         {categories.map((group) => (
-          <button
+          <Chip
             key={group.category.id}
+            label={`${group.category.icon} ${group.category.name}`}
             onClick={() => setActiveCategory(group.category.id)}
-            className={`px-3 py-2 rounded-lg text-sm ${
-              activeCategory === group.category.id
-                ? "bg-sky-600 text-white"
-                : "bg-white border border-gray-300 text-gray-700"
-            }`}
-          >
-            {group.category.icon} {group.category.name}
-          </button>
+            size="small"
+            sx={{
+              borderRadius: "8px",
+              fontSize: "0.8rem",
+              background: activeCategory === group.category.id
+                ? "linear-gradient(135deg, #F97316, #EA580C)"
+                : "rgba(255,255,255,0.04)",
+              color: activeCategory === group.category.id ? "#FFFFFF" : "#9CA3AF",
+              border: activeCategory === group.category.id ? "none" : "1px solid rgba(255,255,255,0.08)",
+              "&:hover": {
+                background: activeCategory === group.category.id
+                  ? "linear-gradient(135deg, #F97316, #EA580C)"
+                  : "rgba(255,255,255,0.08)",
+              },
+            }}
+          />
         ))}
-      </div>
+      </Box>
 
+      {/* Food Items Grid */}
       {filteredItems.length === 0 ? (
-        <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 text-center text-gray-500">
-          No food items found for selected filters.
-        </div>
+        <Paper
+          sx={{
+            background: "#111111",
+            border: "1px dashed rgba(255,255,255,0.1)",
+            borderRadius: "16px",
+            p: 8,
+            textAlign: "center",
+          }}
+        >
+          <Typography sx={{ color: "#6B7280" }}>No food items found for selected filters.</Typography>
+        </Paper>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 pb-28">
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", xl: "1fr 1fr 1fr" }, gap: 2.5 }}>
           {filteredItems.map((item) => {
             const qty = getQty(item.id);
             const price = getCabinPrice(item, bookingState.cabinClass);
             const complimentary = confirmedState.cabinClass !== "Economy" && price === 0;
+            const dietColors = getDietColor(item.dietType);
 
             return (
-              <div
+              <motion.div
                 key={item.id}
-                className={`bg-white rounded-2xl border overflow-hidden shadow-sm ${
-                  qty > 0 ? "border-sky-400 ring-2 ring-sky-100" : "border-gray-200"
-                }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
               >
-                <div className="relative">
-                  <img src={item.imageUrl} alt={item.name} className="w-full h-40 object-cover" />
-                  <span className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold ${getDietBadge(item.dietType)}`}>
-                    {getDietDot(item.dietType)} {item.dietType.replace("_", " ")}
-                  </span>
-                  {qty > 0 && (
-                    <span className="absolute left-0 top-0 bg-sky-500 text-white text-xs px-2 py-1 rounded-br-lg">
-                      Added to your meal
-                    </span>
-                  )}
-                </div>
-                <div className="p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-xs">
-                    {item.newItem && <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">New</span>}
-                    {item.popular && <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Popular</span>}
-                  </div>
-                  <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">{item.description}</p>
-                  <p className="text-xs text-gray-500">
-                    {item.calories} cal • {item.weight}
-                  </p>
-                  {item.allergens.length > 0 && (
-                    <p className="text-xs text-amber-700">Contains: {item.allergens.join(", ")}</p>
-                  )}
-                  <div className="flex items-center justify-between pt-2">
-                    <p className="text-lg font-bold text-sky-700">
-                      {complimentary ? "FREE" : `₹${price.toLocaleString("en-IN")}`}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => updatePassengerItem(item, -1)}
-                        className="h-8 w-8 rounded-lg border border-gray-300 text-gray-700"
-                      >
-                        -
-                      </button>
-                      <span className="min-w-6 text-center text-sm font-semibold">{qty}</span>
-                      <button
-                        onClick={() => {
-                          if (qty >= 3) {
-                            toast("Max quantity is 3");
-                            return;
-                          }
-                          updatePassengerItem(item, 1);
+                <Paper
+                  sx={{
+                    background: "#111111",
+                    border: qty > 0
+                      ? "1px solid rgba(249,115,22,0.3)"
+                      : "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      border: "1px solid rgba(255,255,255,0.12)",
+                    },
+                  }}
+                >
+                  {/* Image */}
+                  <Box sx={{ position: "relative" }}>
+                    <Box
+                      component="img"
+                      src={item.imageUrl}
+                      alt={item.name}
+                      sx={{ width: "100%", height: 160, objectFit: "cover" }}
+                    />
+                    {/* Diet badge */}
+                    <Chip
+                      label={item.dietType.replace("_", " ")}
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        background: dietColors.bg,
+                        border: `1px solid ${dietColors.border}`,
+                        color: dietColors.text,
+                        fontWeight: 600,
+                        fontSize: "0.65rem",
+                      }}
+                    />
+                    {qty > 0 && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          background: "linear-gradient(135deg, #F97316, #EA580C)",
+                          color: "#FFFFFF",
+                          fontSize: "0.65rem",
+                          fontWeight: 700,
+                          px: 1.5,
+                          py: 0.5,
+                          borderBottomRightRadius: "10px",
                         }}
-                        className="h-8 w-8 rounded-lg border border-gray-300 text-gray-700"
                       >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                        Added
+                      </Box>
+                    )}
+                  </Box>
+
+                  <Box sx={{ p: 2.5 }}>
+                    {/* Tags */}
+                    <Box sx={{ display: "flex", gap: 0.8, mb: 1 }}>
+                      {item.newItem && (
+                        <Chip label="New" size="small" sx={{ background: "rgba(16,185,129,0.1)", color: "#10B981", fontSize: "0.65rem", height: 22 }} />
+                      )}
+                      {item.popular && (
+                        <Chip label="Popular" size="small" sx={{ background: "rgba(245,158,11,0.1)", color: "#F59E0B", fontSize: "0.65rem", height: 22 }} />
+                      )}
+                    </Box>
+
+                    <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.95rem", mb: 0.5 }}>
+                      {item.name}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: "#6B7280",
+                        fontSize: "0.8rem",
+                        lineHeight: 1.5,
+                        mb: 1,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {item.description}
+                    </Typography>
+                    <Typography sx={{ color: "#4B5563", fontSize: "0.75rem", mb: 0.5 }}>
+                      {item.calories} cal • {item.weight}
+                    </Typography>
+                    {item.allergens.length > 0 && (
+                      <Typography sx={{ color: "#F59E0B", fontSize: "0.7rem", mb: 1.5 }}>
+                        Contains: {item.allergens.join(", ")}
+                      </Typography>
+                    )}
+
+                    {/* Price + Controls */}
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pt: 1.5, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                      <Typography
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1.05rem",
+                          background: complimentary
+                            ? "linear-gradient(135deg, #10B981, #059669)"
+                            : "linear-gradient(135deg, #F97316, #F59E0B)",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          backgroundClip: "text",
+                        }}
+                      >
+                        {complimentary ? "FREE" : `₹${price.toLocaleString("en-IN")}`}
+                      </Typography>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <IconButton
+                          onClick={() => updatePassengerItem(item, -1)}
+                          size="small"
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            background: "rgba(255,255,255,0.04)",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            color: "#9CA3AF",
+                            "&:hover": { background: "rgba(255,255,255,0.08)" },
+                          }}
+                        >
+                          <RemoveIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                        <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "0.9rem", minWidth: 20, textAlign: "center" }}>
+                          {qty}
+                        </Typography>
+                        <IconButton
+                          onClick={() => {
+                            if (qty >= 3) {
+                              toast("Max quantity is 3");
+                              return;
+                            }
+                            updatePassengerItem(item, 1);
+                          }}
+                          size="small"
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            background: "rgba(249,115,22,0.1)",
+                            border: "1px solid rgba(249,115,22,0.2)",
+                            color: "#F97316",
+                            "&:hover": { background: "rgba(249,115,22,0.2)" },
+                          }}
+                        >
+                          <AddIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Paper>
+              </motion.div>
             );
           })}
-        </div>
+        </Box>
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-30">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-          <div>
-            <p className="font-semibold text-sky-700">₹{foodTotal.toLocaleString("en-IN")} added</p>
-            <p className="text-xs text-gray-500">{totalItems} item(s) across {bookingState.numberOfSeats} seat(s)</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleSkip}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 bg-white hover:bg-gray-50"
+      {/* Fixed bottom bar */}
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: "#111111",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          py: 2,
+          px: 3,
+          zIndex: 30,
+          backdropFilter: "blur(20px)",
+        }}
+      >
+        <Box sx={{ maxWidth: 1280, mx: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+          <Box>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: "1.05rem",
+                background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
             >
-              Skip - No Meals
-            </button>
-            <button
+              ₹{foodTotal.toLocaleString("en-IN")} added
+            </Typography>
+            <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+              {totalItems} item(s) across {bookingState.numberOfSeats} seat(s)
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", gap: 1.5 }}>
+            <Button
+              onClick={handleSkip}
+              variant="outlined"
+              sx={{
+                borderRadius: "10px",
+                borderColor: "rgba(255,255,255,0.12)",
+                color: "#9CA3AF",
+                fontSize: "0.85rem",
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.2)",
+                  background: "rgba(255,255,255,0.04)",
+                },
+              }}
+            >
+              Skip Meals
+            </Button>
+            <Button
               onClick={handleContinue}
-              className="px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+              variant="contained"
+              endIcon={<ArrowForwardIcon />}
+              sx={{
+                borderRadius: "10px",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                background: "linear-gradient(135deg, #F97316, #EA580C)",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #EA580C, #DC2626)",
+                },
+              }}
             >
               Proceed to Review
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 }

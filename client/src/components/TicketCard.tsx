@@ -45,7 +45,7 @@ const TicketCard = forwardRef<HTMLDivElement, TicketCardProps>(
                   textTransform: "uppercase" as const,
                 }}
               >
-                SkyBook
+                NovaWings
               </span>
             </div>
             <span

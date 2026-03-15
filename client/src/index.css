@@ -2,6 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══ NovaWings utility classes ═══ */
+
+.nova-glass {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.nova-glass-orange {
+  background: rgba(249,115,22,0.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(249,115,22,0.2);
+}
+
+.nova-gradient-text {
+  background: linear-gradient(135deg, #F97316 0%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nova-gradient-bg {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+}
+
+.nova-card-hover {
+  transition: all 0.25s ease;
+}
+.nova-card-hover:hover {
+  border-color: rgba(249,115,22,0.3) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(249,115,22,0.1);
+}
+
+.nova-section {
+  padding: 80px 0;
+}
+
+.nova-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Remove blue focus outlines everywhere */
+*:focus-visible {
+  outline: 2px solid rgba(249,115,22,0.6);
+  outline-offset: 2px;
+}
+
 /* ── Remove number input arrows ── */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -21,16 +72,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
-/* ── Autofill background fix ── */
+/* ── Autofill background fix — dark theme ── */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 30px white inset !important;
-  -webkit-text-fill-color: #111827 !important;
+  -webkit-box-shadow: 0 0 0 30px #111111 inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* ── Existing animations ── */
+/* ── Animations ── */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -47,7 +98,7 @@ input:-webkit-autofill:focus {
   animation: slideIn 0.25s ease-out;
 }
 
-/* ── Page enter animation ── */
+/* ── Page enter animation (legacy — Framer Motion now used) ── */
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -56,3 +107,49 @@ input:-webkit-autofill:focus {
   animation: fadeSlideIn 0.4s ease-out both;
 }
 
+/* ── Stagger utility ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Apply staggered delay to grid children */
+.stagger-children > * { animation: fadeUp 0.4s ease-out both; }
+.stagger-children > *:nth-child(1)  { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2)  { animation-delay: 0.10s; }
+.stagger-children > *:nth-child(3)  { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4)  { animation-delay: 0.20s; }
+.stagger-children > *:nth-child(5)  { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6)  { animation-delay: 0.30s; }
+.stagger-children > *:nth-child(7)  { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8)  { animation-delay: 0.40s; }
+.stagger-children > *:nth-child(9)  { animation-delay: 0.45s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.50s; }
+
+/* ── Scale in ── */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-scaleIn {
+  animation: scaleIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Pulse glow ── */
+@keyframes pulseOrange {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); }
+  50%       { box-shadow: 0 0 0 6px rgba(249,115,22,0.15); }
+}
+.animate-pulse-orange {
+  animation: pulseOrange 2s ease-in-out infinite;
+}
+
+/* ── Shimmer skeleton override ── */
+.MuiSkeleton-wave::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(249,115,22,0.04),
+    transparent
+  ) !important;
+}

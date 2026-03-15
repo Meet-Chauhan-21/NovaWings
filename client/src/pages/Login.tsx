@@ -1,21 +1,50 @@
 // src/pages/Login.tsx
-// Login form using Formik + Yup with validation
+// Login form using Formik + Yup with validation — redesigned two-column MUI layout
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field } from "formik";
+import type { FieldProps } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
 import { loginUser } from "../services/authService";
 import { useAuthContext } from "../context/AuthContext";
-import BackButton from "../components/ui/BackButton";
 import type { LoginFormValues } from "../types";
+
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import GoogleIcon from "@mui/icons-material/Google";
+import AppleIcon from "@mui/icons-material/Apple";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 
 /** Yup validation schema for the login form */
 const loginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email format").required("Email is required"),
   password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
 });
+
+const FEATURES = [
+  "90+ Destinations",
+  "Instant E-Tickets",
+  "Secure Payments",
+  "24/7 Support",
+];
 
 /**
  * Login page renders a Formik-based form with email and password fields.
@@ -25,12 +54,16 @@ export default function Login() {
   const { login } = useAuthContext();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const initialValues: LoginFormValues = { email: "", password: "" };
 
   /** Handle form submission: call API, update context, navigate */
-  const handleSubmit = async (values: LoginFormValues, { setSubmitting }: { setSubmitting: (b: boolean) => void }) => {
+  const handleSubmit = async (
+    values: LoginFormValues,
+    { setSubmitting }: { setSubmitting: (b: boolean) => void }
+  ) => {
     setApiError(null);
     try {
       const response = await loginUser(values);
@@ -52,104 +85,393 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 page-enter">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-        <div className="mb-4">
-          <BackButton to="/" label="Home" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Welcome Back</h2>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        background: "#0A0A0A",
+      }}
+    >
+      {/* ── Left Branding Panel (55%) ─────────────────────────────── */}
+      <Box
+        sx={{
+          display: { xs: "none", md: "flex" },
+          flexDirection: "column",
+          justifyContent: "space-between",
+          width: "55%",
+          minHeight: "100vh",
+          p: 6,
+          background: "linear-gradient(160deg, #0A0A0A 0%, #1A0800 50%, #0A0A0A 100%)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Radial orange glow */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 520,
+            height: 520,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(249,115,22,0.18) 0%, rgba(249,115,22,0.06) 45%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
 
-        <Formik initialValues={initialValues} validationSchema={loginSchema} onSubmit={handleSubmit}>
-          {({ isSubmitting, touched, errors }) => (
-            <Form className="space-y-5">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <Field
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none ${
-                    touched.email && errors.email ? "border-red-400" : "border-gray-200"
-                  }`}
-                />
-                <ErrorMessage name="email" component="p" className="text-red-500 text-sm mt-1" />
-              </div>
+        {/* Logo */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, zIndex: 1 }}>
+          <Box
+            sx={{
+              width: 44,
+              height: 44,
+              borderRadius: "12px",
+              background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 14px rgba(249,115,22,0.4)",
+            }}
+          >
+            <FlightTakeoffIcon sx={{ color: "#fff", fontSize: 22 }} />
+          </Box>
+          <Typography
+            sx={{
+              fontSize: "1.5rem",
+              fontWeight: 800,
+              background: "linear-gradient(90deg, #F97316, #F59E0B)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            NovaWings
+          </Typography>
+        </Box>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <Field
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none ${
-                      touched.password && errors.password ? "border-red-400" : "border-gray-200"
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                  >
-                    {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                <ErrorMessage name="password" component="p" className="text-red-500 text-sm mt-1" />
-              </div>
-
-              {apiError && (
-                <div className="flex items-center gap-2 bg-red-50 border border-red-300 text-red-700 text-sm rounded-lg px-4 py-3">
-                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92z" clipRule="evenodd" />
-                    <path d="M11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" />
-                  </svg>
-                  <span>{apiError}</span>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-sky-500 text-white py-3 rounded-xl hover:bg-sky-600 transition hover:scale-105 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        {/* Center content */}
+        <Box sx={{ zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 5 }}>
+          {/* Tagline */}
+          <Box>
+            <Typography
+              sx={{
+                fontSize: "2.75rem",
+                fontWeight: 800,
+                color: "#FFFFFF",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.15,
+                mb: 1.5,
+              }}
+            >
+              Take Flight with{" "}
+              <Box
+                component="span"
+                sx={{
+                  background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
               >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                    </svg>
-                    Logging in...
-                  </span>
-                ) : (
-                  "Login"
-                )}
-              </button>
-            </Form>
-          )}
-        </Formik>
+                Confidence
+              </Box>
+            </Typography>
+            <Typography sx={{ color: "#9CA3AF", fontSize: "1.05rem", lineHeight: 1.7 }}>
+              Your journey starts here. Discover seamless travel with NovaWings.
+            </Typography>
+          </Box>
 
-        <p className="text-center text-gray-500 text-sm mt-6">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-sky-600 hover:underline font-medium">
-            Register
-          </Link>
-        </p>
-      </div>
-    </div>
+          {/* Feature highlights */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            {FEATURES.map((feat) => (
+              <Box key={feat} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <CheckCircleOutlinedIcon sx={{ color: "#F97316", fontSize: 20 }} />
+                <Typography sx={{ color: "#D1D5DB", fontSize: "0.9375rem", fontWeight: 500 }}>
+                  {feat}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+
+          {/* Abstract plane illustration */}
+          <Box sx={{ opacity: 0.12 }}>
+            <svg viewBox="0 0 400 200" width="340" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M20 140 Q80 100 160 110 L340 60 L320 80 L160 130 L200 155 L170 160 L130 140 L80 155 L70 145 L100 130 L60 125 Z"
+                fill="#F97316"
+              />
+              <circle cx="345" cy="58" r="6" fill="#F59E0B" />
+              <path d="M350 58 Q380 50 395 55" stroke="#F59E0B" strokeWidth="2" fill="none" strokeDasharray="4 3" />
+            </svg>
+          </Box>
+        </Box>
+
+        {/* Testimonial quote */}
+        <Box
+          sx={{
+            zIndex: 1,
+            p: 3,
+            borderRadius: "16px",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <FormatQuoteIcon sx={{ color: "#F97316", fontSize: 28, mb: 1, opacity: 0.8 }} />
+          <Typography sx={{ color: "#D1D5DB", fontSize: "0.9rem", lineHeight: 1.7, fontStyle: "italic" }}>
+            "Booked my monsoon getaway in under 3 minutes. NovaWings is the fastest and most reliable booking experience I've tried."
+          </Typography>
+          <Typography sx={{ color: "#F97316", fontSize: "0.8rem", fontWeight: 600, mt: 1.5 }}>
+            — Priya S., Mumbai
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* ── Right Form Panel (45%) ─────────────────────────────────── */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          width: { xs: "100%", md: "45%" },
+          minHeight: "100vh",
+          background: "#0F0F0F",
+          p: { xs: 3, sm: 5 },
+        }}
+      >
+        <Box sx={{ width: "100%", maxWidth: 400 }}>
+          {/* Mobile logo */}
+          <Box
+            sx={{
+              display: { xs: "flex", md: "none" },
+              alignItems: "center",
+              gap: 1,
+              mb: 4,
+            }}
+          >
+            <FlightTakeoffIcon sx={{ color: "#F97316", fontSize: 24 }} />
+            <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "#F97316" }}>
+              NovaWings
+            </Typography>
+          </Box>
+
+          <Typography variant="h4" sx={{ fontWeight: 800, color: "#FFFFFF", mb: 0.75 }}>
+            Welcome Back
+          </Typography>
+          <Typography sx={{ color: "#6B7280", fontSize: "0.9375rem", mb: 4 }}>
+            Sign in to your NovaWings account
+          </Typography>
+
+          <Formik initialValues={initialValues} validationSchema={loginSchema} onSubmit={handleSubmit}>
+            {({ isSubmitting, touched, errors }) => (
+              <Form>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+
+                  {/* Email */}
+                  <Field name="email">
+                    {({ field }: FieldProps) => (
+                      <Box>
+                        <TextField
+                          {...field}
+                          fullWidth
+                          label="Email Address"
+                          type="email"
+                          placeholder="you@example.com"
+                          error={touched.email && Boolean(errors.email)}
+                          helperText={touched.email && errors.email}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <EmailOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                </InputAdornment>
+                              ),
+                            },
+                          }}
+                        />
+                      </Box>
+                    )}
+                  </Field>
+
+                  {/* Password */}
+                  <Field name="password">
+                    {({ field }: FieldProps) => (
+                      <Box>
+                        <TextField
+                          {...field}
+                          fullWidth
+                          label="Password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          error={touched.password && Boolean(errors.password)}
+                          helperText={touched.password && errors.password}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <LockOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() => setShowPassword((s) => !s)}
+                                    edge="end"
+                                    size="small"
+                                    sx={{ color: "#6B7280" }}
+                                  >
+                                    {showPassword ? (
+                                      <VisibilityOffOutlinedIcon fontSize="small" />
+                                    ) : (
+                                      <VisibilityOutlinedIcon fontSize="small" />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            },
+                          }}
+                        />
+                      </Box>
+                    )}
+                  </Field>
+
+                  {/* Remember me + Forgot password */}
+                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          size="small"
+                          sx={{
+                            color: "#4B5563",
+                            "&.Mui-checked": { color: "#F97316" },
+                          }}
+                        />
+                      }
+                      label={
+                        <Typography sx={{ color: "#9CA3AF", fontSize: "0.875rem" }}>
+                          Remember me
+                        </Typography>
+                      }
+                    />
+                    <Typography
+                      component={Link}
+                      to="/forgot-password"
+                      sx={{
+                        color: "#F97316",
+                        fontSize: "0.875rem",
+                        fontWeight: 500,
+                        textDecoration: "none",
+                        "&:hover": { textDecoration: "underline" },
+                      }}
+                    >
+                      Forgot Password?
+                    </Typography>
+                  </Box>
+
+                  {/* API error */}
+                  {apiError && (
+                    <Alert severity="error" sx={{ borderRadius: "12px" }}>
+                      {apiError}
+                    </Alert>
+                  )}
+
+                  {/* Submit button */}
+                  <Button
+                    type="submit"
+                    fullWidth
+                    size="large"
+                    variant="contained"
+                    disabled={isSubmitting}
+                    sx={{
+                      py: 1.6,
+                      fontSize: "1rem",
+                      fontWeight: 700,
+                      borderRadius: "12px",
+                      background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
+                      boxShadow: "0 4px 20px rgba(249,115,22,0.4)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #FB923C 0%, #F97316 100%)",
+                        boxShadow: "0 6px 24px rgba(249,115,22,0.55)",
+                      },
+                      "&:disabled": { opacity: 0.6 },
+                    }}
+                  >
+                    {isSubmitting ? (
+                      <CircularProgress size={22} sx={{ color: "#fff" }} />
+                    ) : (
+                      "Sign In"
+                    )}
+                  </Button>
+
+                  {/* Social sign-in */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, my: 0.5 }}>
+                    <Divider sx={{ flex: 1, borderColor: "rgba(255,255,255,0.08)" }} />
+                    <Typography sx={{ color: "#4B5563", fontSize: "0.8125rem", whiteSpace: "nowrap" }}>
+                      Or continue with
+                    </Typography>
+                    <Divider sx={{ flex: 1, borderColor: "rgba(255,255,255,0.08)" }} />
+                  </Box>
+
+                  <Box sx={{ display: "flex", gap: 1.5 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      disabled
+                      startIcon={<GoogleIcon />}
+                      sx={{
+                        borderColor: "rgba(255,255,255,0.1)",
+                        color: "#6B7280",
+                        borderRadius: "10px",
+                        py: 1.25,
+                        "&:disabled": { borderColor: "rgba(255,255,255,0.06)", color: "#4B5563" },
+                      }}
+                    >
+                      Google
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      disabled
+                      startIcon={<AppleIcon />}
+                      sx={{
+                        borderColor: "rgba(255,255,255,0.1)",
+                        color: "#6B7280",
+                        borderRadius: "10px",
+                        py: 1.25,
+                        "&:disabled": { borderColor: "rgba(255,255,255,0.06)", color: "#4B5563" },
+                      }}
+                    >
+                      Apple
+                    </Button>
+                  </Box>
+
+                  {/* Sign up link */}
+                  <Typography sx={{ textAlign: "center", color: "#6B7280", fontSize: "0.9rem", mt: 0.5 }}>
+                    Don't have an account?{" "}
+                    <Box
+                      component={Link}
+                      to="/register"
+                      sx={{
+                        color: "#F97316",
+                        fontWeight: 600,
+                        textDecoration: "none",
+                        "&:hover": { textDecoration: "underline" },
+                      }}
+                    >
+                      Sign Up
+                    </Box>
+                  </Typography>
+
+                </Box>
+              </Form>
+            )}
+          </Formik>
+        </Box>
+      </Box>
+    </Box>
   );
 }

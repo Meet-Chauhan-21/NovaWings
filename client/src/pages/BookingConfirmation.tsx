@@ -1,9 +1,10 @@
 // src/pages/BookingConfirmation.tsx
-// Booking confirmation page shown after successful payment — professional e-ticket
+// Booking confirmation page shown after successful payment — dark theme with animations
 
 import { useMemo } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { getBookingById } from "../services/bookingService";
 import paymentService from "../services/paymentService";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -12,6 +13,15 @@ import TicketCard from "../components/TicketCard";
 import { useTicketDownload } from "../hooks/useTicketDownload";
 import { getAirportCode } from "../utils/airportHelper";
 import type { TicketData } from "../types";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DownloadIcon from "@mui/icons-material/Download";
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 
 function formatDateStr(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", {
@@ -112,103 +122,205 @@ export default function BookingConfirmation() {
   if (!paymentResult && isError) return <ErrorMessage message="Failed to load booking details." />;
   if (!paymentResult && !booking) return <ErrorMessage message="Booking not found." />;
 
+  // Confetti colors
+  const confettiColors = ["#F97316", "#F59E0B", "#EF4444", "#3B82F6", "#22C55E", "#A855F7", "#EC4899", "#06B6D4"];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50 py-12 px-4">
+    <Box sx={{ minHeight: "100vh", py: { xs: 6, md: 10 }, px: { xs: 2, md: 3 } }}>
       <style>{`
-        @keyframes checkPop {
-          0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-          60% { transform: scale(1.3) rotate(5deg); }
-          80% { transform: scale(0.95); }
-          100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        .check-animate {
-          animation: checkPop 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;
-        }
         @keyframes confettiFall {
-          0% { transform: translateY(-10px); opacity: 1; }
-          100% { transform: translateY(60px); opacity: 0; }
-        }
-        .confetti-dot {
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          animation: confettiFall 1.2s ease-out forwards;
+          0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(80px) rotate(360deg); opacity: 0; }
         }
         @media print {
           .no-print { display: none !important; }
         }
       `}</style>
 
-      <div className="max-w-2xl mx-auto">
-        {/* ── Success Header with Animation ── */}
-        <div className="text-center mb-10">
-          <div className="relative inline-block">
-            <div className="check-animate inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100 mb-4">
-              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            {/* Confetti dots */}
-            {["#ef4444","#3b82f6","#22c55e","#eab308","#a855f7","#f97316","#ec4899","#06b6d4"].map((color, i) => (
-              <div
-                key={i}
-                className="confetti-dot"
-                style={{
-                  backgroundColor: color,
-                  top: `${10 + Math.sin(i * 0.8) * 30}px`,
-                  left: `${50 + Math.cos(i * 0.8) * 50}%`,
-                  animationDelay: `${i * 0.1}s`,
+      <Box sx={{ maxWidth: 700, mx: "auto" }}>
+        {/* Success Header with Animation */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+        >
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            <Box sx={{ position: "relative", display: "inline-block", mb: 3 }}>
+              {/* Confetti dots */}
+              {confettiColors.map((color, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    position: "absolute",
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    backgroundColor: color,
+                    top: `${10 + Math.sin(i * 0.8) * 35}px`,
+                    left: `${50 + Math.cos(i * 0.8) * 55}%`,
+                    animation: `confettiFall 1.4s ease-out ${i * 0.1}s forwards`,
+                  }}
+                />
+              ))}
+
+              {/* Check circle */}
+              <motion.div
+                initial={{ scale: 0, rotate: -45 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
+              >
+                <Box
+                  sx={{
+                    width: 88,
+                    height: 88,
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05))",
+                    border: "2px solid rgba(34,197,94,0.3)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <CheckCircleIcon sx={{ fontSize: 48, color: "#22C55E" }} />
+                </Box>
+              </motion.div>
+            </Box>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "1.5rem", md: "2rem" },
+                  fontWeight: 800,
+                  color: "#FFFFFF",
+                  mb: 1,
                 }}
-              />
-            ))}
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800">Payment Successful!</h1>
-          <p className="text-gray-500 mt-1">Your booking has been confirmed</p>
-        </div>
+              >
+                Payment Successful!
+              </Typography>
+              <Typography sx={{ color: "#6B7280", fontSize: "0.95rem" }}>
+                Your booking has been confirmed
+              </Typography>
+            </motion.div>
+          </Box>
+        </motion.div>
 
-        {/* ── Full Professional Ticket ── */}
-        {ticketData && <TicketCard ref={ticketRef} ticket={ticketData} />}
+        {/* Ticket Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          {ticketData && <TicketCard ref={ticketRef} ticket={ticketData} />}
+        </motion.div>
 
-        {/* ── Actions ── */}
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 no-print">
-          <button
-            onClick={() =>
-              ticketData &&
-              downloadTicket(ticketData.bookingId, ticketData.passengerName)
-            }
-            disabled={isDownloading || !ticketData}
-            className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-sky-600 hover:bg-sky-700 text-white font-bold text-base rounded-2xl transition shadow-lg shadow-sky-200 disabled:opacity-60"
+        {/* Action Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.9 }}
+          className="no-print"
+        >
+          <Box
+            sx={{
+              mt: 5,
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 2,
+            }}
           >
-            {isDownloading ? (
-              <>
-                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Generating PDF...
-              </>
-            ) : (
-              <>📥 Download Ticket PDF</>
-            )}
-          </button>
-          <Link
-            to="/explore"
-            className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 font-medium py-4 rounded-2xl hover:bg-gray-50 transition shadow-sm"
-          >
-            ✈ Book Another Flight
-          </Link>
-        </div>
+            <Button
+              onClick={() =>
+                ticketData &&
+                downloadTicket(ticketData.bookingId, ticketData.passengerName)
+              }
+              disabled={isDownloading || !ticketData}
+              variant="contained"
+              startIcon={isDownloading ? undefined : <DownloadIcon />}
+              sx={{
+                flex: 1,
+                py: 2,
+                borderRadius: "14px",
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                background: "linear-gradient(135deg, #F97316, #EA580C)",
+                boxShadow: "0 8px 30px rgba(249,115,22,0.3)",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #EA580C, #DC2626)",
+                },
+                "&.Mui-disabled": {
+                  background: "rgba(255,255,255,0.06)",
+                  color: "#4B5563",
+                },
+              }}
+            >
+              {isDownloading ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      border: "2px solid rgba(255,255,255,0.3)",
+                      borderTop: "2px solid #FFFFFF",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite",
+                      "@keyframes spin": { "100%": { transform: "rotate(360deg)" } },
+                    }}
+                  />
+                  Generating PDF...
+                </Box>
+              ) : (
+                "Download Ticket PDF"
+              )}
+            </Button>
 
-        <div className="mt-4 text-center no-print">
-          <Link
-            to="/my-bookings"
-            className="text-sky-600 hover:text-sky-700 font-medium text-sm hover:underline"
-          >
-            📋 View All My Bookings
-          </Link>
-        </div>
-      </div>
-    </div>
+            <Button
+              component={Link}
+              to="/explore"
+              variant="outlined"
+              startIcon={<FlightTakeoffIcon />}
+              sx={{
+                flex: 1,
+                py: 2,
+                borderRadius: "14px",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                borderColor: "rgba(255,255,255,0.12)",
+                color: "#9CA3AF",
+                "&:hover": {
+                  borderColor: "#F97316",
+                  color: "#F97316",
+                  background: "rgba(249,115,22,0.04)",
+                },
+              }}
+            >
+              Book Another Flight
+            </Button>
+          </Box>
+
+          <Box sx={{ mt: 3, textAlign: "center" }}>
+            <Button
+              component={Link}
+              to="/my-bookings"
+              startIcon={<ListAltIcon sx={{ fontSize: 18 }} />}
+              sx={{
+                color: "#F97316",
+                fontSize: "0.85rem",
+                fontWeight: 500,
+                textTransform: "none",
+                "&:hover": {
+                  background: "rgba(249,115,22,0.06)",
+                },
+              }}
+            >
+              View All My Bookings
+            </Button>
+          </Box>
+        </motion.div>
+      </Box>
+    </Box>
   );
 }

@@ -1,9 +1,30 @@
+// src/pages/PaymentPreview.tsx
+// Payment review and checkout page — dark theme with MUI components
+
 import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import BackButton from "../components/ui/BackButton";
+import { motion } from "framer-motion";
 import BookingProgress from "../components/BookingProgress";
 import { useRazorpay } from "../hooks/useRazorpay";
 import type { FoodOrder } from "../types";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import FlightIcon from "@mui/icons-material/Flight";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import PaymentIcon from "@mui/icons-material/Payment";
 
 interface PaymentPreviewState {
   flightId: string;
@@ -33,12 +54,12 @@ export default function PaymentPreview() {
 
   if (!state) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <p className="text-gray-600 mb-4">Booking information not found.</p>
-        <button onClick={() => navigate("/")} className="px-4 py-2 bg-sky-600 text-white rounded-lg">
+      <Box sx={{ maxWidth: 600, mx: "auto", px: 3, py: 12, textAlign: "center" }}>
+        <Typography sx={{ color: "#6B7280", mb: 3 }}>Booking information not found.</Typography>
+        <Button variant="contained" onClick={() => navigate("/")} sx={{ borderRadius: "10px" }}>
           Go Home
-        </button>
-      </div>
+        </Button>
+      </Box>
     );
   }
 
@@ -76,103 +97,312 @@ export default function PaymentPreview() {
   const canPay = acceptTerms && acceptRefundRule && !isProcessing;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      <BackButton to={`/select-food/${confirmedState.flightId}`} label="Back" />
+    <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, md: 3 }, py: { xs: 3, md: 5 } }}>
+      {/* Back button */}
+      <IconButton
+        onClick={() => navigate(`/select-food/${confirmedState.flightId}`)}
+        sx={{
+          mb: 2,
+          color: "#9CA3AF",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          "&:hover": { background: "rgba(249,115,22,0.1)", color: "#F97316" },
+        }}
+      >
+        <ArrowBackIcon fontSize="small" />
+      </IconButton>
 
       <BookingProgress activeStep={4} />
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-6">
-        <h1 className="text-2xl font-bold text-gray-900">Review Your Booking</h1>
-      </div>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <Typography sx={{ fontSize: { xs: "1.4rem", md: "1.7rem" }, fontWeight: 800, color: "#FFFFFF", mb: 3 }}>
+          Review Your Booking
+        </Typography>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <h2 className="font-bold text-gray-900 mb-2">Flight Summary</h2>
-            <p className="text-gray-700">
-              {state.airlineName} {state.flightNumber} | {state.source} to {state.destination}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              {new Date(confirmedState.departureTime).toLocaleString("en-IN")} | {confirmedState.cabinClass}
-            </p>
-            <p className="text-sm text-gray-600 mt-2">Seats: {confirmedState.selectedSeats.join(", ")}</p>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <h2 className="font-bold text-gray-900 mb-3">Meal Summary</h2>
-            {confirmedState.mealSkipped || selectedMeals.length === 0 ? (
-              <p className="text-sm text-gray-500">No meals selected for this flight.</p>
-            ) : (
-              <div className="space-y-4">
-                {selectedMeals.map((order) => (
-                  <div key={order.seatNumber} className="border border-amber-100 bg-amber-50 rounded-xl p-4">
-                    <p className="font-semibold text-gray-800">
-                      Seat {order.seatNumber} - {order.passengerLabel}
-                    </p>
-                    <ul className="mt-2 space-y-1 text-sm text-gray-700">
-                      {order.items.map((item) => (
-                        <li key={item.foodItemId} className="flex justify-between">
-                          <span>
-                            {item.foodItemName} x {item.quantity}
-                          </span>
-                          <span>₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="text-sm font-semibold text-right mt-2">Subtotal: ₹{order.subtotal.toLocaleString("en-IN")}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <h2 className="font-bold text-gray-900 mb-3">Price Breakdown</h2>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span>Base Fare ({confirmedState.numberOfSeats} x ₹{confirmedState.basePrice.toLocaleString("en-IN")})</span><span>₹{baseFare.toLocaleString("en-IN")}</span></div>
-              <div className="flex justify-between"><span>Taxes & Fees (18%)</span><span>₹{taxes.toLocaleString("en-IN")}</span></div>
-              <div className="flex justify-between"><span>Convenience Fee</span><span>₹{convenienceFee.toLocaleString("en-IN")}</span></div>
-              <div className="flex justify-between"><span>Meals</span><span>₹{meals.toLocaleString("en-IN")}</span></div>
-              <div className="border-t pt-3 mt-3 flex justify-between text-lg font-bold text-emerald-700">
-                <span>Total Amount</span>
-                <span>₹{grandTotal.toLocaleString("en-IN")}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-3 text-sm text-gray-700">
-            <p className="font-medium text-gray-900">Payment Methods</p>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-2 py-1 bg-gray-100 rounded">Card</span>
-              <span className="px-2 py-1 bg-gray-100 rounded">UPI</span>
-              <span className="px-2 py-1 bg-gray-100 rounded">Net Banking</span>
-            </div>
-            <p className="text-xs text-gray-500">All methods are processed securely by Razorpay.</p>
-            <label className="flex items-start gap-2">
-              <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} />
-              <span>I agree to the Terms & Conditions.</span>
-            </label>
-            <label className="flex items-start gap-2">
-              <input type="checkbox" checked={acceptRefundRule} onChange={(e) => setAcceptRefundRule(e.target.checked)} />
-              <span>No refund for cancellation less than 24 hours before departure.</span>
-            </label>
-            <button
-              onClick={handlePay}
-              disabled={!canPay}
-              className={`w-full py-3 rounded-xl font-bold transition ${canPay ? "bg-sky-600 text-white hover:bg-sky-700" : "bg-gray-200 text-gray-500"}`}
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 380px" }, gap: 3 }}>
+        {/* Left column — details */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          {/* Flight Summary */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
+            <Paper
+              sx={{
+                background: "#111111",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: "16px",
+                p: 3,
+              }}
             >
-              {isProcessing ? "Processing..." : `Pay ₹${grandTotal.toLocaleString("en-IN")} Securely`}
-            </button>
-            <div className="text-xs text-gray-500 flex gap-3">
-              <span>256-bit SSL</span>
-              <span>Razorpay</span>
-              <span>PCI DSS</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+                <FlightIcon sx={{ color: "#F97316", fontSize: 20 }} />
+                <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700 }}>
+                  Flight Summary
+                </Typography>
+              </Box>
+              <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "1rem", mb: 0.5 }}>
+                {state.airlineName} {state.flightNumber}
+              </Typography>
+              <Typography sx={{ color: "#FFFFFF", fontSize: "0.9rem", mb: 1 }}>
+                {state.source} → {state.destination}
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+                  {new Date(confirmedState.departureTime).toLocaleString("en-IN")}
+                </Typography>
+                <Chip
+                  label={confirmedState.cabinClass}
+                  size="small"
+                  sx={{
+                    background: "rgba(249,115,22,0.1)",
+                    border: "1px solid rgba(249,115,22,0.2)",
+                    color: "#F97316",
+                    fontSize: "0.7rem",
+                    height: 22,
+                  }}
+                />
+              </Box>
+              <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 2 }} />
+              <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>
+                Seats: {confirmedState.selectedSeats.join(", ")}
+              </Typography>
+            </Paper>
+          </motion.div>
+
+          {/* Meal Summary */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
+            <Paper
+              sx={{
+                background: "#111111",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: "16px",
+                p: 3,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+                <RestaurantMenuIcon sx={{ color: "#F97316", fontSize: 20 }} />
+                <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700 }}>
+                  Meal Summary
+                </Typography>
+              </Box>
+              {confirmedState.mealSkipped || selectedMeals.length === 0 ? (
+                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+                  No meals selected for this flight.
+                </Typography>
+              ) : (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {selectedMeals.map((order) => (
+                    <Box
+                      key={order.seatNumber}
+                      sx={{
+                        background: "rgba(249,115,22,0.04)",
+                        border: "1px solid rgba(249,115,22,0.1)",
+                        borderRadius: "12px",
+                        p: 2.5,
+                      }}
+                    >
+                      <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.9rem", mb: 1 }}>
+                        Seat {order.seatNumber} — {order.passengerLabel}
+                      </Typography>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
+                        {order.items.map((item) => (
+                          <Box key={item.foodItemId} sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>
+                              {item.foodItemName} x {item.quantity}
+                            </Typography>
+                            <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>
+                              ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                      <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 1.5 }} />
+                      <Typography sx={{ color: "#F97316", fontSize: "0.85rem", fontWeight: 600, textAlign: "right" }}>
+                        Subtotal: ₹{order.subtotal.toLocaleString("en-IN")}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Paper>
+          </motion.div>
+        </Box>
+
+        {/* Right column — payment */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          {/* Price Breakdown */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}>
+            <Paper
+              sx={{
+                background: "#111111",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: "16px",
+                p: 3,
+                position: "sticky",
+                top: 86,
+              }}
+            >
+              <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 2.5 }}>
+                Price Breakdown
+              </Typography>
+
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+                    Base Fare ({confirmedState.numberOfSeats} × ₹{confirmedState.basePrice.toLocaleString("en-IN")})
+                  </Typography>
+                  <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>
+                    ₹{baseFare.toLocaleString("en-IN")}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Taxes & Fees (18%)</Typography>
+                  <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{taxes.toLocaleString("en-IN")}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Convenience Fee</Typography>
+                  <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{convenienceFee.toLocaleString("en-IN")}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Meals</Typography>
+                  <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{meals.toLocaleString("en-IN")}</Typography>
+                </Box>
+
+                <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", my: 1 }} />
+
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.1rem" }}>Total Amount</Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: "1.3rem",
+                      background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    ₹{grandTotal.toLocaleString("en-IN")}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 2.5 }} />
+
+              {/* Payment Methods */}
+              <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 1.5 }}>
+                Payment Methods
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, mb: 2.5, flexWrap: "wrap" }}>
+                {[
+                  { icon: <CreditCardIcon sx={{ fontSize: 14 }} />, label: "Card" },
+                  { icon: <PaymentIcon sx={{ fontSize: 14 }} />, label: "UPI" },
+                  { label: "Net Banking" },
+                ].map((method) => (
+                  <Chip
+                    key={method.label}
+                    icon={method.icon}
+                    label={method.label}
+                    size="small"
+                    sx={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      color: "#9CA3AF",
+                      fontSize: "0.75rem",
+                      "& .MuiChip-icon": { color: "#9CA3AF" },
+                    }}
+                  />
+                ))}
+              </Box>
+              <Typography sx={{ color: "#4B5563", fontSize: "0.75rem", mb: 2.5 }}>
+                All methods are processed securely by Razorpay.
+              </Typography>
+
+              {/* Terms checkboxes */}
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, mb: 2.5 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={acceptTerms}
+                      onChange={(e) => setAcceptTerms(e.target.checked)}
+                      size="small"
+                      sx={{
+                        color: "#4B5563",
+                        "&.Mui-checked": { color: "#F97316" },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>
+                      I agree to the Terms & Conditions.
+                    </Typography>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={acceptRefundRule}
+                      onChange={(e) => setAcceptRefundRule(e.target.checked)}
+                      size="small"
+                      sx={{
+                        color: "#4B5563",
+                        "&.Mui-checked": { color: "#F97316" },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>
+                      No refund for cancellation less than 24 hours before departure.
+                    </Typography>
+                  }
+                />
+              </Box>
+
+              {/* Pay button */}
+              <Button
+                onClick={handlePay}
+                disabled={!canPay}
+                variant="contained"
+                fullWidth
+                sx={{
+                  py: 1.8,
+                  borderRadius: "12px",
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  background: canPay
+                    ? "linear-gradient(135deg, #F97316, #EA580C)"
+                    : "rgba(255,255,255,0.06)",
+                  color: canPay ? "#FFFFFF" : "#4B5563",
+                  "&:hover": {
+                    background: canPay
+                      ? "linear-gradient(135deg, #EA580C, #DC2626)"
+                      : "rgba(255,255,255,0.06)",
+                  },
+                  "&.Mui-disabled": {
+                    color: "#4B5563",
+                  },
+                  mb: 2,
+                }}
+              >
+                {isProcessing ? "Processing..." : `Pay ₹${grandTotal.toLocaleString("en-IN")} Securely`}
+              </Button>
+
+              {/* Trust badges */}
+              <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+                {[
+                  { icon: <LockOutlinedIcon sx={{ fontSize: 12 }} />, label: "256-bit SSL" },
+                  { icon: <VerifiedIcon sx={{ fontSize: 12 }} />, label: "Razorpay" },
+                  { label: "PCI DSS" },
+                ].map((badge) => (
+                  <Box key={badge.label} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    {badge.icon && <Box sx={{ color: "#4B5563" }}>{badge.icon}</Box>}
+                    <Typography sx={{ color: "#4B5563", fontSize: "0.7rem" }}>{badge.label}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+          </motion.div>
+        </Box>
+      </Box>
+    </Box>
   );
 }

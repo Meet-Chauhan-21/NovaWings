@@ -1,64 +1,169 @@
-import React from "react";
+// src/components/BookingProgress.tsx
+// MUI Stepper component for booking flow with custom dark theme styling
+
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import Typography from "@mui/material/Typography";
+
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import AirlineSeatReclineExtraIcon from "@mui/icons-material/AirlineSeatReclineExtra";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import PaymentIcon from "@mui/icons-material/Payment";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 interface BookingProgressProps {
   activeStep: number;
 }
 
-interface Step {
-  label: string;
-  icon: string;
-}
-
-const steps: Step[] = [
-  { label: "Search", icon: "🔍" },
-  { label: "Seats", icon: "💺" },
-  { label: "Meals", icon: "🍽" },
-  { label: "Review", icon: "📋" },
-  { label: "Payment", icon: "💳" },
+const STEPS = [
+  { label: "Passengers", icon: PersonOutlineIcon },
+  { label: "Seats", icon: AirlineSeatReclineExtraIcon },
+  { label: "Meals", icon: RestaurantMenuIcon },
+  { label: "Review", icon: ReceiptLongIcon },
+  { label: "Payment", icon: PaymentIcon },
 ];
 
-export default function BookingProgress({ activeStep }: BookingProgressProps) {
+function CustomStepIcon({
+  active,
+  completed,
+  icon,
+}: {
+  active: boolean;
+  completed: boolean;
+  icon: React.ReactNode;
+}) {
+  const stepIndex = Number(icon) - 1;
+  const StepIcon = STEPS[stepIndex]?.icon;
+
+  if (completed) {
+    return (
+      <Box
+        sx={{
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, #F97316, #EA580C)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CheckCircleIcon sx={{ color: "#fff", fontSize: 22 }} />
+      </Box>
+    );
+  }
+
+  if (active) {
+    return (
+      <Box
+        sx={{
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, #F97316, #F59E0B)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 0 0 4px rgba(249,115,22,0.2)",
+          animation: "pulse 2s ease-in-out infinite",
+          "@keyframes pulse": {
+            "0%, 100%": { boxShadow: "0 0 0 4px rgba(249,115,22,0.2)" },
+            "50%": { boxShadow: "0 0 0 8px rgba(249,115,22,0.1)" },
+          },
+        }}
+      >
+        {StepIcon && <StepIcon sx={{ color: "#fff", fontSize: 20 }} />}
+      </Box>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-2xl border border-sky-100 shadow-sm p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-2">
-        {steps.map((step, index) => {
-          const stepNumber = index + 1;
-          const completed = stepNumber < activeStep;
-          const active = stepNumber === activeStep;
-          const upcoming = stepNumber > activeStep;
+    <Box
+      sx={{
+        width: 40,
+        height: 40,
+        borderRadius: "50%",
+        background: "rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#6B7280",
+      }}
+    >
+      <Typography sx={{ fontSize: "0.85rem", fontWeight: 600 }}>
+        {Number(icon)}
+      </Typography>
+    </Box>
+  );
+}
 
-          return (
-            <React.Fragment key={step.label}>
-              <div className="flex flex-col items-center min-w-0 flex-1">
-                <div
-                  className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold transition ${
-                    completed
-                      ? "bg-green-600 text-white"
-                      : active
-                      ? "bg-sky-600 text-white scale-105"
-                      : "bg-gray-100 text-gray-500"
-                  }`}
-                >
-                  {completed ? "✓" : step.icon}
-                </div>
-                <span
-                  className={`mt-2 text-[11px] sm:text-xs font-medium text-center ${
-                    active ? "text-sky-700" : upcoming ? "text-gray-500" : "text-green-700"
-                  }`}
-                >
-                  {step.label}
-                </span>
-              </div>
+export default function BookingProgress({ activeStep }: BookingProgressProps) {
+  // Map external step numbers (1-5) to internal index (0-4)
+  const stepIndex = activeStep - 1;
 
-              {index < steps.length - 1 && (
-                <div
-                  className={`h-0.5 flex-1 ${completed ? "bg-green-500" : "border-t border-dashed border-gray-300"}`}
+  return (
+    <Box
+      sx={{
+        background: "#111111",
+        border: "1px solid rgba(255,255,255,0.06)",
+        borderRadius: "16px",
+        p: { xs: 2.5, sm: 3.5 },
+        mb: 3,
+      }}
+    >
+      <Stepper
+        activeStep={stepIndex}
+        alternativeLabel
+        sx={{
+          "& .MuiStepConnector-line": {
+            borderTopStyle: "dashed",
+            borderTopWidth: 2,
+            borderColor: "rgba(255,255,255,0.1)",
+          },
+          "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": {
+            borderColor: "#F97316",
+            borderTopStyle: "solid",
+          },
+          "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": {
+            borderColor: "#F97316",
+            borderTopStyle: "solid",
+          },
+        }}
+      >
+        {STEPS.map((step, index) => (
+          <Step key={step.label} completed={index < stepIndex}>
+            <StepLabel
+              StepIconComponent={(props) => (
+                <CustomStepIcon
+                  active={props.active ?? false}
+                  completed={props.completed ?? false}
+                  icon={props.icon}
                 />
               )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </div>
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                  fontWeight: index === stepIndex ? 600 : 400,
+                  color:
+                    index < stepIndex
+                      ? "#F97316"
+                      : index === stepIndex
+                        ? "#FFFFFF"
+                        : "#6B7280",
+                  mt: 0.5,
+                }}
+              >
+                {step.label}
+              </Typography>
+            </StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+    </Box>
   );
 }

@@ -1,156 +1,532 @@
 // src/components/Navbar.tsx
-// Top navigation bar with links, auth state awareness, and responsive hamburger menu
+// Top navigation bar with links, auth state awareness, and responsive drawer menu
 
-import { useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import { isAdmin } from "../utils/roleHelper";
 
-/**
- * Navbar displays navigation links, login/logout buttons,
- * admin badge only for admins, and a responsive mobile hamburger menu.
- */
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Avatar from "@mui/material/Avatar";
+import Badge from "@mui/material/Badge";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import FlightIcon from "@mui/icons-material/Flight";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import LogoutIcon from "@mui/icons-material/Logout";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+
+// ── Nav links ────────────────────────────
+const NAV_LINKS = [
+  { label: "Home", path: "/" },
+  { label: "Explore", path: "/explore" },
+  { label: "Flights", path: "/search" },
+];
+
 export default function Navbar() {
   const { user, logout } = useAuthContext();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
   const userIsAdmin = isAdmin(user?.role);
 
-  /** Toggle the mobile hamburger menu */
-  const toggleMenu = useCallback(() => setMenuOpen((prev) => !prev), []);
+  // ── Mobile drawer ────────────────────────
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const toggleDrawer = useCallback(() => setDrawerOpen((p) => !p), []);
 
-  /** Handle logout and close menus */
+  // ── Avatar menu ──────────────────────────
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
+  const openMenu = useCallback((e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget), []);
+  const closeMenu = useCallback(() => setAnchorEl(null), []);
+
+  // ── Scroll detection ─────────────────────
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // ── Handlers ─────────────────────────────
   const handleLogout = useCallback(() => {
+    closeMenu();
+    setDrawerOpen(false);
     logout();
-    setMenuOpen(false);
-  }, [logout]);
+  }, [logout, closeMenu]);
 
-  /** Navigate and close mobile menu */
   const handleNavigate = useCallback(
     (path: string) => {
+      closeMenu();
+      setDrawerOpen(false);
       navigate(path);
-      setMenuOpen(false);
     },
-    [navigate]
+    [navigate, closeMenu]
   );
 
-  return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 text-sky-600 font-bold text-xl">
-          ✈ SkyBook
-        </Link>
+  const isActive = (path: string) => location.pathname === path;
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-6">
-          <Link to="/explore" className="text-gray-700 hover:text-sky-600 transition font-medium">
-            Explore
-          </Link>
-          <Link to="/search" className="text-gray-700 hover:text-sky-600 transition font-medium">
-            Search
-          </Link>
+  const userInitial = user?.name?.charAt(0)?.toUpperCase() || "U";
+
+  return (
+    <>
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          background: scrolled ? "rgba(10,10,10,0.95)" : "rgba(10,10,10,0.85)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          borderBottom: scrolled
+            ? "1px solid rgba(249,115,22,0.15)"
+            : "1px solid rgba(255,255,255,0.06)",
+          height: 70,
+          transition: "all 0.3s ease",
+        }}
+      >
+        <Toolbar
+          sx={{
+            maxWidth: 1280,
+            width: "100%",
+            mx: "auto",
+            height: 70,
+            px: { xs: 2, md: 3 },
+          }}
+        >
+          {/* ── Logo ──────────────────────────── */}
+          <Box
+            onClick={() => navigate("/")}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.2,
+              cursor: "pointer",
+              mr: { md: 6 },
+            }}
+          >
+            <FlightTakeoffIcon sx={{ color: "#F97316", fontSize: 30 }} />
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: "1.2rem",
+                  lineHeight: 1.1,
+                  background: "linear-gradient(135deg, #F97316 0%, #F59E0B 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                NovaWings
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "0.6rem",
+                  color: "#6B7280",
+                  letterSpacing: "0.08em",
+                  lineHeight: 1,
+                  display: { xs: "none", md: "block" },
+                }}
+              >
+                Fly Smarter
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* ── Center Nav Links (desktop) ─────── */}
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 4,
+              flex: 1,
+              justifyContent: "center",
+            }}
+          >
+            {NAV_LINKS.map((link) => (
+              <Box
+                key={link.label}
+                onClick={() => !link.comingSoon && handleNavigate(link.path)}
+                sx={{
+                  position: "relative",
+                  cursor: link.comingSoon ? "default" : "pointer",
+                  opacity: link.comingSoon ? 0.4 : 1,
+                  py: 0.5,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: isActive(link.path) ? "#F97316" : "#9CA3AF",
+                    fontWeight: isActive(link.path) ? 600 : 400,
+                    transition: "color 0.2s ease",
+                    "&:hover": {
+                      color: link.comingSoon ? "#9CA3AF" : "#F97316",
+                    },
+                  }}
+                >
+                  {link.label}
+                </Typography>
+                {/* Underline */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: -2,
+                    left: 0,
+                    width: isActive(link.path) ? "100%" : "0%",
+                    height: 2,
+                    background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                    borderRadius: 1,
+                    transition: "width 0.2s ease",
+                    ...(link.comingSoon
+                      ? {}
+                      : {
+                          ".MuiBox-root:hover > &": {
+                            width: "100%",
+                          },
+                        }),
+                  }}
+                />
+              </Box>
+            ))}
+
+            {userIsAdmin && (
+              <Box
+                onClick={() => handleNavigate("/admin")}
+                sx={{ position: "relative", cursor: "pointer", py: 0.5 }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: isActive("/admin") ? "#F97316" : "#9CA3AF",
+                    fontWeight: isActive("/admin") ? 600 : 400,
+                    transition: "color 0.2s ease",
+                    "&:hover": { color: "#F97316" },
+                  }}
+                >
+                  Dashboard
+                </Typography>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: -2,
+                    left: 0,
+                    width: isActive("/admin") ? "100%" : "0%",
+                    height: 2,
+                    background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                    borderRadius: 1,
+                    transition: "width 0.2s ease",
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+
+          {/* ── Right Side (desktop) ──────────── */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1.5 }}>
+            {!user ? (
+              <>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => navigate("/login")}
+                  sx={{ borderRadius: "10px" }}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => navigate("/register")}
+                  sx={{ borderRadius: "10px" }}
+                >
+                  Get Started
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Notifications */}
+                <IconButton sx={{ color: "#9CA3AF", "&:hover": { color: "#F97316" } }}>
+                  <Badge
+                    badgeContent={2}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        background: "linear-gradient(135deg, #F97316, #EA580C)",
+                        color: "#fff",
+                        fontSize: "0.65rem",
+                        minWidth: 18,
+                        height: 18,
+                      },
+                    }}
+                  >
+                    <NotificationsNoneOutlinedIcon sx={{ fontSize: 22 }} />
+                  </Badge>
+                </IconButton>
+
+                {/* Avatar */}
+                <IconButton onClick={openMenu} sx={{ p: 0.5 }}>
+                  <Avatar
+                    sx={{
+                      width: 38,
+                      height: 38,
+                      background: "linear-gradient(135deg, #F97316, #EA580C)",
+                      fontSize: "0.95rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {userInitial}
+                  </Avatar>
+                </IconButton>
+
+                {/* Dropdown Menu */}
+                <Menu
+                  anchorEl={anchorEl}
+                  open={menuOpen}
+                  onClose={closeMenu}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                  slotProps={{
+                    paper: {
+                      sx: {
+                        background: "#111111",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "14px",
+                        minWidth: 220,
+                        p: 1,
+                        mt: 1,
+                      },
+                    },
+                  }}
+                >
+                  {/* User info header */}
+                  <Box sx={{ px: 2, py: 1.2 }}>
+                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem" }}>
+                      {user.name}
+                    </Typography>
+                    <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+                      {user.email}
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.06)" }} />
+
+                  {/* Menu items */}
+                  <MenuItem disabled sx={{ opacity: 0.4, borderRadius: "8px" }}>
+                    <PersonOutlineIcon sx={{ fontSize: 20, mr: 1.5, color: "#9CA3AF" }} />
+                    <Typography variant="body2">My Profile</Typography>
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={() => handleNavigate("/my-bookings")}
+                    sx={{ borderRadius: "8px" }}
+                  >
+                    <FlightIcon sx={{ fontSize: 20, mr: 1.5, color: "#9CA3AF" }} />
+                    <Typography variant="body2">My Bookings</Typography>
+                  </MenuItem>
+
+                  <MenuItem disabled sx={{ opacity: 0.4, borderRadius: "8px" }}>
+                    <SettingsOutlinedIcon sx={{ fontSize: 20, mr: 1.5, color: "#9CA3AF" }} />
+                    <Typography variant="body2">Settings</Typography>
+                  </MenuItem>
+
+                  <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.06)" }} />
+
+                  <MenuItem onClick={handleLogout} sx={{ borderRadius: "8px" }}>
+                    <LogoutIcon sx={{ fontSize: 20, mr: 1.5, color: "#EF4444" }} />
+                    <Typography variant="body2" sx={{ color: "#EF4444" }}>
+                      Sign Out
+                    </Typography>
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </Box>
+
+          {/* ── Mobile Hamburger ──────────────── */}
+          <IconButton
+            onClick={toggleDrawer}
+            sx={{
+              display: { xs: "flex", md: "none" },
+              ml: "auto",
+              color: "#9CA3AF",
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      {/* Spacer to push content below fixed AppBar */}
+      <Box sx={{ height: 70 }} />
+
+      {/* ── Mobile Drawer ─────────────────── */}
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        PaperProps={{
+          sx: {
+            width: 280,
+            background: "#0F0F0F",
+            borderRight: "1px solid rgba(255,255,255,0.06)",
+          },
+        }}
+      >
+        {/* Drawer Header */}
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 2.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+            <FlightTakeoffIcon sx={{ color: "#F97316", fontSize: 26 }} />
+            <Typography
+              sx={{
+                fontWeight: 800,
+                fontSize: "1.1rem",
+                background: "linear-gradient(135deg, #F97316 0%, #F59E0B 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              NovaWings
+            </Typography>
+          </Box>
+          <IconButton onClick={toggleDrawer} sx={{ color: "#6B7280" }}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
+
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+
+        {/* Nav Links */}
+        <List sx={{ px: 1.5, py: 1 }}>
+          {NAV_LINKS.map((link) => (
+            <ListItemButton
+              key={link.label}
+              disabled={link.comingSoon}
+              onClick={() => handleNavigate(link.path)}
+              sx={{
+                borderRadius: "10px",
+                mb: 0.5,
+                color: isActive(link.path) ? "#F97316" : "#9CA3AF",
+                "&:hover": { background: "rgba(249,115,22,0.08)" },
+              }}
+            >
+              <ListItemText
+                primary={link.label}
+                primaryTypographyProps={{ fontWeight: isActive(link.path) ? 600 : 400, fontSize: "0.9rem" }}
+              />
+            </ListItemButton>
+          ))}
 
           {userIsAdmin && (
-            <Link to="/admin" className="text-gray-700 hover:text-sky-600 transition font-medium">
-              Dashboard
-            </Link>
+            <ListItemButton
+              onClick={() => handleNavigate("/admin")}
+              sx={{
+                borderRadius: "10px",
+                mb: 0.5,
+                color: isActive("/admin") ? "#F97316" : "#9CA3AF",
+                "&:hover": { background: "rgba(249,115,22,0.08)" },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 36, color: "inherit" }}>
+                <DashboardOutlinedIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Dashboard"
+                primaryTypographyProps={{ fontWeight: isActive("/admin") ? 600 : 400, fontSize: "0.9rem" }}
+              />
+            </ListItemButton>
           )}
+        </List>
 
-          {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-gray-700 font-medium">Hi, {user.name}</span>
-              {userIsAdmin && (
-                <span className="bg-purple-100 text-purple-700 rounded-full px-3 py-1 text-xs font-medium">
-                  Admin
-                </span>
-              )}
-              <Link to="/my-bookings" className="text-gray-700 hover:text-sky-600 transition font-medium">
-                My Bookings
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition hover:scale-105 text-sm font-medium"
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mx: 2 }} />
+
+        {/* Auth section */}
+        <Box sx={{ p: 2 }}>
+          {!user ? (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => handleNavigate("/login")}
+                sx={{ borderRadius: "10px" }}
               >
-                Logout
-              </button>
-            </div>
+                Sign In
+              </Button>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => handleNavigate("/register")}
+                sx={{ borderRadius: "10px" }}
+              >
+                Get Started
+              </Button>
+            </Box>
           ) : (
-            <div className="flex items-center gap-3">
-              <Link
-                to="/login"
-                className="text-sky-600 hover:text-sky-700 transition font-medium"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="bg-sky-500 text-white px-4 py-2 rounded-xl hover:bg-sky-600 transition hover:scale-105 text-sm font-medium"
-              >
-                Register
-              </Link>
-            </div>
-          )}
-        </div>
+            <Box>
+              {/* User info */}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+                <Avatar
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    background: "linear-gradient(135deg, #F97316, #EA580C)",
+                    fontSize: "0.95rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  {userInitial}
+                </Avatar>
+                <Box>
+                  <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", lineHeight: 1.2 }}>
+                    {user.name}
+                  </Typography>
+                  <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                    {user.email}
+                  </Typography>
+                </Box>
+              </Box>
 
-        {/* Mobile Hamburger */}
-        <button onClick={toggleMenu} className="md:hidden text-gray-700 p-2">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {menuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-      </div>
+              <List sx={{ p: 0 }}>
+                <ListItemButton
+                  onClick={() => handleNavigate("/my-bookings")}
+                  sx={{ borderRadius: "10px", mb: 0.5, color: "#9CA3AF", "&:hover": { background: "rgba(249,115,22,0.08)" } }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36, color: "inherit" }}>
+                    <FlightIcon sx={{ fontSize: 20 }} />
+                  </ListItemIcon>
+                  <ListItemText primary="My Bookings" primaryTypographyProps={{ fontSize: "0.9rem" }} />
+                </ListItemButton>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-white border-t px-4 pb-4 space-y-2">
-          <button onClick={() => handleNavigate("/explore")} className="block w-full text-left py-2 text-gray-700 hover:text-sky-600">
-            Explore
-          </button>
-          <button onClick={() => handleNavigate("/search")} className="block w-full text-left py-2 text-gray-700 hover:text-sky-600">
-            Search
-          </button>
-          {user ? (
-            <>
-              {userIsAdmin && (
-                <button onClick={() => handleNavigate("/admin")} className="block w-full text-left py-2 text-gray-700 hover:text-sky-600">
-                  Dashboard
-                </button>
-              )}
-              <button onClick={() => handleNavigate("/my-bookings")} className="block w-full text-left py-2 text-gray-700 hover:text-sky-600">
-                My Bookings
-              </button>
-              <div className="flex items-center gap-2 py-2">
-                <span className="text-gray-700 font-medium">{user.name}</span>
-                {userIsAdmin && (
-                  <span className="bg-purple-100 text-purple-700 rounded-full px-3 py-1 text-xs font-medium">
-                    Admin
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="w-full bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition text-sm font-medium"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <button onClick={() => handleNavigate("/login")} className="block w-full text-left py-2 text-sky-600 font-medium">
-                Login
-              </button>
-              <button onClick={() => handleNavigate("/register")} className="block w-full text-left py-2 text-sky-600 font-medium">
-                Register
-              </button>
-            </>
+                <ListItemButton
+                  onClick={handleLogout}
+                  sx={{ borderRadius: "10px", color: "#EF4444", "&:hover": { background: "rgba(239,68,68,0.08)" } }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36, color: "inherit" }}>
+                    <LogoutIcon sx={{ fontSize: 20 }} />
+                  </ListItemIcon>
+                  <ListItemText primary="Sign Out" primaryTypographyProps={{ fontSize: "0.9rem" }} />
+                </ListItemButton>
+              </List>
+            </Box>
           )}
-        </div>
-      )}
-    </nav>
+        </Box>
+      </Drawer>
+    </>
   );
 }

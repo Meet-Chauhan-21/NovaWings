@@ -1,14 +1,29 @@
 // src/pages/SeatSelection.tsx
-// Airplane seat selection page with visual cabin layout
+// Airplane seat selection page with visual cabin layout — dark theme
 
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import { getFlightById } from "../services/flightService";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 import BookingProgress from "../components/BookingProgress";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import LinearProgress from "@mui/material/LinearProgress";
+
+import FlightIcon from "@mui/icons-material/Flight";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 const SEATS_PER_ROW = 6;
 const BUSINESS_ROWS = 2;
@@ -41,7 +56,6 @@ function generateSeats(totalSeats: number, flightId: string): SeatInfo[] {
   const bookedCount = Math.ceil(totalSeats * 0.3);
   const bookedIndices = new Set<number>();
 
-  // Generate random booked seat indices (seeded by flightId)
   let generated = 0;
   let attempt = 0;
   while (generated < bookedCount && attempt < totalSeats * 2) {
@@ -53,7 +67,6 @@ function generateSeats(totalSeats: number, flightId: string): SeatInfo[] {
     attempt++;
   }
 
-  // Create seat objects
   let seatIndex = 0;
   for (let row = 1; row <= totalRows; row++) {
     for (let pos = 0; pos < SEATS_PER_ROW; pos++) {
@@ -155,186 +168,383 @@ export default function SeatSelection() {
   if (isError || !flight) return <ErrorMessage message="Failed to load flight details." />;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 3 }, py: { xs: 3, md: 5 } }}>
       <BookingProgress activeStep={2} />
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Select Your Seats</h1>
-      <p className="text-gray-600 mb-8">Choose {numberOfSeats} seat{numberOfSeats > 1 ? "s" : ""} for your flight</p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        {/* Back button */}
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate(-1)}
+          sx={{
+            mb: 2,
+            color: "#9CA3AF",
+            textTransform: "none",
+            fontWeight: 500,
+            fontSize: "0.875rem",
+            px: 0,
+            "&:hover": { color: "#F97316", background: "transparent" },
+          }}
+        >
+          Back
+        </Button>
+
+        <Typography sx={{ fontSize: { xs: "1.5rem", md: "1.8rem" }, fontWeight: 800, color: "#FFFFFF", mb: 0.5 }}>
+          Select Your Seats
+        </Typography>
+        <Typography sx={{ color: "#6B7280", fontSize: "0.9rem", mb: 4 }}>
+          Choose {numberOfSeats} seat{numberOfSeats > 1 ? "s" : ""} for your flight
+        </Typography>
+      </motion.div>
+
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 340px" }, gap: 3 }}>
         {/* Airplane Seat Grid */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-lg p-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+          <Paper
+            sx={{
+              background: "#111111",
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: "20px",
+              p: { xs: 3, sm: 5 },
+              overflow: "hidden",
+            }}
+          >
             {/* Airplane nose */}
-            <div className="flex justify-center mb-8">
-              <div className="text-4xl">✈️</div>
-            </div>
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
+              <Box
+                sx={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, rgba(249,115,22,0.15), rgba(249,115,22,0.05))",
+                  border: "1px solid rgba(249,115,22,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FlightIcon sx={{ color: "#F97316", fontSize: 28 }} />
+              </Box>
+            </Box>
+
+            {/* Column labels */}
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 2, gap: "4px" }}>
+              <Box sx={{ width: 32, mr: "4px" }} />
+              {["A", "B", "C", "", "D", "E", "F"].map((letter, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    width: letter ? { xs: 36, sm: 42 } : 16,
+                    textAlign: "center",
+                  }}
+                >
+                  <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600 }}>
+                    {letter}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
 
             {/* Seats grid */}
-            <div className="space-y-4">
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "6px" }}>
               {Array.from({ length: Math.ceil(seats.length / SEATS_PER_ROW) }).map((_, rowIdx) => {
                 const rowSeats = seats.slice(rowIdx * SEATS_PER_ROW, (rowIdx + 1) * SEATS_PER_ROW);
+                const isBizRow = rowIdx < BUSINESS_ROWS;
                 return (
-                  <div key={rowIdx} className="flex items-center justify-center gap-1">
-                    <span className="w-8 text-center text-sm font-medium text-gray-600">{rowIdx + 1}</span>
-                    <div className="flex gap-1">
-                      {rowSeats.map((seat, _posIdx) => {
-                        const isSelected = selectedSeats.has(seat.id);
-                        const isBusiness = seat.isBusiness;
-                        const isBookedSeat = seat.isBooked;
+                  <Box key={rowIdx} sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}>
+                    <Typography
+                      sx={{
+                        width: 32,
+                        textAlign: "center",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        color: "#6B7280",
+                      }}
+                    >
+                      {rowIdx + 1}
+                    </Typography>
+                    {rowSeats.map((seat, posIdx) => {
+                      const isSelected = selectedSeats.has(seat.id);
+                      const isBookedSeat = seat.isBooked;
 
-                        let classes = "w-10 h-10 rounded border-2 font-bold text-sm cursor-pointer transition-all ";
+                      let bg = "rgba(255,255,255,0.04)";
+                      let border = "1px solid rgba(255,255,255,0.08)";
+                      let color = "#9CA3AF";
+                      let cursor = "pointer";
+                      let hoverBg = "rgba(249,115,22,0.1)";
+                      let transform = "none";
 
-                        if (isBookedSeat) {
-                          classes += "bg-gray-300 border-gray-400 text-gray-400 cursor-not-allowed opacity-60";
-                        } else if (isSelected) {
-                          classes += isBusiness
-                            ? "bg-amber-500 border-amber-600 text-white scale-110"
-                            : "bg-sky-600 border-sky-700 text-white scale-110";
-                        } else if (isBusiness) {
-                          classes += "bg-amber-100 border-amber-400 text-amber-700 hover:bg-amber-200";
-                        } else {
-                          classes += "bg-sky-100 border-sky-400 text-sky-700 hover:bg-sky-200";
-                        }
+                      if (isBookedSeat) {
+                        bg = "rgba(255,255,255,0.02)";
+                        border = "1px solid rgba(255,255,255,0.04)";
+                        color = "#374151";
+                        cursor = "not-allowed";
+                        hoverBg = bg;
+                      } else if (isSelected) {
+                        bg = "linear-gradient(135deg, #F97316, #EA580C)";
+                        border = "1px solid #F97316";
+                        color = "#FFFFFF";
+                        transform = "scale(1.08)";
+                        hoverBg = bg;
+                      } else if (isBizRow) {
+                        bg = "rgba(245,158,11,0.08)";
+                        border = "1px solid rgba(245,158,11,0.2)";
+                        color = "#F59E0B";
+                        hoverBg = "rgba(245,158,11,0.15)";
+                      }
 
-                        return (
-                          <button
-                            key={seat.id}
+                      return (
+                        <Box key={seat.id} sx={{ display: "flex", gap: "4px" }}>
+                          {posIdx === AISLE_POSITION && (
+                            <Box sx={{ width: 16 }} />
+                          )}
+                          <Box
+                            component="button"
                             onClick={() => handleSeatClick(seat.id, isBookedSeat)}
                             disabled={isBookedSeat}
-                            className={classes}
+                            sx={{
+                              width: { xs: 36, sm: 42 },
+                              height: { xs: 36, sm: 42 },
+                              borderRadius: "8px",
+                              background: bg,
+                              border,
+                              color,
+                              cursor,
+                              transform,
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "all 0.2s ease",
+                              outline: "none",
+                              p: 0,
+                              "&:hover:not(:disabled)": {
+                                background: hoverBg,
+                                transform: isSelected ? "scale(1.08)" : "scale(1.05)",
+                              },
+                            }}
                           >
                             {seat.label}
-                          </button>
-                        );
-                      })}
-                      {/* Aisle */}
-                      {rowSeats.length > AISLE_POSITION && (
-                        <div className="w-2 h-10 mx-2 border-l-2 border-dashed border-gray-300" />
-                      )}
-                    </div>
-                  </div>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
                 );
               })}
-            </div>
+            </Box>
 
             {/* Airplane tail */}
-            <div className="flex justify-center mt-8 text-2xl">📍</div>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+              <Box sx={{ width: 40, height: 2, background: "rgba(255,255,255,0.1)", borderRadius: 1 }} />
+            </Box>
 
             {/* Legend */}
-            <div className="mt-8 pt-8 border-t border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-sky-100 border-2 border-sky-400 rounded" />
-                <span className="text-sm text-gray-600">Available</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-sky-600 border-2 border-sky-700 rounded" />
-                <span className="text-sm text-gray-600">Selected</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-amber-100 border-2 border-amber-400 rounded" />
-                <span className="text-sm text-gray-600">Business</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-gray-300 border-2 border-gray-400 rounded" />
-                <span className="text-sm text-gray-600">Booked</span>
-              </div>
-            </div>
-          </div>
-        </div>
+            <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 3 }} />
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)" }, gap: 2 }}>
+              {[
+                { bg: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.08)", label: "Available" },
+                { bg: "linear-gradient(135deg, #F97316, #EA580C)", border: "#F97316", label: "Selected" },
+                { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.2)", label: "Business" },
+                { bg: "rgba(255,255,255,0.02)", border: "rgba(255,255,255,0.04)", label: "Booked" },
+              ].map((item) => (
+                <Box key={item.label} sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                  <Box
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: "6px",
+                      background: item.bg,
+                      border: `1px solid ${item.border}`,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>{item.label}</Typography>
+                </Box>
+              ))}
+            </Box>
+          </Paper>
+        </motion.div>
 
         {/* Summary Panel */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-4 space-y-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+          <Paper
+            sx={{
+              background: "#111111",
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: "20px",
+              p: 3,
+              position: "sticky",
+              top: 86,
+            }}
+          >
             {/* Flight summary */}
-            <div className="space-y-3 pb-6 border-b border-gray-200">
-              <h3 className="font-bold text-gray-800">Flight Summary</h3>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600">From:</span>
-                  <span className="font-medium text-gray-800">{flight.source}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600">To:</span>
-                  <span className="font-medium text-gray-800">{flight.destination}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600">Airline:</span>
-                  <span className="font-medium text-gray-800">{flight.airlineName}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600">Price/Seat:</span>
-                  <span className="font-medium text-sky-600">₹{flight.price.toLocaleString("en-IN")}</span>
-                </div>
-              </div>
-            </div>
+            <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 2 }}>
+              Flight Summary
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2, mb: 3 }}>
+              {[
+                { label: "Route", value: `${flight.source} → ${flight.destination}` },
+                { label: "Airline", value: flight.airlineName },
+                { label: "Per Seat", value: `₹${flight.price.toLocaleString("en-IN")}`, highlight: true },
+              ].map((item) => (
+                <Box key={item.label} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>{item.label}</Typography>
+                  <Typography
+                    sx={{
+                      color: item.highlight ? "#F97316" : "#FFFFFF",
+                      fontSize: "0.85rem",
+                      fontWeight: item.highlight ? 700 : 500,
+                    }}
+                  >
+                    {item.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+
+            <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mb: 3 }} />
 
             {/* Selected seats */}
-            <div className="space-y-2 pb-6 border-b border-gray-200">
-              <h3 className="font-bold text-gray-800">Selected Seats</h3>
-              {selectedSeats.size === 0 ? (
-                <p className="text-sm text-gray-500 italic">No seats selected yet</p>
-              ) : (
-                <p className="text-sm font-medium text-gray-700">
-                  {Array.from(selectedSeats)
-                    .sort()
-                    .join(", ")}
-                </p>
-              )}
-              <p className="text-xs text-gray-500">
-                {selectedSeats.size}/{numberOfSeats} seat{numberOfSeats > 1 ? "s" : ""}
-              </p>
-            </div>
+            <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 1.5 }}>
+              Selected Seats
+            </Typography>
+            {selectedSeats.size === 0 ? (
+              <Typography sx={{ color: "#4B5563", fontSize: "0.85rem", fontStyle: "italic", mb: 1.5 }}>
+                No seats selected yet
+              </Typography>
+            ) : (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
+                {Array.from(selectedSeats).sort().map((seat) => (
+                  <Chip
+                    key={seat}
+                    label={seat}
+                    size="small"
+                    sx={{
+                      background: "rgba(249,115,22,0.1)",
+                      border: "1px solid rgba(249,115,22,0.2)",
+                      color: "#F97316",
+                      fontWeight: 700,
+                      fontSize: "0.8rem",
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+
+            {/* Progress bar */}
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
+                <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+                  {selectedSeats.size}/{numberOfSeats} selected
+                </Typography>
+                <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+                  {Math.round((selectedSeats.size / numberOfSeats) * 100)}%
+                </Typography>
+              </Box>
+              <LinearProgress
+                variant="determinate"
+                value={(selectedSeats.size / numberOfSeats) * 100}
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  background: "rgba(255,255,255,0.06)",
+                  "& .MuiLinearProgress-bar": {
+                    background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                    borderRadius: 3,
+                  },
+                }}
+              />
+            </Box>
+
+            <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mb: 3 }} />
 
             {/* Price breakdown */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Seat Price:</span>
-                <span className="font-medium">
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2, mb: 3 }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Seat Price</Typography>
+                <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>
                   ₹{flight.price.toLocaleString("en-IN")} × {numberOfSeats}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Taxes & Fees (18%):</span>
-                <span className="font-medium">₹{taxPrice.toLocaleString("en-IN")}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Convenience Fee:</span>
-                <span className="font-medium">₹{convenienceFee.toLocaleString("en-IN")}</span>
-              </div>
-              <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
-                <span>Total:</span>
-                <span className="text-sky-600">₹{grandTotal.toLocaleString("en-IN")}</span>
-              </div>
-            </div>
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Taxes & Fees (18%)</Typography>
+                <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{taxPrice.toLocaleString("en-IN")}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Convenience Fee</Typography>
+                <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{convenienceFee.toLocaleString("en-IN")}</Typography>
+              </Box>
+              <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: "1.2rem",
+                    background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  ₹{grandTotal.toLocaleString("en-IN")}
+                </Typography>
+              </Box>
+            </Box>
 
-            {/* Confirm button */}
-            <button
+            {/* Continue button */}
+            <Button
               onClick={handleConfirmBooking}
               disabled={!isFull}
-              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
-                isFull
-                  ? "bg-sky-600 text-white hover:bg-sky-700 active:scale-95"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+              variant="contained"
+              fullWidth
+              endIcon={<ArrowForwardIcon />}
+              sx={{
+                py: 1.8,
+                borderRadius: "12px",
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                background: isFull
+                  ? "linear-gradient(135deg, #F97316, #EA580C)"
+                  : "rgba(255,255,255,0.06)",
+                color: isFull ? "#FFFFFF" : "#4B5563",
+                "&:hover": {
+                  background: isFull
+                    ? "linear-gradient(135deg, #EA580C, #DC2626)"
+                    : "rgba(255,255,255,0.06)",
+                },
+                "&.Mui-disabled": {
+                  color: "#4B5563",
+                },
+                mb: 2,
+              }}
             >
-              <>Continue to Meals</>
-            </button>
+              Continue to Meals
+            </Button>
 
             {/* Trust badges */}
-            <div className="flex items-center justify-center gap-4 mt-3">
-              <span className="text-xs text-gray-500 flex items-center gap-1">256-bit SSL</span>
-              <span className="text-xs text-gray-500 flex items-center gap-1">Razorpay Secured</span>
-              <span className="text-xs text-gray-500 flex items-center gap-1">All cards accepted</span>
-            </div>
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+              {[
+                { icon: <LockOutlinedIcon sx={{ fontSize: 12 }} />, label: "256-bit SSL" },
+                { icon: <VerifiedIcon sx={{ fontSize: 12 }} />, label: "Razorpay" },
+              ].map((badge) => (
+                <Box key={badge.label} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <Box sx={{ color: "#4B5563" }}>{badge.icon}</Box>
+                  <Typography sx={{ color: "#4B5563", fontSize: "0.7rem" }}>{badge.label}</Typography>
+                </Box>
+              ))}
+            </Box>
 
             {!isFull && selectedSeats.size > 0 && (
-              <p className="text-xs text-amber-600 text-center">
+              <Typography sx={{ color: "#F59E0B", fontSize: "0.8rem", textAlign: "center", mt: 2 }}>
                 Select {numberOfSeats - selectedSeats.size} more seat{numberOfSeats - selectedSeats.size > 1 ? "s" : ""}
-              </p>
+              </Typography>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
+          </Paper>
+        </motion.div>
+      </Box>
+    </Box>
   );
 }

@@ -1,11 +1,15 @@
 // src/App.tsx
 // Root component — defines all routes with lazy-loaded pages
+// v2: AnimatePresence page transitions, ScrollToTop, conditional Navbar/Footer
 
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -29,8 +33,66 @@ const AddFlight = lazy(() => import("./pages/admin/AddFlight"));
 const EditFlight = lazy(() => import("./pages/admin/EditFlight"));
 
 /**
- * App sets up routing, auth context, toast notifications,
- * and wraps all pages in a Suspense boundary with a loading spinner.
+ * AppContent uses useLocation (must be inside BrowserRouter) to:
+ *  - Drive AnimatePresence page transitions keyed by pathname
+ *  - Hide Navbar / Footer on /admin routes
+ */
+function AppContent() {
+  const location = useLocation();
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+      <Navbar />
+      <ScrollToTop />
+
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location.pathname}
+          className="flex-1"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+        >
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes location={location}>
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/flights/:id" element={<FlightDetail />} />
+              <Route path="/search" element={<SearchResults />} />
+
+              {/* Protected routes (any logged-in user) */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/book/:flightId" element={<BookFlight />} />
+                <Route path="/select-seats/:flightId" element={<SeatSelection />} />
+                <Route path="/select-food/:flightId" element={<FoodSelection />} />
+                <Route path="/payment-preview" element={<PaymentPreview />} />
+                <Route path="/my-bookings" element={<MyBookings />} />
+                <Route path="/bookings/:id" element={<BookingDetail />} />
+                <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
+              </Route>
+
+              {/* Admin-only routes */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/flights/add" element={<AddFlight />} />
+                <Route path="/admin/flights/:id/edit" element={<EditFlight />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </motion.main>
+      </AnimatePresence>
+
+      <Footer />
+    </div>
+  );
+}
+
+/**
+ * App sets up routing, auth context, and toast notifications,
+ * then renders AppContent inside the router context.
  */
 export default function App() {
   return (
@@ -44,9 +106,10 @@ export default function App() {
               borderRadius: "12px",
               padding: "14px 20px",
               fontSize: "14px",
-              background: "#fff",
-              color: "#1f2937",
-              boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+              background: "#111111",
+              color: "#FFFFFF",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.4)",
             },
             success: {
               iconTheme: { primary: "#10b981", secondary: "#fff" },
@@ -56,40 +119,7 @@ export default function App() {
             },
           }}
         />
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          <Navbar />
-          <main className="flex-1">
-            <Suspense fallback={<LoadingSpinner />}>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/explore" element={<ExplorePage />} />
-                <Route path="/flights/:id" element={<FlightDetail />} />
-                <Route path="/search" element={<SearchResults />} />
-
-                {/* Protected routes (any logged-in user) */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/book/:flightId" element={<BookFlight />} />
-                  <Route path="/select-seats/:flightId" element={<SeatSelection />} />
-                  <Route path="/select-food/:flightId" element={<FoodSelection />} />
-                  <Route path="/payment-preview" element={<PaymentPreview />} />
-                  <Route path="/my-bookings" element={<MyBookings />} />
-                  <Route path="/bookings/:id" element={<BookingDetail />} />
-                  <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
-                </Route>
-
-                {/* Admin-only routes */}
-                <Route element={<AdminRoute />}>
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/admin/flights/add" element={<AddFlight />} />
-                  <Route path="/admin/flights/:id/edit" element={<EditFlight />} />
-                </Route>
-              </Routes>
-            </Suspense>
-          </main>
-        </div>
+        <AppContent />
       </AuthProvider>
     </BrowserRouter>
   );

@@ -1,11 +1,27 @@
 // src/components/CityCombobox.tsx
-// Fully dynamic city combobox — fetches all locations from API, no hardcoded data
+// Fully dynamic city combobox — MUI-styled dark theme, all existing logic preserved
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useDebounce from "../hooks/useDebounce";
 import locationService from "../services/locationService";
 import type { Location } from "../types";
+
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+
+import FlightTakeoffOutlinedIcon from "@mui/icons-material/FlightTakeoffOutlined";
+import FlightLandOutlinedIcon from "@mui/icons-material/FlightLandOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LocationCityOutlinedIcon from "@mui/icons-material/LocationCityOutlined";
+import CorporateFareOutlinedIcon from "@mui/icons-material/CorporateFareOutlined";
 
 interface CityComboboxProps {
   value: string;
@@ -14,6 +30,8 @@ interface CityComboboxProps {
   excludeCity?: string;
   label?: string;
   labelClassName?: string;
+  /** Controls the leading adornment icon */
+  type?: "departure" | "arrival";
 }
 
 export default function CityCombobox({
@@ -23,6 +41,7 @@ export default function CityCombobox({
   excludeCity,
   label,
   labelClassName,
+  type,
 }: CityComboboxProps) {
   const [inputValue, setInputValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
@@ -34,19 +53,21 @@ export default function CityCombobox({
   const debouncedInput = useDebounce(inputValue, 300);
 
   // Fetch all active locations on mount (cached 30 min)
-  const { data: allLocations = [] } = useQuery({
+  const { data: allLocations = [], isFetching: loadingAll } = useQuery({
     queryKey: ["locations"],
     queryFn: locationService.getAll,
     staleTime: 30 * 60 * 1000,
   });
 
   // Search API when user types 2+ chars
-  const { data: searchResults = [] } = useQuery({
+  const { data: searchResults = [], isFetching: loadingSearch } = useQuery({
     queryKey: ["locationSearch", debouncedInput],
     queryFn: () => locationService.search(debouncedInput),
     staleTime: 5 * 60 * 1000,
     enabled: debouncedInput.length >= 2,
   });
+
+  const isLoading = debouncedInput.length >= 2 ? loadingSearch : loadingAll;
 
   // Decide which list to show
   const locationsToShow = debouncedInput.length >= 2 ? searchResults : allLocations;
@@ -119,7 +140,6 @@ export default function CityCombobox({
       setIsOpen(true);
       return;
     }
-
     if (isOpen) {
       switch (e.key) {
         case "ArrowDown":
@@ -147,63 +167,123 @@ export default function CityCombobox({
     }
   }
 
+  // Pick lead icon based on `type` prop
+  const LeadIcon =
+    type === "arrival"
+      ? FlightLandOutlinedIcon
+      : type === "departure"
+        ? FlightTakeoffOutlinedIcon
+        : LocationCityOutlinedIcon;
+
   function renderOption(loc: Location, idx: number) {
     const isActive = idx === focusedIndex;
     const isSelected = loc.city === value;
     return (
-      <button
+      <Box
         key={loc.id}
         data-option
+        component="button"
         type="button"
         onMouseDown={() => selectCity(loc)}
         onMouseEnter={() => setFocusedIndex(idx)}
-        className={`w-full text-left px-4 py-3 flex items-center justify-between gap-3 transition-colors ${
-          isActive
-            ? "bg-sky-50 text-sky-700"
-            : isSelected
-              ? "bg-sky-50 text-sky-700 font-medium"
-              : "text-gray-700 hover:bg-gray-50"
-        }`}
+        sx={{
+          width: "100%",
+          textAlign: "left",
+          px: 2,
+          py: 1.25,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1.5,
+          border: "none",
+          cursor: "pointer",
+          transition: "background 0.12s ease",
+          background: isActive || isSelected ? "rgba(249,115,22,0.08)" : "transparent",
+          borderLeft: isActive || isSelected ? "2px solid #F97316" : "2px solid transparent",
+          "&:hover": { background: "rgba(249,115,22,0.06)" },
+        }}
       >
-        <div className="flex items-center gap-2.5 min-w-0">
-          <span className="text-base shrink-0">{loc.type === "metro" ? "🌆" : "🏙️"}</span>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 truncate">{loc.city}</p>
-            <p className="text-xs text-gray-400 truncate">
+        {/* City info — 3-line design */}
+        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5, minWidth: 0, flex: 1 }}>
+          <Box sx={{ mt: 0.25, width: 28, height: 28, borderRadius: "6px", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            {loc.type === "metro"
+              ? <CorporateFareOutlinedIcon sx={{ fontSize: 14, color: "#9CA3AF" }} />
+              : <LocationCityOutlinedIcon sx={{ fontSize: 14, color: "#6B7280" }} />
+            }
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            {/* Line 1: City name */}
+            <Typography sx={{ color: isActive || isSelected ? "#FFFFFF" : "#E5E7EB", fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {loc.city}
+            </Typography>
+            {/* Line 2: State + country + flight count */}
+            <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {loc.state}, {loc.country}
-            </p>
+              {loc.activeFlights ? (
+                <Box component="span" sx={{ ml: 0.75, color: "#4B5563" }}>· {loc.activeFlights} flights</Box>
+              ) : null}
+            </Typography>
+            {/* Line 3: Airport name */}
             {loc.airportName && (
-              <p className="text-[11px] text-gray-400 truncate mt-0.5">
-                ✈ {loc.airportName}
-              </p>
+              <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", mt: 0.125 }}>
+                {loc.airportName}
+              </Typography>
             )}
-          </div>
-        </div>
-        <div className="text-right shrink-0">
-          <span className="text-xs font-mono font-bold text-sky-600 bg-sky-50 border border-sky-200 px-1.5 py-0.5 rounded">
-            {loc.airportCode}
-          </span>
-        </div>
-      </button>
+          </Box>
+        </Box>
+
+        {/* IATA code chip */}
+        <Chip
+          label={loc.airportCode}
+          size="small"
+          sx={{
+            flexShrink: 0,
+            fontFamily: '"JetBrains Mono",monospace',
+            fontWeight: 700,
+            fontSize: "0.6875rem",
+            background: "rgba(249,115,22,0.12)",
+            color: "#F97316",
+            border: "1px solid rgba(249,115,22,0.25)",
+            height: 22,
+            "& .MuiChip-label": { px: 1 },
+          }}
+        />
+      </Box>
     );
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <Box ref={containerRef} sx={{ position: "relative" }}>
       {label && (
-        <label className={labelClassName ?? "block text-xs font-medium text-gray-600 mb-1"}>{label}</label>
+        <Typography
+          component="label"
+          className={labelClassName}
+          sx={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6B7280", mb: 0.75, textTransform: "uppercase", letterSpacing: "0.06em" }}
+        >
+          {label}
+        </Typography>
       )}
 
-      <div
-        className={`flex items-center border rounded-xl bg-white px-3 py-2.5 transition-all ${
-          focused
-            ? "border-sky-500 ring-2 ring-sky-100"
-            : "border-gray-200 hover:border-gray-300"
-        }`}
+      {/* Input row */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          background: "#1a1a1a",
+          border: focused ? "1px solid rgba(249,115,22,0.7)" : "1px solid rgba(255,255,255,0.1)",
+          borderRadius: "12px",
+          px: 1.5,
+          gap: 1,
+          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+          boxShadow: focused ? "0 0 0 3px rgba(249,115,22,0.06)" : "none",
+          "&:hover": { borderColor: focused ? "rgba(249,115,22,0.7)" : "rgba(249,115,22,0.4)" },
+        }}
       >
-        <span className="text-gray-400 mr-2 shrink-0">🏙️</span>
-        <input
-          type="text"
+        <InputAdornment position="start" sx={{ ml: 0 }}>
+          <LeadIcon sx={{ color: focused ? "#F97316" : "#F97316", fontSize: 18, transition: "color 0.2s" }} />
+        </InputAdornment>
+
+        <InputBase
           value={inputValue}
           placeholder={placeholder}
           onChange={(e) => {
@@ -221,83 +301,109 @@ export default function CityCombobox({
             setTimeout(() => setInputValue(value), 200);
           }}
           onKeyDown={handleKeyDown}
-          className="flex-1 outline-none text-sm text-gray-800 bg-transparent placeholder-gray-400"
+          sx={{ flex: 1, "& input": { color: "#FFFFFF", fontSize: "0.9375rem", fontWeight: 500, padding: "16px 0", "&::placeholder": { color: "#6B7280" } } }}
         />
-        {inputValue && (
-          <button
-            type="button"
-            onClick={() => {
-              setInputValue("");
-              onChange("");
-              setIsOpen(false);
-            }}
-            className="text-gray-400 hover:text-red-400 ml-1 transition-colors shrink-0"
+
+        {isLoading && <CircularProgress size={14} sx={{ color: "#F97316", flexShrink: 0 }} />}
+
+        {inputValue && !isLoading && (
+          <IconButton
+            size="small"
+            onClick={() => { setInputValue(""); onChange(""); setIsOpen(false); }}
             tabIndex={-1}
+            sx={{ color: "#4B5563", "&:hover": { color: "#EF4444" }, p: 0.25 }}
           >
-            ✕
-          </button>
+            <CloseIcon sx={{ fontSize: 14 }} />
+          </IconButton>
         )}
-        <button
-          type="button"
+
+        <IconButton
+          size="small"
           onClick={() => setIsOpen(!isOpen)}
-          className="text-gray-400 hover:text-gray-600 p-1 shrink-0"
           tabIndex={-1}
+          sx={{ color: "#4B5563", p: 0.25 }}
         >
-          <span className={`text-xs transition-transform inline-block ${isOpen ? "rotate-180" : ""}`}>
-            ▼
-          </span>
-        </button>
-      </div>
+          <ExpandMoreIcon sx={{ fontSize: 16, transition: "transform 0.2s ease", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
+        </IconButton>
+      </Box>
 
       {/* Dropdown */}
       {isOpen && (
-        <div
+        <Paper
           ref={listRef}
-          className="absolute z-50 mt-1 w-full min-w-[320px] bg-white border border-gray-200 rounded-xl shadow-xl max-h-80 overflow-y-auto"
+          elevation={0}
+          sx={{
+            position: "absolute",
+            zIndex: 1300,
+            mt: 0.75,
+            width: "100%",
+            minWidth: 300,
+            background: "#161616",
+            border: "1px solid rgba(249,115,22,0.25)",
+            borderRadius: "14px",
+            maxHeight: 320,
+            overflowY: "auto",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.6), 0 4px 16px rgba(249,115,22,0.08)",
+            "&::-webkit-scrollbar": { width: "4px" },
+            "&::-webkit-scrollbar-track": { background: "transparent" },
+            "&::-webkit-scrollbar-thumb": { background: "#F97316", borderRadius: "2px" },
+          }}
         >
-          {/* Popular cities header when showing all */}
+          {/* Popular header */}
           {debouncedInput.length < 2 && filtered.length > 0 && (
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50/80 border-b border-gray-100 flex items-center gap-1.5">
-              <span>⭐</span> Popular Cities
-            </div>
+            <Box sx={{ px: 2, py: 1, borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
+              <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Popular Cities
+              </Typography>
+            </Box>
           )}
 
-          {/* Metro cities group */}
+          {/* Metro Cities */}
           {metros.length > 0 && (
             <>
-              <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50 border-b border-gray-100">
-                🌆 Metro Cities
-              </div>
+              <Box sx={{ px: 2, py: 0.75, background: "rgba(255,255,255,0.015)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  Metro Cities
+                </Typography>
+              </Box>
               {metros.map((loc, idx) => renderOption(loc, idx))}
             </>
           )}
 
-          {/* Other cities group */}
+          {/* Other Cities */}
           {others.length > 0 && (
             <>
-              <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50 border-b border-gray-100 border-t">
-                🏙️ Other Cities
-              </div>
+              <Box sx={{ px: 2, py: 0.75, background: "rgba(255,255,255,0.015)", borderTop: "1px solid rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  Other Cities
+                </Typography>
+              </Box>
               {others.map((loc, idx) => renderOption(loc, metros.length + idx))}
             </>
           )}
 
           {/* No results */}
           {filtered.length === 0 && inputValue && (
-            <div className="px-4 py-4 text-center">
-              <p className="text-sm text-gray-500">City not found — "{inputValue}"</p>
-              <p className="text-xs text-gray-400 mt-1">Admin can add new cities from the dashboard</p>
-            </div>
+            <Box sx={{ px: 3, py: 4, textAlign: "center" }}>
+              <Typography sx={{ color: "#6B7280", fontSize: "0.875rem" }}>
+                No city found for "{inputValue}"
+              </Typography>
+              <Typography sx={{ color: "#4B5563", fontSize: "0.75rem", mt: 0.5 }}>
+                Admin can add new cities from the dashboard
+              </Typography>
+            </Box>
           )}
 
-          {/* Empty input hint */}
+          {/* Empty hint */}
           {filtered.length === 0 && !inputValue && (
-            <div className="px-4 py-4 text-sm text-gray-400 text-center">
-              Start typing to search cities...
-            </div>
+            <Box sx={{ px: 3, py: 3, textAlign: "center" }}>
+              <Typography sx={{ color: "#4B5563", fontSize: "0.875rem" }}>
+                Start typing to search cities…
+              </Typography>
+            </Box>
           )}
-        </div>
+        </Paper>
       )}
-    </div>
+    </Box>
   );
 }

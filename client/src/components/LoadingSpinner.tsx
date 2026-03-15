@@ -1,14 +1,90 @@
 // src/components/LoadingSpinner.tsx
-// Centered animated loading spinner
+// MUI CircularProgress spinner with size, full-page overlay, and message variants
+
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+
+interface LoadingSpinnerProps {
+  /** Visual size of the spinner */
+  size?: "small" | "medium" | "large";
+  /** If true, renders a full-viewport overlay */
+  fullPage?: boolean;
+  /** Optional label shown below the spinner */
+  message?: string;
+}
+
+const SIZE_MAP = { small: 24, medium: 40, large: 56 } as const;
 
 /**
- * LoadingSpinner renders a centered spinning circle
- * in the primary sky-blue color.
+ * LoadingSpinner renders an orange MUI CircularProgress.
+ * Pass `fullPage` to cover the entire viewport with a dark overlay.
  */
-export default function LoadingSpinner() {
+export default function LoadingSpinner({
+  size = "medium",
+  fullPage = false,
+  message,
+}: LoadingSpinnerProps) {
+  const px = SIZE_MAP[size];
+
+  const inner = (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 1.5,
+      }}
+    >
+      <CircularProgress
+        size={px}
+        thickness={3.5}
+        sx={{ color: "#F97316" }}
+      />
+      {message && (
+        <Typography
+          sx={{
+            color: "#9CA3AF",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            letterSpacing: "0.02em",
+          }}
+        >
+          {message}
+        </Typography>
+      )}
+    </Box>
+  );
+
+  if (fullPage) {
+    return (
+      <Box
+        sx={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(10,10,10,0.85)",
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        {inner}
+      </Box>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center py-20">
-      <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
-    </div>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 10,
+      }}
+    >
+      {inner}
+    </Box>
   );
 }

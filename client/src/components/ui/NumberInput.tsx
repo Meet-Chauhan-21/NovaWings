@@ -1,4 +1,12 @@
+// src/components/ui/NumberInput.tsx
+// Dark MUI-styled passenger counter — icon + count label + –/+ buttons
+
 import React, { useCallback } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import RemoveIcon from "@mui/icons-material/Remove";
+import AddIcon from "@mui/icons-material/Add";
 
 interface NumberInputProps {
   label?: string;
@@ -47,54 +55,132 @@ const NumberInput: React.FC<NumberInputProps> = ({
     [min, max, onChange]
   );
 
+  const canDecrease = !disabled && value > min;
+  const canIncrease = !disabled && value < max;
+
+  const btnSx = (enabled: boolean) => ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 28,
+    height: 28,
+    borderRadius: "7px",
+    border: "1px solid rgba(249,115,22,0.25)",
+    background: "rgba(249,115,22,0.08)",
+    color: "#F97316",
+    cursor: enabled ? "pointer" : "not-allowed",
+    opacity: enabled ? 1 : 0.35,
+    transition: "all 0.15s ease",
+    flexShrink: 0,
+    userSelect: "none" as const,
+    ...(enabled && {
+      "&:hover": {
+        background: "rgba(249,115,22,0.2)",
+        borderColor: "rgba(249,115,22,0.55)",
+      },
+    }),
+  });
+
   return (
-    <div className={`w-full ${className}`}>
+    <Box className={className}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <Typography
+          sx={{
+            color: "#6B7280",
+            fontSize: "0.7rem",
+            fontWeight: 600,
+            mb: 0.8,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}
+        >
           {label}
-        </label>
+        </Typography>
       )}
-      <div
-        className={`flex items-center rounded-lg border ${
-          error ? "border-red-400 ring-1 ring-red-300" : "border-gray-300"
-        } bg-white overflow-hidden transition-all duration-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200`}
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          px: 1.5,
+          py: "14px",
+          background: "#1a1a1a",
+          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+          borderRadius: "12px",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            borderColor: error ? "rgba(239,68,68,0.7)" : "rgba(249,115,22,0.4)",
+          },
+          "&:focus-within": {
+            borderColor: error ? "rgba(239,68,68,0.7)" : "rgba(249,115,22,0.7)",
+            boxShadow: `0 0 0 3px ${
+              error ? "rgba(239,68,68,0.06)" : "rgba(249,115,22,0.06)"
+            }`,
+          },
+        }}
       >
-        <button
-          type="button"
-          onClick={decrease}
-          disabled={disabled || value <= min}
-          className="px-3 py-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150 border-r border-gray-200"
-          tabIndex={-1}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-          </svg>
-        </button>
-        <input
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          name={name}
-          id={id}
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          className="flex-1 text-center py-2.5 text-sm font-medium text-gray-900 bg-transparent border-none outline-none focus:ring-0 min-w-[40px]"
-        />
-        <button
-          type="button"
-          onClick={increase}
-          disabled={disabled || value >= max}
-          className="px-3 py-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150 border-l border-gray-200"
-          tabIndex={-1}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-      </div>
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
+        {/* Icon */}
+        <PeopleAltOutlinedIcon sx={{ color: "#F97316", fontSize: 18, flexShrink: 0 }} />
+
+        {/* Label */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography
+            sx={{
+              color: "#FFFFFF",
+              fontSize: "0.9375rem",
+              fontWeight: 500,
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {value}&nbsp;
+            <Box
+              component="span"
+              sx={{ color: "#9CA3AF", fontSize: "0.8125rem", fontWeight: 400 }}
+            >
+              {value === 1 ? "Passenger" : "Passengers"}
+            </Box>
+          </Typography>
+        </Box>
+
+        {/* –/+ controls */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Box onClick={canDecrease ? decrease : undefined} sx={btnSx(canDecrease)}>
+            <RemoveIcon sx={{ fontSize: 13 }} />
+          </Box>
+
+          {/* Hidden input for form submission / direct typing */}
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            name={name}
+            id={id}
+            value={value}
+            onChange={handleChange}
+            disabled={disabled}
+            style={{
+              width: 0,
+              height: 0,
+              opacity: 0,
+              position: "absolute",
+              pointerEvents: "none",
+            }}
+          />
+
+          <Box onClick={canIncrease ? increase : undefined} sx={btnSx(canIncrease)}>
+            <AddIcon sx={{ fontSize: 13 }} />
+          </Box>
+        </Box>
+      </Box>
+
+      {error && (
+        <Typography sx={{ mt: 0.5, fontSize: "0.75rem", color: "#EF4444" }}>
+          {error}
+        </Typography>
+      )}
+    </Box>
   );
 };
 

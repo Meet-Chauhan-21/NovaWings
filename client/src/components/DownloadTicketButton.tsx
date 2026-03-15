@@ -7,6 +7,7 @@ import paymentService from "../services/paymentService";
 import { generateTicketPDF } from "../utils/generateTicketPDF";
 import { getAirportCode } from "../utils/airportHelper";
 import type { BookingResponse, TicketData } from "../types";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 
 interface DownloadTicketButtonProps {
   booking: BookingResponse;
@@ -110,7 +111,7 @@ export default function DownloadTicketButton({
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
         ) : (
-          <span>📥</span>
+          <FileDownloadOutlinedIcon style={{ width: 16, height: 16 }} />
         )}
       </button>
     );
@@ -133,7 +134,7 @@ export default function DownloadTicketButton({
             Generating...
           </>
         ) : (
-          <>📥 Download Ticket</>
+          <><FileDownloadOutlinedIcon style={{ width: 14, height: 14 }} /> Download Ticket</>
         )}
       </button>
     );
@@ -156,7 +157,7 @@ export default function DownloadTicketButton({
           Generating PDF...
         </>
       ) : (
-        <>📥 Download Ticket PDF</>
+        <><FileDownloadOutlinedIcon style={{ width: 20, height: 20 }} /> Download Ticket PDF</>
       )}
     </button>
   );

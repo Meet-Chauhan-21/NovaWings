@@ -1,16 +1,47 @@
 // src/pages/FlightDetail.tsx
-// Professional MakeMyTrip-style flight detail page with fare summary
+// Dark-themed flight detail page with tabs, hero card, and booking sidebar
 
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useState } from "react";
+import { useParams, useSearchParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getFlightById } from "../services/flightService";
 import { useAuthContext } from "../context/AuthContext";
-import LoadingSpinner from "../components/LoadingSpinner";
-import ErrorMessage from "../components/ErrorMessage";
-import BackButton from "../components/ui/BackButton";
 
-/* ───────── Helper functions ───────── */
+// MUI
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import Paper from "@mui/material/Paper";
+import Chip from "@mui/material/Chip";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Divider from "@mui/material/Divider";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import MuiLink from "@mui/material/Link";
+import Skeleton from "@mui/material/Skeleton";
+import LinearProgress from "@mui/material/LinearProgress";
 
+// Icons
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import FlightLandIcon from "@mui/icons-material/FlightLand";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
+import LuggageOutlinedIcon from "@mui/icons-material/LuggageOutlined";
+import BackpackOutlinedIcon from "@mui/icons-material/BackpackOutlined";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import AirplanemodeInactiveIcon from "@mui/icons-material/AirplanemodeInactive";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AirlineSeatReclineNormalIcon from "@mui/icons-material/AirlineSeatReclineNormal";
+import FlightIcon from "@mui/icons-material/Flight";
+import EventSeatOutlinedIcon from "@mui/icons-material/EventSeatOutlined";
+
+// ── Helpers ──────────────────────────────────
 function formatTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString("en-IN", {
     hour: "2-digit",
@@ -43,13 +74,14 @@ function formatPrice(price: number): string {
   }).format(price);
 }
 
-/* ───────── Component ───────── */
-
+// ── Component ────────────────────────────────
 export default function FlightDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuthContext();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const passengers = parseInt(searchParams.get("passengers") || "1");
+  const [activeTab, setActiveTab] = useState(0);
 
   const {
     data: flight,
@@ -62,9 +94,40 @@ export default function FlightDetail() {
     enabled: !!id,
   });
 
-  if (isLoading) return <LoadingSpinner />;
-  if (isError) return <ErrorMessage message="Failed to load flight details." />;
-  if (!flight) return <ErrorMessage message="Flight not found." />;
+  // Loading
+  if (isLoading) {
+    return (
+      <Box sx={{ background: "#0A0A0A", minHeight: "100vh", pt: 4 }}>
+        <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 } }}>
+          <Skeleton variant="rounded" height={240} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "20px", mb: 3 }} />
+          <Box sx={{ display: "flex", gap: 3 }}>
+            <Box sx={{ flex: 1 }}>
+              <Skeleton variant="rounded" height={400} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "16px" }} />
+            </Box>
+            <Box sx={{ width: 360, display: { xs: "none", lg: "block" } }}>
+              <Skeleton variant="rounded" height={400} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "20px" }} />
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  // Error
+  if (isError || !flight) {
+    return (
+      <Box sx={{ background: "#0A0A0A", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Box sx={{ textAlign: "center" }}>
+          <AirplanemodeInactiveIcon sx={{ fontSize: 64, color: "#EF4444", mb: 2 }} />
+          <Typography variant="h5" sx={{ color: "#fff", mb: 1 }}>{isError ? "Something went wrong" : "Flight not found"}</Typography>
+          <Typography sx={{ color: "#6B7280", mb: 3 }}>
+            {isError ? "Failed to load flight details." : "The flight you're looking for doesn't exist."}
+          </Typography>
+          <Button variant="contained" onClick={() => navigate(-1)}>Go Back</Button>
+        </Box>
+      </Box>
+    );
+  }
 
   const duration = getFlightDuration(flight.departureTime, flight.arrivalTime);
   const baseFare = flight.price * passengers;
@@ -73,274 +136,559 @@ export default function FlightDetail() {
   const total = baseFare + tax + convenienceFee;
   const totalSeats = 180;
   const seatPercent = Math.min(((totalSeats - flight.availableSeats) / totalSeats) * 100, 100);
-  const seatBarColor =
-    flight.availableSeats > 10 ? "bg-green-500" : flight.availableSeats >= 5 ? "bg-orange-500" : "bg-red-500";
-  const seatTextColor =
-    flight.availableSeats > 10
-      ? "text-emerald-600"
-      : flight.availableSeats >= 5
-        ? "text-orange-500"
-        : "text-red-500";
+  const seatColor = flight.availableSeats > 10 ? "#10B981" : flight.availableSeats >= 5 ? "#F59E0B" : "#EF4444";
 
   return (
-    <div className="min-h-screen bg-gray-50 page-enter">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* ── Back ── */}
-        <div className="mb-4">
-          <BackButton label="Back to Results" />
-        </div>
+    <Box sx={{ background: "#0A0A0A", minHeight: "100vh", pb: 8 }}>
+      <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 }, pt: 3 }}>
 
-        {/* ═══════ Flight Header Card ═══════ */}
-        <div className="bg-gradient-to-r from-sky-600 to-blue-700 rounded-2xl text-white p-6 md:p-8 mb-6">
-          {/* Row 1 */}
-          <div className="flex flex-wrap items-center gap-3 mb-5">
-            <h1 className="text-2xl md:text-3xl font-bold">{flight.airlineName}</h1>
-            <span className="text-white/70 font-mono text-lg">{flight.flightNumber}</span>
-            <span className="ml-auto bg-white/20 backdrop-blur rounded-full px-3 py-1 text-xs font-medium">
-              ✈ Non-stop
-            </span>
-          </div>
+        {/* ── Breadcrumb ── */}
+        <Breadcrumbs
+          separator={<NavigateNextIcon sx={{ fontSize: 16, color: "#F97316" }} />}
+          sx={{ mb: 3 }}
+        >
+          <MuiLink component={RouterLink} to="/" sx={{ color: "#6B7280", fontSize: "0.8rem", textDecoration: "none", "&:hover": { color: "#F97316" } }}>
+            Home
+          </MuiLink>
+          <MuiLink component={RouterLink} to="/search" sx={{ color: "#6B7280", fontSize: "0.8rem", textDecoration: "none", "&:hover": { color: "#F97316" } }}>
+            Search
+          </MuiLink>
+          <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>Flight Details</Typography>
+        </Breadcrumbs>
 
-          {/* Row 2: times */}
-          <div className="flex items-center gap-4 md:gap-8">
+        {/* ══════════ Hero Card ══════════ */}
+        <Card
+          sx={{
+            background: "linear-gradient(135deg, #111111 0%, #1a1a1a 100%)",
+            border: "1px solid rgba(249,115,22,0.15)",
+            borderRadius: "20px",
+            p: { xs: 3, md: 4 },
+            mb: 4,
+          }}
+        >
+          {/* Airline name + badges */}
+          <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1.5, mb: 4 }}>
+            <Typography sx={{ color: "#F97316", fontWeight: 700, fontSize: "1.1rem" }}>
+              {flight.airlineName}
+            </Typography>
+            <Typography sx={{ color: "#4B5563", fontFamily: "monospace", fontSize: "0.85rem" }}>
+              {flight.flightNumber}
+            </Typography>
+            <Box sx={{ ml: "auto" }}>
+              <Chip
+                label="NON-STOP"
+                size="small"
+                sx={{
+                  background: "rgba(16,185,129,0.1)",
+                  color: "#10B981",
+                  fontWeight: 700,
+                  fontSize: "0.65rem",
+                  letterSpacing: "0.05em",
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Three-column route */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 2, md: 5 },
+            }}
+          >
             {/* Departure */}
-            <div className="text-center min-w-[100px]">
-              <p className="text-3xl md:text-4xl font-bold">{formatTime(flight.departureTime)}</p>
-              <p className="text-white/80 font-medium mt-1">{flight.source}</p>
-              <p className="text-white/60 text-xs mt-0.5">{formatDate(flight.departureTime)}</p>
-            </div>
+            <Box sx={{ textAlign: { xs: "left", md: "center" }, minWidth: { md: 140 } }}>
+              <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: { xs: "1.8rem", md: "2.5rem" }, lineHeight: 1.1 }}>
+                {formatTime(flight.departureTime)}
+              </Typography>
+              <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", mt: 0.5 }}>
+                {formatDate(flight.departureTime)}
+              </Typography>
+              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "1.1rem", mt: 0.5 }}>
+                {flight.source}
+              </Typography>
+            </Box>
 
-            {/* Arrow */}
-            <div className="flex-1 flex flex-col items-center">
-              <span className="text-sm text-white/70 font-medium mb-1">{duration}</span>
-              <div className="w-full flex items-center">
-                <div className="h-[2px] flex-1 bg-white/30" />
-                <span className="mx-2 text-lg">✈</span>
-                <div className="h-[2px] flex-1 bg-white/30" />
-              </div>
-            </div>
+            {/* Center — duration + line */}
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 1 }}>
+                {duration}
+              </Typography>
+              <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+                <FlightTakeoffIcon sx={{ fontSize: 16, color: "#F97316" }} />
+                <Box sx={{ height: 1, flex: 1, borderTop: "2px dashed rgba(249,115,22,0.3)", mx: 1 }} />
+                <FlightIcon sx={{ fontSize: 18, color: "#F97316" }} />
+                <Box sx={{ height: 1, flex: 1, borderTop: "2px dashed rgba(249,115,22,0.3)", mx: 1 }} />
+                <FlightLandIcon sx={{ fontSize: 16, color: "#F97316" }} />
+              </Box>
+              <Chip
+                label="Direct Flight"
+                size="small"
+                sx={{ mt: 1, background: "rgba(249,115,22,0.1)", color: "#F97316", fontSize: "0.65rem" }}
+              />
+            </Box>
 
             {/* Arrival */}
-            <div className="text-center min-w-[100px]">
-              <p className="text-3xl md:text-4xl font-bold">{formatTime(flight.arrivalTime)}</p>
-              <p className="text-white/80 font-medium mt-1">{flight.destination}</p>
-              <p className="text-white/60 text-xs mt-0.5">{formatDate(flight.arrivalTime)}</p>
-            </div>
-          </div>
+            <Box sx={{ textAlign: { xs: "right", md: "center" }, minWidth: { md: 140 } }}>
+              <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: { xs: "1.8rem", md: "2.5rem" }, lineHeight: 1.1 }}>
+                {formatTime(flight.arrivalTime)}
+              </Typography>
+              <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", mt: 0.5 }}>
+                {formatDate(flight.arrivalTime)}
+              </Typography>
+              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "1.1rem", mt: 0.5 }}>
+                {flight.destination}
+              </Typography>
+            </Box>
+          </Box>
 
           {/* Bottom chips */}
-          <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-white/20">
-            <span className="bg-white/15 backdrop-blur rounded-full px-3 py-1 text-xs">✈ Non-stop</span>
-            <span className="bg-white/15 backdrop-blur rounded-full px-3 py-1 text-xs">
-              🪑 {flight.availableSeats} seats left
-            </span>
-            <span className="bg-white/15 backdrop-blur rounded-full px-3 py-1 text-xs">Economy Class</span>
-          </div>
-        </div>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 3, pt: 3, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <Chip
+              icon={<EventSeatOutlinedIcon sx={{ fontSize: 14, color: `${seatColor} !important` }} />}
+              label={`${flight.availableSeats} seats left`}
+              size="small"
+              sx={{ background: "rgba(255,255,255,0.04)", color: seatColor, fontSize: "0.7rem" }}
+            />
+            <Chip
+              label="Economy Class"
+              size="small"
+              sx={{ background: "rgba(255,255,255,0.04)", color: "#9CA3AF", fontSize: "0.7rem" }}
+            />
+            <Chip
+              label="Boeing 737"
+              size="small"
+              sx={{ background: "rgba(255,255,255,0.04)", color: "#9CA3AF", fontSize: "0.7rem" }}
+            />
+          </Box>
+        </Card>
 
-        {/* ═══════ Two Column Layout ═══════ */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* ── Left Column: Details ── */}
-          <div className="flex-1 min-w-0 space-y-4">
-            {/* Section 1: Journey Details */}
-            <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="text-lg font-bold text-gray-800 mb-5">Journey Details</h2>
-              <div className="relative pl-8">
-                {/* Vertical line */}
-                <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-sky-300" />
+        {/* ══════════ Two-Column Layout ══════════ */}
+        <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 3 }}>
 
-                {/* Departure */}
-                <div className="relative mb-12">
-                  <div className="absolute -left-5 top-1 w-3 h-3 bg-sky-500 rounded-full border-2 border-white shadow" />
-                  <p className="font-bold text-gray-800 text-lg">
-                    {flight.source}
-                  </p>
-                  <p className="text-sm text-gray-500">{formatTime(flight.departureTime)} · {formatDate(flight.departureTime)}</p>
-                </div>
+          {/* ── Left: Tabs Content ── */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Paper
+              sx={{
+                background: "#111111",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: "16px",
+                overflow: "hidden",
+              }}
+            >
+              <Tabs
+                value={activeTab}
+                onChange={(_, v) => setActiveTab(v)}
+                variant="scrollable"
+                scrollButtons="auto"
+                sx={{ borderBottom: "1px solid rgba(255,255,255,0.06)", px: 1 }}
+              >
+                <Tab label="Flight Details" />
+                <Tab label="Fare Breakdown" />
+                <Tab label="Baggage Info" />
+                <Tab label="Cancellation" />
+              </Tabs>
 
-                {/* Duration label */}
-                <div className="absolute left-8 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium flex items-center gap-1.5">
-                  <span>✈</span> {flight.airlineName} {flight.flightNumber} · {duration}
-                </div>
+              <Box sx={{ p: { xs: 2.5, md: 3 } }}>
+                {/* Tab 0 — Flight Details */}
+                {activeTab === 0 && (
+                  <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
+                    {/* Timeline */}
+                    <Box sx={{ flex: 1 }}>
+                      <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                        Journey Timeline
+                      </Typography>
+                      <Box sx={{ position: "relative", pl: 4 }}>
+                        {/* Vertical line */}
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            left: 11,
+                            top: 8,
+                            bottom: 8,
+                            width: 2,
+                            background: "linear-gradient(180deg, #F97316, rgba(249,115,22,0.2))",
+                            borderRadius: 1,
+                          }}
+                        />
 
-                {/* Arrival */}
-                <div className="relative">
-                  <div className="absolute -left-5 top-1 w-3 h-3 bg-sky-500 rounded-full border-2 border-white shadow" />
-                  <p className="font-bold text-gray-800 text-lg">
-                    {flight.destination}
-                  </p>
-                  <p className="text-sm text-gray-500">{formatTime(flight.arrivalTime)} · {formatDate(flight.arrivalTime)}</p>
-                </div>
-              </div>
-            </div>
+                        {/* Departure */}
+                        <Box sx={{ position: "relative", mb: 8 }}>
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              left: -26,
+                              top: 4,
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              background: "#F97316",
+                              border: "2px solid #111111",
+                              boxShadow: "0 0 0 3px rgba(249,115,22,0.2)",
+                            }}
+                          />
+                          <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1rem" }}>
+                            {flight.source}
+                          </Typography>
+                          <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>
+                            {formatTime(flight.departureTime)} · {formatDate(flight.departureTime)}
+                          </Typography>
+                        </Box>
 
-            {/* Section 2: Flight Information */}
-            <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Flight Information</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: "Aircraft", value: "Boeing 737" },
-                  { label: "Class", value: "Economy" },
-                  { label: "Flight No", value: flight.flightNumber },
-                  { label: "Airline", value: flight.airlineName },
-                  { label: "Departure", value: `${formatTime(flight.departureTime)}, ${formatDate(flight.departureTime)}` },
-                  { label: "Arrival", value: `${formatTime(flight.arrivalTime)}, ${formatDate(flight.arrivalTime)}` },
-                  { label: "Duration", value: duration },
-                  { label: "Seats Left", value: String(flight.availableSeats) },
-                ].map((item) => (
-                  <div key={item.label} className="bg-gray-50 rounded-xl p-3">
-                    <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-1">{item.label}</p>
-                    <p className="text-sm font-medium text-gray-800">{item.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+                        {/* Duration label */}
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            left: 36,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
+                        >
+                          <FlightIcon sx={{ fontSize: 14, color: "#F97316" }} />
+                          <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>
+                            {flight.airlineName} · {flight.flightNumber} · {duration}
+                          </Typography>
+                        </Box>
 
-            {/* Section 3: Baggage Policy */}
-            <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Baggage Policy</h2>
-              <div className="space-y-3">
-                {[
-                  { icon: "🎒", label: "Cabin Baggage", value: "7 kg (1 piece)" },
-                  { icon: "🧳", label: "Check-in Baggage", value: "15 kg (1 piece)" },
-                  { icon: "⚠️", label: "Note", value: "Excess baggage charges apply" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-3 text-sm">
-                    <span className="text-lg">{item.icon}</span>
-                    <span className="text-gray-500 w-36">{item.label}</span>
-                    <span className="text-gray-800 font-medium">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                        {/* Arrival */}
+                        <Box sx={{ position: "relative" }}>
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              left: -26,
+                              top: 4,
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              background: "#F97316",
+                              border: "2px solid #111111",
+                              boxShadow: "0 0 0 3px rgba(249,115,22,0.2)",
+                            }}
+                          />
+                          <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1rem" }}>
+                            {flight.destination}
+                          </Typography>
+                          <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>
+                            {formatTime(flight.arrivalTime)} · {formatDate(flight.arrivalTime)}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
 
-            {/* Section 4: Cancellation Policy */}
-            <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Cancellation Policy</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="text-left px-4 py-2.5 font-semibold text-gray-700 rounded-tl-xl">
-                        Time Before Departure
-                      </th>
-                      <th className="text-left px-4 py-2.5 font-semibold text-gray-700 rounded-tr-xl">
-                        Cancellation Fee
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                    {/* Flight info grid */}
+                    <Box sx={{ flex: 1 }}>
+                      <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                        Flight Information
+                      </Typography>
+                      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+                        {[
+                          { label: "Aircraft", value: "Boeing 737" },
+                          { label: "Class", value: "Economy" },
+                          { label: "Flight No", value: flight.flightNumber },
+                          { label: "Airline", value: flight.airlineName },
+                          { label: "Duration", value: duration },
+                          { label: "Seats Left", value: String(flight.availableSeats) },
+                        ].map((item) => (
+                          <Box
+                            key={item.label}
+                            sx={{
+                              background: "rgba(255,255,255,0.03)",
+                              borderRadius: "10px",
+                              p: 1.5,
+                              border: "1px solid rgba(255,255,255,0.04)",
+                            }}
+                          >
+                            <Typography sx={{ color: "#4B5563", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", mb: 0.3 }}>
+                              {item.label}
+                            </Typography>
+                            <Typography sx={{ color: "#fff", fontSize: "0.85rem", fontWeight: 500 }}>
+                              {item.value}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+
+                      {/* Amenities */}
+                      <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mt: 3, mb: 2 }}>
+                        Amenities
+                      </Typography>
+                      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1 }}>
+                        {[
+                          { available: true, label: "In-flight Meals (paid)" },
+                          { available: true, label: "USB Charging" },
+                          { available: true, label: "Entertainment" },
+                          { available: true, label: "Seat Selection" },
+                          { available: false, label: "Free Wi-Fi" },
+                          { available: true, label: "Blanket Available" },
+                        ].map((item) => (
+                          <Box key={item.label} sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                            {item.available ? (
+                              <CheckCircleOutlineIcon sx={{ fontSize: 14, color: "#10B981" }} />
+                            ) : (
+                              <CancelOutlinedIcon sx={{ fontSize: 14, color: "#4B5563" }} />
+                            )}
+                            <Typography sx={{ color: item.available ? "#9CA3AF" : "#4B5563", fontSize: "0.8rem" }}>
+                              {item.label}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Tab 1 — Fare Breakdown */}
+                {activeTab === 1 && (
+                  <Box sx={{ maxWidth: 500 }}>
+                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                      Fare Breakdown
+                    </Typography>
                     {[
-                      { time: "> 24 hours", fee: "₹3,000 per person", rowClass: "bg-white" },
-                      { time: "3 – 24 hours", fee: "₹5,000 per person", rowClass: "bg-gray-50" },
-                      { time: "< 3 hours", fee: "Non-refundable", rowClass: "bg-white" },
+                      { label: `Base Fare (${formatPrice(flight.price)} × ${passengers})`, value: formatPrice(baseFare) },
+                      { label: "Taxes & Surcharges (18%)", value: formatPrice(tax) },
+                      { label: "Convenience Fee", value: formatPrice(convenienceFee) },
                     ].map((row) => (
-                      <tr key={row.time} className={row.rowClass}>
-                        <td className="px-4 py-2.5 text-gray-700">{row.time}</td>
-                        <td className="px-4 py-2.5 text-gray-700 font-medium">{row.fee}</td>
-                      </tr>
+                      <Box key={row.label} sx={{ display: "flex", justifyContent: "space-between", py: 1.2 }}>
+                        <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>{row.label}</Typography>
+                        <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem", fontWeight: 500 }}>{row.value}</Typography>
+                      </Box>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                    <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 1.5 }} />
+                    <Box sx={{ display: "flex", justifyContent: "space-between", py: 1 }}>
+                      <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: "1.25rem",
+                          background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          backgroundClip: "text",
+                        }}
+                      >
+                        {formatPrice(total)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
 
-            {/* Section 5: Amenities */}
-            <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Amenities</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {[
-                  { icon: "✅", label: "In-flight Meals (paid)" },
-                  { icon: "✅", label: "USB Charging" },
-                  { icon: "✅", label: "Entertainment" },
-                  { icon: "✅", label: "Seat Selection" },
-                  { icon: "❌", label: "Free Wi-Fi" },
-                  { icon: "✅", label: "Blanket Available" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-2 text-sm bg-gray-50 rounded-xl px-3 py-2.5"
-                  >
-                    <span>{item.icon}</span>
-                    <span className={item.icon === "❌" ? "text-gray-400" : "text-gray-700"}>{item.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                {/* Tab 2 — Baggage Info */}
+                {activeTab === 2 && (
+                  <Box>
+                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                      Baggage Allowance
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      {[
+                        { icon: <BackpackOutlinedIcon sx={{ fontSize: 20 }} />, label: "Cabin Baggage", value: "7 kg (1 piece)", sub: "Max dimensions: 55 × 35 × 25 cm" },
+                        { icon: <LuggageOutlinedIcon sx={{ fontSize: 20 }} />, label: "Check-in Baggage", value: "15 kg (1 piece)", sub: "Economy class allowance" },
+                        { icon: <WarningAmberIcon sx={{ fontSize: 20 }} />, label: "Excess Baggage", value: "₹500 per kg", sub: "Charges apply beyond free allowance" },
+                      ].map((item) => (
+                        <Box
+                          key={item.label}
+                          sx={{
+                            display: "flex",
+                            gap: 2,
+                            p: 2,
+                            background: "rgba(255,255,255,0.03)",
+                            borderRadius: "12px",
+                            border: "1px solid rgba(255,255,255,0.04)",
+                          }}
+                        >
+                          <Box sx={{ color: "#F97316", mt: 0.3 }}>{item.icon}</Box>
+                          <Box>
+                            <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>{item.label}</Typography>
+                            <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem" }}>{item.value}</Typography>
+                            <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>{item.sub}</Typography>
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
 
-          {/* ── Right Column: Fare Summary (sticky) ── */}
-          <div className="lg:w-[380px] shrink-0">
-            <div className="sticky top-24 bg-white rounded-2xl shadow-lg border border-gray-100 p-5 space-y-5">
-              <h2 className="text-lg font-bold text-gray-800">Fare Summary</h2>
+                {/* Tab 3 — Cancellation */}
+                {activeTab === 3 && (
+                  <Box>
+                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                      Cancellation Policy
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                      {[
+                        { time: "> 24 hours before departure", fee: "₹3,000 per person", color: "#10B981", bgColor: "rgba(16,185,129,0.08)" },
+                        { time: "3 – 24 hours before departure", fee: "₹5,000 per person", color: "#F59E0B", bgColor: "rgba(245,158,11,0.08)" },
+                        { time: "< 3 hours before departure", fee: "Non-refundable", color: "#EF4444", bgColor: "rgba(239,68,68,0.08)" },
+                      ].map((row) => (
+                        <Box
+                          key={row.time}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            p: 2,
+                            background: row.bgColor,
+                            borderRadius: "12px",
+                            border: `1px solid ${row.color}20`,
+                          }}
+                        >
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                            <AccessTimeIcon sx={{ fontSize: 18, color: row.color }} />
+                            <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>{row.time}</Typography>
+                          </Box>
+                          <Typography sx={{ color: row.color, fontWeight: 600, fontSize: "0.85rem" }}>
+                            {row.fee}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Paper>
+          </Box>
 
-              {/* Passenger row */}
-              <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-xl px-4 py-2.5">
-                <span>👤</span>
-                <span>
+          {/* ── Right: Booking Sidebar ── */}
+          <Box sx={{ width: { lg: 360 }, flexShrink: 0 }}>
+            <Paper
+              sx={{
+                position: { lg: "sticky" },
+                top: { lg: 86 },
+                background: "#111111",
+                border: "1px solid rgba(249,115,22,0.2)",
+                borderRadius: "20px",
+                p: 3,
+              }}
+            >
+              <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem", mb: 2.5 }}>
+                Fare Summary
+              </Typography>
+
+              {/* Passenger info */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  background: "rgba(255,255,255,0.03)",
+                  borderRadius: "10px",
+                  px: 2,
+                  py: 1.2,
+                  mb: 2.5,
+                }}
+              >
+                <AirlineSeatReclineNormalIcon sx={{ fontSize: 18, color: "#F97316" }} />
+                <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>
                   {passengers} × Economy
-                </span>
-              </div>
+                </Typography>
+              </Box>
 
-              {/* Price breakdown */}
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-gray-600">
-                  <span>
-                    Base Fare ({formatPrice(flight.price)} × {passengers})
-                  </span>
-                  <span className="font-medium text-gray-800">{formatPrice(baseFare)}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Taxes &amp; Surcharges (18%)</span>
-                  <span className="font-medium text-gray-800">{formatPrice(tax)}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Convenience Fee</span>
-                  <span className="font-medium text-gray-800">{formatPrice(convenienceFee)}</span>
-                </div>
-                <div className="border-t border-gray-200 pt-3 flex justify-between">
-                  <span className="font-bold text-gray-800">Total Amount</span>
-                  <span className="font-bold text-xl text-sky-600">{formatPrice(total)}</span>
-                </div>
-              </div>
+              {/* Price rows */}
+              <Box sx={{ mb: 2.5 }}>
+                {[
+                  { label: `Base Fare (${formatPrice(flight.price)} × ${passengers})`, value: formatPrice(baseFare) },
+                  { label: "Taxes & Surcharges (18%)", value: formatPrice(tax) },
+                  { label: "Convenience Fee", value: formatPrice(convenienceFee) },
+                ].map((row) => (
+                  <Box key={row.label} sx={{ display: "flex", justifyContent: "space-between", py: 0.8 }}>
+                    <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>{row.label}</Typography>
+                    <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 500 }}>{row.value}</Typography>
+                  </Box>
+                ))}
+                <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 1.5 }} />
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography sx={{ color: "#fff", fontWeight: 700 }}>Total Amount</Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: "1.3rem",
+                      background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    {formatPrice(total)}
+                  </Typography>
+                </Box>
+              </Box>
 
-              {/* Seat availability bar */}
-              <div>
-                <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-                  <span>Seat Availability</span>
-                  <span className={`font-semibold ${seatTextColor}`}>{flight.availableSeats} seats remaining</span>
-                </div>
-                <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div className={`${seatBarColor} h-full rounded-full transition-all`} style={{ width: `${seatPercent}%` }} />
-                </div>
-              </div>
+              {/* Seat availability */}
+              <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.8 }}>
+                  <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>Seat Availability</Typography>
+                  <Typography sx={{ color: seatColor, fontSize: "0.75rem", fontWeight: 600 }}>
+                    {flight.availableSeats} remaining
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={seatPercent}
+                  sx={{
+                    height: 6,
+                    borderRadius: 3,
+                    background: "rgba(255,255,255,0.06)",
+                    "& .MuiLinearProgress-bar": {
+                      background: seatColor,
+                      borderRadius: 3,
+                    },
+                  }}
+                />
+              </Box>
 
-              {/* Book CTA */}
-              {user ? (
-                <Link
-                  to={`/book/${flight.id}?passengers=${passengers}`}
-                  className="block text-center bg-sky-600 hover:bg-sky-700 text-white w-full py-3 rounded-xl font-bold text-lg transition"
-                >
-                  Book Now for {formatPrice(total)}
-                </Link>
-              ) : (
-                <Link
-                  to="/login"
-                  className="block text-center bg-sky-600 hover:bg-sky-700 text-white w-full py-3 rounded-xl font-bold text-lg transition"
-                >
-                  Login to Book
-                </Link>
-              )}
+              {/* Book Now */}
+              <Button
+                variant="contained"
+                fullWidth
+                size="large"
+                endIcon={<ArrowForwardIcon />}
+                onClick={() => navigate(user ? `/book/${flight.id}?passengers=${passengers}` : "/login")}
+                sx={{
+                  borderRadius: "14px",
+                  py: 1.5,
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  mb: 1.5,
+                }}
+              >
+                {user ? `Book Now for ${formatPrice(total)}` : "Login to Book"}
+              </Button>
+
+              {/* Wishlist */}
+              <Button
+                variant="outlined"
+                fullWidth
+                startIcon={<FavoriteBorderIcon />}
+                disabled
+                sx={{
+                  borderRadius: "14px",
+                  py: 1.2,
+                  fontSize: "0.85rem",
+                  mb: 2.5,
+                }}
+              >
+                Add to Wishlist
+              </Button>
 
               {/* Trust badges */}
-              <div className="flex justify-center gap-4 text-xs text-gray-400">
-                <span>✅ Secure Booking</span>
-                <span>✅ Instant Confirmation</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {[
+                  { icon: <LockOutlinedIcon sx={{ fontSize: 14 }} />, text: "Secure Checkout" },
+                  { icon: <VerifiedOutlinedIcon sx={{ fontSize: 14 }} />, text: "Instant Confirmation" },
+                ].map((badge) => (
+                  <Box key={badge.text} sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center" }}>
+                    <Box sx={{ color: "#4B5563" }}>{badge.icon}</Box>
+                    <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>{badge.text}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 }
