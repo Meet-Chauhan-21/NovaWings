@@ -97,15 +97,15 @@ export default function FlightDetail() {
   // Loading
   if (isLoading) {
     return (
-      <Box sx={{ background: "#0A0A0A", minHeight: "100vh", pt: 4 }}>
+      <Box sx={{ background: "var(--nw-bg)", minHeight: "100vh", pt: 4 }}>
         <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 } }}>
-          <Skeleton variant="rounded" height={240} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "20px", mb: 3 }} />
+          <Skeleton variant="rounded" height={240} sx={{ bgcolor: "var(--nw-border)", borderRadius: "20px", mb: 3 }} />
           <Box sx={{ display: "flex", gap: 3 }}>
             <Box sx={{ flex: 1 }}>
-              <Skeleton variant="rounded" height={400} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "16px" }} />
+              <Skeleton variant="rounded" height={400} sx={{ bgcolor: "var(--nw-border)", borderRadius: "16px" }} />
             </Box>
             <Box sx={{ width: 360, display: { xs: "none", lg: "block" } }}>
-              <Skeleton variant="rounded" height={400} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "20px" }} />
+              <Skeleton variant="rounded" height={400} sx={{ bgcolor: "var(--nw-border)", borderRadius: "20px" }} />
             </Box>
           </Box>
         </Box>
@@ -116,11 +116,11 @@ export default function FlightDetail() {
   // Error
   if (isError || !flight) {
     return (
-      <Box sx={{ background: "#0A0A0A", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Box sx={{ background: "var(--nw-bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Box sx={{ textAlign: "center" }}>
-          <AirplanemodeInactiveIcon sx={{ fontSize: 64, color: "#EF4444", mb: 2 }} />
-          <Typography variant="h5" sx={{ color: "#fff", mb: 1 }}>{isError ? "Something went wrong" : "Flight not found"}</Typography>
-          <Typography sx={{ color: "#6B7280", mb: 3 }}>
+          <AirplanemodeInactiveIcon sx={{ fontSize: 64, color: "var(--nw-error)", mb: 2 }} />
+          <Typography variant="h5" sx={{ color: "var(--nw-text-primary)", mb: 1 }}>{isError ? "Something went wrong" : "Flight not found"}</Typography>
+          <Typography sx={{ color: "var(--nw-text-muted)", mb: 3 }}>
             {isError ? "Failed to load flight details." : "The flight you're looking for doesn't exist."}
           </Typography>
           <Button variant="contained" onClick={() => navigate(-1)}>Go Back</Button>
@@ -136,31 +136,31 @@ export default function FlightDetail() {
   const total = baseFare + tax + convenienceFee;
   const totalSeats = 180;
   const seatPercent = Math.min(((totalSeats - flight.availableSeats) / totalSeats) * 100, 100);
-  const seatColor = flight.availableSeats > 10 ? "#10B981" : flight.availableSeats >= 5 ? "#F59E0B" : "#EF4444";
+  const seatColor = flight.availableSeats > 10 ? "var(--nw-success)" : flight.availableSeats >= 5 ? "var(--nw-secondary)" : "var(--nw-error)";
 
   return (
-    <Box sx={{ background: "#0A0A0A", minHeight: "100vh", pb: 8 }}>
+    <Box sx={{ background: "var(--nw-bg)", minHeight: "100vh", pb: 8 }}>
       <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 }, pt: 3 }}>
 
         {/* ── Breadcrumb ── */}
         <Breadcrumbs
-          separator={<NavigateNextIcon sx={{ fontSize: 16, color: "#F97316" }} />}
+          separator={<NavigateNextIcon sx={{ fontSize: 16, color: "var(--nw-primary)" }} />}
           sx={{ mb: 3 }}
         >
-          <MuiLink component={RouterLink} to="/" sx={{ color: "#6B7280", fontSize: "0.8rem", textDecoration: "none", "&:hover": { color: "#F97316" } }}>
+          <MuiLink component={RouterLink} to="/" sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem", textDecoration: "none", "&:hover": { color: "var(--nw-primary)" } }}>
             Home
           </MuiLink>
-          <MuiLink component={RouterLink} to="/search" sx={{ color: "#6B7280", fontSize: "0.8rem", textDecoration: "none", "&:hover": { color: "#F97316" } }}>
+          <MuiLink component={RouterLink} to="/search" sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem", textDecoration: "none", "&:hover": { color: "var(--nw-primary)" } }}>
             Search
           </MuiLink>
-          <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>Flight Details</Typography>
+          <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem" }}>Flight Details</Typography>
         </Breadcrumbs>
 
         {/* ══════════ Hero Card ══════════ */}
         <Card
           sx={{
-            background: "linear-gradient(135deg, #111111 0%, #1a1a1a 100%)",
-            border: "1px solid rgba(249,115,22,0.15)",
+            background: "linear-gradient(135deg, var(--nw-card) 0%, var(--nw-elevated) 100%)",
+            border: "1px solid var(--nw-primary-15)",
             borderRadius: "20px",
             p: { xs: 3, md: 4 },
             mb: 4,
@@ -168,10 +168,10 @@ export default function FlightDetail() {
         >
           {/* Airline name + badges */}
           <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1.5, mb: 4 }}>
-            <Typography sx={{ color: "#F97316", fontWeight: 700, fontSize: "1.1rem" }}>
+            <Typography sx={{ color: "var(--nw-primary)", fontWeight: 700, fontSize: "1.1rem" }}>
               {flight.airlineName}
             </Typography>
-            <Typography sx={{ color: "#4B5563", fontFamily: "monospace", fontSize: "0.85rem" }}>
+            <Typography sx={{ color: "var(--nw-text-disabled)", fontFamily: "monospace", fontSize: "0.85rem" }}>
               {flight.flightNumber}
             </Typography>
             <Box sx={{ ml: "auto" }}>
@@ -180,7 +180,7 @@ export default function FlightDetail() {
                 size="small"
                 sx={{
                   background: "rgba(16,185,129,0.1)",
-                  color: "#10B981",
+                  color: "var(--nw-success)",
                   fontWeight: 700,
                   fontSize: "0.65rem",
                   letterSpacing: "0.05em",
@@ -199,67 +199,67 @@ export default function FlightDetail() {
           >
             {/* Departure */}
             <Box sx={{ textAlign: { xs: "left", md: "center" }, minWidth: { md: 140 } }}>
-              <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: { xs: "1.8rem", md: "2.5rem" }, lineHeight: 1.1 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: { xs: "1.8rem", md: "2.5rem" }, lineHeight: 1.1 }}>
                 {formatTime(flight.departureTime)}
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", mt: 0.5 }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", mt: 0.5 }}>
                 {formatDate(flight.departureTime)}
               </Typography>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "1.1rem", mt: 0.5 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "1.1rem", mt: 0.5 }}>
                 {flight.source}
               </Typography>
             </Box>
 
             {/* Center — duration + line */}
             <Box sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 1 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem", mb: 1 }}>
                 {duration}
               </Typography>
               <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
-                <FlightTakeoffIcon sx={{ fontSize: 16, color: "#F97316" }} />
-                <Box sx={{ height: 1, flex: 1, borderTop: "2px dashed rgba(249,115,22,0.3)", mx: 1 }} />
-                <FlightIcon sx={{ fontSize: 18, color: "#F97316" }} />
-                <Box sx={{ height: 1, flex: 1, borderTop: "2px dashed rgba(249,115,22,0.3)", mx: 1 }} />
-                <FlightLandIcon sx={{ fontSize: 16, color: "#F97316" }} />
+                <FlightTakeoffIcon sx={{ fontSize: 16, color: "var(--nw-primary)" }} />
+                <Box sx={{ height: 1, flex: 1, borderTop: "2px dashed var(--nw-primary-30)", mx: 1 }} />
+                <FlightIcon sx={{ fontSize: 18, color: "var(--nw-primary)" }} />
+                <Box sx={{ height: 1, flex: 1, borderTop: "2px dashed var(--nw-primary-30)", mx: 1 }} />
+                <FlightLandIcon sx={{ fontSize: 16, color: "var(--nw-primary)" }} />
               </Box>
               <Chip
                 label="Direct Flight"
                 size="small"
-                sx={{ mt: 1, background: "rgba(249,115,22,0.1)", color: "#F97316", fontSize: "0.65rem" }}
+                sx={{ mt: 1, background: "var(--nw-primary-10)", color: "var(--nw-primary)", fontSize: "0.65rem" }}
               />
             </Box>
 
             {/* Arrival */}
             <Box sx={{ textAlign: { xs: "right", md: "center" }, minWidth: { md: 140 } }}>
-              <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: { xs: "1.8rem", md: "2.5rem" }, lineHeight: 1.1 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: { xs: "1.8rem", md: "2.5rem" }, lineHeight: 1.1 }}>
                 {formatTime(flight.arrivalTime)}
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", mt: 0.5 }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", mt: 0.5 }}>
                 {formatDate(flight.arrivalTime)}
               </Typography>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "1.1rem", mt: 0.5 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "1.1rem", mt: 0.5 }}>
                 {flight.destination}
               </Typography>
             </Box>
           </Box>
 
           {/* Bottom chips */}
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 3, pt: 3, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 3, pt: 3, borderTop: "1px solid var(--nw-border)" }}>
             <Chip
               icon={<EventSeatOutlinedIcon sx={{ fontSize: 14, color: `${seatColor} !important` }} />}
               label={`${flight.availableSeats} seats left`}
               size="small"
-              sx={{ background: "rgba(255,255,255,0.04)", color: seatColor, fontSize: "0.7rem" }}
+              sx={{ background: "var(--nw-border-soft)", color: seatColor, fontSize: "0.7rem" }}
             />
             <Chip
               label="Economy Class"
               size="small"
-              sx={{ background: "rgba(255,255,255,0.04)", color: "#9CA3AF", fontSize: "0.7rem" }}
+              sx={{ background: "var(--nw-border-soft)", color: "var(--nw-text-secondary)", fontSize: "0.7rem" }}
             />
             <Chip
               label="Boeing 737"
               size="small"
-              sx={{ background: "rgba(255,255,255,0.04)", color: "#9CA3AF", fontSize: "0.7rem" }}
+              sx={{ background: "var(--nw-border-soft)", color: "var(--nw-text-secondary)", fontSize: "0.7rem" }}
             />
           </Box>
         </Card>
@@ -271,8 +271,8 @@ export default function FlightDetail() {
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Paper
               sx={{
-                background: "#111111",
-                border: "1px solid rgba(255,255,255,0.06)",
+                background: "var(--nw-card)",
+                border: "1px solid var(--nw-border)",
                 borderRadius: "16px",
                 overflow: "hidden",
               }}
@@ -282,7 +282,7 @@ export default function FlightDetail() {
                 onChange={(_, v) => setActiveTab(v)}
                 variant="scrollable"
                 scrollButtons="auto"
-                sx={{ borderBottom: "1px solid rgba(255,255,255,0.06)", px: 1 }}
+                sx={{ borderBottom: "1px solid var(--nw-border)", px: 1 }}
               >
                 <Tab label="Flight Details" />
                 <Tab label="Fare Breakdown" />
@@ -296,7 +296,7 @@ export default function FlightDetail() {
                   <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
                     {/* Timeline */}
                     <Box sx={{ flex: 1 }}>
-                      <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                      <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
                         Journey Timeline
                       </Typography>
                       <Box sx={{ position: "relative", pl: 4 }}>
@@ -308,7 +308,7 @@ export default function FlightDetail() {
                             top: 8,
                             bottom: 8,
                             width: 2,
-                            background: "linear-gradient(180deg, #F97316, rgba(249,115,22,0.2))",
+                            background: "linear-gradient(180deg, var(--nw-primary), var(--nw-primary-20))",
                             borderRadius: 1,
                           }}
                         />
@@ -323,15 +323,15 @@ export default function FlightDetail() {
                               width: 12,
                               height: 12,
                               borderRadius: "50%",
-                              background: "#F97316",
-                              border: "2px solid #111111",
-                              boxShadow: "0 0 0 3px rgba(249,115,22,0.2)",
+                              background: "var(--nw-primary)",
+                              border: "2px solid var(--nw-card)",
+                              boxShadow: "0 0 0 3px var(--nw-primary-20)",
                             }}
                           />
-                          <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1rem" }}>
+                          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem" }}>
                             {flight.source}
                           </Typography>
-                          <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>
+                          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>
                             {formatTime(flight.departureTime)} · {formatDate(flight.departureTime)}
                           </Typography>
                         </Box>
@@ -348,8 +348,8 @@ export default function FlightDetail() {
                             gap: 1,
                           }}
                         >
-                          <FlightIcon sx={{ fontSize: 14, color: "#F97316" }} />
-                          <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>
+                          <FlightIcon sx={{ fontSize: 14, color: "var(--nw-primary)" }} />
+                          <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem" }}>
                             {flight.airlineName} · {flight.flightNumber} · {duration}
                           </Typography>
                         </Box>
@@ -364,15 +364,15 @@ export default function FlightDetail() {
                               width: 12,
                               height: 12,
                               borderRadius: "50%",
-                              background: "#F97316",
-                              border: "2px solid #111111",
-                              boxShadow: "0 0 0 3px rgba(249,115,22,0.2)",
+                              background: "var(--nw-primary)",
+                              border: "2px solid var(--nw-card)",
+                              boxShadow: "0 0 0 3px var(--nw-primary-20)",
                             }}
                           />
-                          <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1rem" }}>
+                          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem" }}>
                             {flight.destination}
                           </Typography>
-                          <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>
+                          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>
                             {formatTime(flight.arrivalTime)} · {formatDate(flight.arrivalTime)}
                           </Typography>
                         </Box>
@@ -381,7 +381,7 @@ export default function FlightDetail() {
 
                     {/* Flight info grid */}
                     <Box sx={{ flex: 1 }}>
-                      <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                      <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
                         Flight Information
                       </Typography>
                       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
@@ -396,16 +396,16 @@ export default function FlightDetail() {
                           <Box
                             key={item.label}
                             sx={{
-                              background: "rgba(255,255,255,0.03)",
+                              background: "var(--nw-glass)",
                               borderRadius: "10px",
                               p: 1.5,
-                              border: "1px solid rgba(255,255,255,0.04)",
+                              border: "1px solid var(--nw-border-soft)",
                             }}
                           >
-                            <Typography sx={{ color: "#4B5563", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", mb: 0.3 }}>
+                            <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", mb: 0.3 }}>
                               {item.label}
                             </Typography>
-                            <Typography sx={{ color: "#fff", fontSize: "0.85rem", fontWeight: 500 }}>
+                            <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem", fontWeight: 500 }}>
                               {item.value}
                             </Typography>
                           </Box>
@@ -413,7 +413,7 @@ export default function FlightDetail() {
                       </Box>
 
                       {/* Amenities */}
-                      <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mt: 3, mb: 2 }}>
+                      <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem", mt: 3, mb: 2 }}>
                         Amenities
                       </Typography>
                       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1 }}>
@@ -427,11 +427,11 @@ export default function FlightDetail() {
                         ].map((item) => (
                           <Box key={item.label} sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
                             {item.available ? (
-                              <CheckCircleOutlineIcon sx={{ fontSize: 14, color: "#10B981" }} />
+                              <CheckCircleOutlineIcon sx={{ fontSize: 14, color: "var(--nw-success)" }} />
                             ) : (
-                              <CancelOutlinedIcon sx={{ fontSize: 14, color: "#4B5563" }} />
+                              <CancelOutlinedIcon sx={{ fontSize: 14, color: "var(--nw-text-disabled)" }} />
                             )}
-                            <Typography sx={{ color: item.available ? "#9CA3AF" : "#4B5563", fontSize: "0.8rem" }}>
+                            <Typography sx={{ color: item.available ? "var(--nw-text-secondary)" : "var(--nw-text-disabled)", fontSize: "0.8rem" }}>
                               {item.label}
                             </Typography>
                           </Box>
@@ -444,7 +444,7 @@ export default function FlightDetail() {
                 {/* Tab 1 — Fare Breakdown */}
                 {activeTab === 1 && (
                   <Box sx={{ maxWidth: 500 }}>
-                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
                       Fare Breakdown
                     </Typography>
                     {[
@@ -453,18 +453,18 @@ export default function FlightDetail() {
                       { label: "Convenience Fee", value: formatPrice(convenienceFee) },
                     ].map((row) => (
                       <Box key={row.label} sx={{ display: "flex", justifyContent: "space-between", py: 1.2 }}>
-                        <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>{row.label}</Typography>
-                        <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem", fontWeight: 500 }}>{row.value}</Typography>
+                        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>{row.label}</Typography>
+                        <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem", fontWeight: 500 }}>{row.value}</Typography>
                       </Box>
                     ))}
-                    <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 1.5 }} />
+                    <Divider sx={{ borderColor: "var(--nw-border)", my: 1.5 }} />
                     <Box sx={{ display: "flex", justifyContent: "space-between", py: 1 }}>
-                      <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
+                      <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
                       <Typography
                         sx={{
                           fontWeight: 800,
                           fontSize: "1.25rem",
-                          background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                          background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
                           backgroundClip: "text",
@@ -479,7 +479,7 @@ export default function FlightDetail() {
                 {/* Tab 2 — Baggage Info */}
                 {activeTab === 2 && (
                   <Box>
-                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
                       Baggage Allowance
                     </Typography>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -494,16 +494,16 @@ export default function FlightDetail() {
                             display: "flex",
                             gap: 2,
                             p: 2,
-                            background: "rgba(255,255,255,0.03)",
+                            background: "var(--nw-glass)",
                             borderRadius: "12px",
-                            border: "1px solid rgba(255,255,255,0.04)",
+                            border: "1px solid var(--nw-border-soft)",
                           }}
                         >
-                          <Box sx={{ color: "#F97316", mt: 0.3 }}>{item.icon}</Box>
+                          <Box sx={{ color: "var(--nw-primary)", mt: 0.3 }}>{item.icon}</Box>
                           <Box>
-                            <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>{item.label}</Typography>
-                            <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem" }}>{item.value}</Typography>
-                            <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>{item.sub}</Typography>
+                            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>{item.label}</Typography>
+                            <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem" }}>{item.value}</Typography>
+                            <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem" }}>{item.sub}</Typography>
                           </Box>
                         </Box>
                       ))}
@@ -514,14 +514,14 @@ export default function FlightDetail() {
                 {/* Tab 3 — Cancellation */}
                 {activeTab === 3 && (
                   <Box>
-                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem", mb: 3 }}>
                       Cancellation Policy
                     </Typography>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                       {[
-                        { time: "> 24 hours before departure", fee: "₹3,000 per person", color: "#10B981", bgColor: "rgba(16,185,129,0.08)" },
-                        { time: "3 – 24 hours before departure", fee: "₹5,000 per person", color: "#F59E0B", bgColor: "rgba(245,158,11,0.08)" },
-                        { time: "< 3 hours before departure", fee: "Non-refundable", color: "#EF4444", bgColor: "rgba(239,68,68,0.08)" },
+                        { time: "> 24 hours before departure", fee: "₹3,000 per person", color: "var(--nw-success)", bgColor: "rgba(16,185,129,0.08)" },
+                        { time: "3 – 24 hours before departure", fee: "₹5,000 per person", color: "var(--nw-secondary)", bgColor: "var(--nw-warning-08)" },
+                        { time: "< 3 hours before departure", fee: "Non-refundable", color: "var(--nw-error)", bgColor: "var(--nw-error-08)" },
                       ].map((row) => (
                         <Box
                           key={row.time}
@@ -537,7 +537,7 @@ export default function FlightDetail() {
                         >
                           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                             <AccessTimeIcon sx={{ fontSize: 18, color: row.color }} />
-                            <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>{row.time}</Typography>
+                            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem" }}>{row.time}</Typography>
                           </Box>
                           <Typography sx={{ color: row.color, fontWeight: 600, fontSize: "0.85rem" }}>
                             {row.fee}
@@ -557,13 +557,13 @@ export default function FlightDetail() {
               sx={{
                 position: { lg: "sticky" },
                 top: { lg: 86 },
-                background: "#111111",
-                border: "1px solid rgba(249,115,22,0.2)",
+                background: "var(--nw-card)",
+                border: "1px solid var(--nw-primary-20)",
                 borderRadius: "20px",
                 p: 3,
               }}
             >
-              <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem", mb: 2.5 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem", mb: 2.5 }}>
                 Fare Summary
               </Typography>
 
@@ -573,15 +573,15 @@ export default function FlightDetail() {
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
-                  background: "rgba(255,255,255,0.03)",
+                  background: "var(--nw-glass)",
                   borderRadius: "10px",
                   px: 2,
                   py: 1.2,
                   mb: 2.5,
                 }}
               >
-                <AirlineSeatReclineNormalIcon sx={{ fontSize: 18, color: "#F97316" }} />
-                <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>
+                <AirlineSeatReclineNormalIcon sx={{ fontSize: 18, color: "var(--nw-primary)" }} />
+                <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem" }}>
                   {passengers} × Economy
                 </Typography>
               </Box>
@@ -594,18 +594,18 @@ export default function FlightDetail() {
                   { label: "Convenience Fee", value: formatPrice(convenienceFee) },
                 ].map((row) => (
                   <Box key={row.label} sx={{ display: "flex", justifyContent: "space-between", py: 0.8 }}>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>{row.label}</Typography>
-                    <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 500 }}>{row.value}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>{row.label}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 500 }}>{row.value}</Typography>
                   </Box>
                 ))}
-                <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 1.5 }} />
+                <Divider sx={{ borderColor: "var(--nw-border)", my: 1.5 }} />
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography sx={{ color: "#fff", fontWeight: 700 }}>Total Amount</Typography>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700 }}>Total Amount</Typography>
                   <Typography
                     sx={{
                       fontWeight: 800,
                       fontSize: "1.3rem",
-                      background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                      background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -619,7 +619,7 @@ export default function FlightDetail() {
               {/* Seat availability */}
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.8 }}>
-                  <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>Seat Availability</Typography>
+                  <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem" }}>Seat Availability</Typography>
                   <Typography sx={{ color: seatColor, fontSize: "0.75rem", fontWeight: 600 }}>
                     {flight.availableSeats} remaining
                   </Typography>
@@ -630,7 +630,7 @@ export default function FlightDetail() {
                   sx={{
                     height: 6,
                     borderRadius: 3,
-                    background: "rgba(255,255,255,0.06)",
+                    background: "var(--nw-border)",
                     "& .MuiLinearProgress-bar": {
                       background: seatColor,
                       borderRadius: 3,
@@ -680,8 +680,8 @@ export default function FlightDetail() {
                   { icon: <VerifiedOutlinedIcon sx={{ fontSize: 14 }} />, text: "Instant Confirmation" },
                 ].map((badge) => (
                   <Box key={badge.text} sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center" }}>
-                    <Box sx={{ color: "#4B5563" }}>{badge.icon}</Box>
-                    <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>{badge.text}</Typography>
+                    <Box sx={{ color: "var(--nw-text-disabled)" }}>{badge.icon}</Box>
+                    <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem" }}>{badge.text}</Typography>
                   </Box>
                 ))}
               </Box>
@@ -692,3 +692,6 @@ export default function FlightDetail() {
     </Box>
   );
 }
+
+
+

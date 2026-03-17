@@ -60,14 +60,15 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
     <>
       <Paper
         sx={{
-          background: "#111111",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--nw-card)",
+          border: "1px solid var(--nw-border)",
           borderRadius: "16px",
           overflow: "hidden",
           transition: "all 0.2s ease",
+          height: "100%",
           "&:hover": {
             border: "1px solid rgba(249,115,22,0.2)",
-            boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
+            boxShadow: "0 8px 30px rgba(15,23,42,0.12)",
           },
         }}
       >
@@ -121,10 +122,10 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
               <FlightIcon sx={{ color: "#F97316", fontSize: 20 }} />
             </Box>
             <Box>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.9rem" }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem" }}>
                 {booking.airlineName}
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", fontFamily: "monospace" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", fontFamily: "monospace" }}>
                 {booking.flightNumber}
               </Typography>
             </Box>
@@ -135,11 +136,11 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
             <Box sx={{ flex: 1 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.3 }}>
                 <FlightTakeoffIcon sx={{ fontSize: 14, color: "#F97316" }} />
-                <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   From
                 </Typography>
               </Box>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.05rem" }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.05rem" }}>
                 {booking.source}
               </Typography>
             </Box>
@@ -154,7 +155,7 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
                     transform: "translate(-50%, -50%) rotate(90deg)",
                     color: "#F97316",
                     fontSize: 16,
-                    background: "#111111",
+                    background: "var(--nw-card)",
                     px: 0.2,
                   }}
                 />
@@ -164,30 +165,30 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
             <Box sx={{ flex: 1, textAlign: "right" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.3, justifyContent: "flex-end" }}>
                 <FlightLandIcon sx={{ fontSize: 14, color: "#F97316" }} />
-                <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   To
                 </Typography>
               </Box>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.05rem" }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.05rem" }}>
                 {booking.destination}
               </Typography>
             </Box>
           </Box>
 
-          <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mb: 2 }} />
+          <Divider sx={{ borderColor: "var(--nw-border)", mb: 2 }} />
 
           {/* Bottom row: Details + Price */}
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <AirlineSeatReclineExtraIcon sx={{ fontSize: 14, color: "#6B7280" }} />
-                <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>
+                <AirlineSeatReclineExtraIcon sx={{ fontSize: 14, color: "var(--nw-text-muted)" }} />
+                <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem" }}>
                   {booking.numberOfSeats} seat{booking.numberOfSeats > 1 ? "s" : ""}
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <EventIcon sx={{ fontSize: 14, color: "#6B7280" }} />
-                <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>
+                <EventIcon sx={{ fontSize: 14, color: "var(--nw-text-muted)" }} />
+                <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem" }}>
                   {formatDate(booking.bookingDate)}
                 </Typography>
               </Box>
@@ -265,10 +266,10 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
               sx={{
                 borderRadius: "8px",
                 fontSize: "0.75rem",
-                color: "#6B7280",
+                color: "var(--nw-text-muted)",
                 textTransform: "none",
                 ml: "auto",
-                "&:hover": { background: "rgba(255,255,255,0.04)" },
+                "&:hover": { background: "var(--nw-glass)" },
               }}
             >
               {expanded ? "Less" : "More"}
@@ -277,10 +278,10 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
 
           {/* Expandable details */}
           <Collapse in={expanded}>
-            <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid var(--nw-border)" }}>
               {booking.selectedSeats && booking.selectedSeats.length > 0 && (
                 <Box sx={{ mb: 1.5 }}>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em", mb: 0.8 }}>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em", mb: 0.8 }}>
                     Seats
                   </Typography>
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -304,7 +305,7 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
               )}
               {booking.paymentId && (
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <Typography sx={{ color: "#4B5563", fontSize: "0.7rem", fontFamily: "monospace" }}>
+                  <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.7rem", fontFamily: "monospace" }}>
                     Payment: {booking.paymentId}
                   </Typography>
                   <Chip
@@ -332,8 +333,8 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
         onClose={() => setCancelDialog(false)}
         PaperProps={{
           sx: {
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.08)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-border-strong)",
             borderRadius: "16px",
             maxWidth: 400,
           },
@@ -341,12 +342,12 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
       >
         <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
           <WarningAmberIcon sx={{ color: "#EF4444" }} />
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.1rem" }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>
             Cancel Booking?
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.9rem" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.9rem" }}>
             Are you sure you want to cancel this booking? This action cannot be undone.
           </Typography>
         </DialogContent>
@@ -355,11 +356,11 @@ const BookingCard: React.FC<BookingCardProps> = React.memo(({ booking, onCancel,
             onClick={() => setCancelDialog(false)}
             sx={{
               borderRadius: "10px",
-              color: "#9CA3AF",
-              border: "1px solid rgba(255,255,255,0.1)",
+              color: "var(--nw-text-secondary)",
+              border: "1px solid var(--nw-border-strong)",
               textTransform: "none",
               fontWeight: 600,
-              "&:hover": { background: "rgba(255,255,255,0.04)" },
+              "&:hover": { background: "var(--nw-glass)" },
             }}
           >
             Keep Booking

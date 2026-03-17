@@ -62,8 +62,8 @@ function formatTimeStr(iso: string): string {
 }
 
 const STATUS_STYLES: Record<string, { bg: string; border: string; color: string; label: string }> = {
-  CONFIRMED: { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.2)", color: "#22C55E", label: "Confirmed" },
-  CANCELLED: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.2)", color: "#EF4444", label: "Cancelled" },
+  CONFIRMED: { bg: "var(--nw-success-08)", border: "var(--nw-success-20)", color: "var(--nw-success-bright)", label: "Confirmed" },
+  CANCELLED: { bg: "var(--nw-error-08)", border: "var(--nw-error-20)", color: "var(--nw-error)", label: "Cancelled" },
 };
 
 export default function BookingDetail() {
@@ -142,14 +142,14 @@ export default function BookingDetail() {
   if (isError) return <ErrorMessage message="Failed to load booking details." />;
   if (!booking) return <ErrorMessage message="Booking not found." />;
 
-  const statusStyle = STATUS_STYLES[booking.status] ?? { bg: "rgba(156,163,175,0.08)", border: "rgba(156,163,175,0.2)", color: "#9CA3AF", label: booking.status };
+  const statusStyle = STATUS_STYLES[booking.status] ?? { bg: "rgba(156,163,175,0.08)", border: "rgba(156,163,175,0.2)", color: "var(--nw-text-secondary)", label: booking.status };
   const payment = payments?.find((p) => p.bookingId === booking.id);
 
   const sectionHeadingSx = {
     fontSize: "0.65rem",
     textTransform: "uppercase" as const,
     letterSpacing: "0.1em",
-    color: "#F97316",
+    color: "var(--nw-primary)",
     fontWeight: 700,
     mb: 2,
     display: "flex",
@@ -162,13 +162,13 @@ export default function BookingDetail() {
       {/* Breadcrumbs */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
         <Breadcrumbs
-          separator={<NavigateNextIcon sx={{ fontSize: 16, color: "#4B5563" }} />}
+          separator={<NavigateNextIcon sx={{ fontSize: 16, color: "var(--nw-text-disabled)" }} />}
           sx={{ mb: 3 }}
         >
           <MuiLink
             component={Link}
             to="/"
-            sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "#6B7280", fontSize: "0.85rem", textDecoration: "none", "&:hover": { color: "#F97316" } }}
+            sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "var(--nw-text-muted)", fontSize: "0.85rem", textDecoration: "none", "&:hover": { color: "var(--nw-primary)" } }}
           >
             <HomeOutlinedIcon sx={{ fontSize: 16 }} />
             Home
@@ -176,11 +176,11 @@ export default function BookingDetail() {
           <MuiLink
             component={Link}
             to="/my-bookings"
-            sx={{ color: "#6B7280", fontSize: "0.85rem", textDecoration: "none", "&:hover": { color: "#F97316" } }}
+            sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem", textDecoration: "none", "&:hover": { color: "var(--nw-primary)" } }}
           >
             My Bookings
           </MuiLink>
-          <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem", fontWeight: 500 }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem", fontWeight: 500 }}>
             #{booking.id.slice(-8).toUpperCase()}
           </Typography>
         </Breadcrumbs>
@@ -212,7 +212,7 @@ export default function BookingDetail() {
               <Typography sx={{ color: statusStyle.color, fontWeight: 700, fontSize: "1rem" }}>
                 Booking {statusStyle.label}
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>
                 Booked on {formatDateStr(booking.bookingDate)}
               </Typography>
             </Box>
@@ -223,9 +223,9 @@ export default function BookingDetail() {
               fontFamily: "monospace",
               fontWeight: 700,
               fontSize: "0.75rem",
-              background: "rgba(249,115,22,0.1)",
-              border: "1px solid rgba(249,115,22,0.2)",
-              color: "#F97316",
+              background: "var(--nw-primary-10)",
+              border: "1px solid var(--nw-primary-20)",
+              color: "var(--nw-primary)",
             }}
           />
         </Paper>
@@ -236,19 +236,19 @@ export default function BookingDetail() {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {/* Flight Summary */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
-            <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
+            <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
               <Typography sx={sectionHeadingSx}>
                 <FlightIcon sx={{ fontSize: 16 }} />
                 Flight Summary
               </Typography>
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
-                <Box sx={{ width: 40, height: 40, borderRadius: "10px", background: "rgba(249,115,22,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <FlightIcon sx={{ color: "#F97316", fontSize: 20 }} />
+                <Box sx={{ width: 40, height: 40, borderRadius: "10px", background: "var(--nw-primary-08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <FlightIcon sx={{ color: "var(--nw-primary)", fontSize: 20 }} />
                 </Box>
                 <Box>
-                  <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.95rem" }}>{booking.airlineName}</Typography>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.8rem", fontFamily: "monospace" }}>{booking.flightNumber}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.95rem" }}>{booking.airlineName}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem", fontFamily: "monospace" }}>{booking.flightNumber}</Typography>
                 </Box>
               </Box>
 
@@ -256,27 +256,27 @@ export default function BookingDetail() {
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Box sx={{ flex: 1 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.3 }}>
-                    <FlightTakeoffIcon sx={{ fontSize: 14, color: "#F97316" }} />
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", textTransform: "uppercase" }}>From</Typography>
+                    <FlightTakeoffIcon sx={{ fontSize: 14, color: "var(--nw-primary)" }} />
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", textTransform: "uppercase" }}>From</Typography>
                   </Box>
-                  <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.1rem" }}>{booking.source}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>{booking.source}</Typography>
                   {ticketData && (
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>{ticketData.departureTime}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>{ticketData.departureTime}</Typography>
                   )}
                 </Box>
                 <Box sx={{ px: 2 }}>
-                  <Box sx={{ width: 60, height: 0, borderTop: "2px dashed rgba(249,115,22,0.3)", position: "relative" }}>
-                    <FlightIcon sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%) rotate(90deg)", color: "#F97316", fontSize: 16, background: "#111111", px: 0.3 }} />
+                  <Box sx={{ width: 60, height: 0, borderTop: "2px dashed var(--nw-primary-30)", position: "relative" }}>
+                    <FlightIcon sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%) rotate(90deg)", color: "var(--nw-primary)", fontSize: 16, background: "var(--nw-card)", px: 0.3 }} />
                   </Box>
                 </Box>
                 <Box sx={{ flex: 1, textAlign: "right" }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.3, justifyContent: "flex-end" }}>
-                    <FlightLandIcon sx={{ fontSize: 14, color: "#F97316" }} />
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", textTransform: "uppercase" }}>To</Typography>
+                    <FlightLandIcon sx={{ fontSize: 14, color: "var(--nw-primary)" }} />
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", textTransform: "uppercase" }}>To</Typography>
                   </Box>
-                  <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.1rem" }}>{booking.destination}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>{booking.destination}</Typography>
                   {ticketData && (
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>{ticketData.arrivalTime}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>{ticketData.arrivalTime}</Typography>
                   )}
                 </Box>
               </Box>
@@ -285,13 +285,13 @@ export default function BookingDetail() {
 
           {/* Seat Assignment */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}>
-            <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
+            <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
               <Typography sx={sectionHeadingSx}>
                 <AirlineSeatReclineExtraIcon sx={{ fontSize: 16 }} />
                 Passengers & Seats
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>
+                <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem" }}>
                   {booking.numberOfSeats} passenger{booking.numberOfSeats > 1 ? "s" : ""} • Economy Class
                 </Typography>
               </Box>
@@ -302,9 +302,9 @@ export default function BookingDetail() {
                       key={seat}
                       label={`Passenger ${i + 1} — Seat ${seat}`}
                       sx={{
-                        background: "rgba(249,115,22,0.08)",
-                        border: "1px solid rgba(249,115,22,0.2)",
-                        color: "#F97316",
+                        background: "var(--nw-primary-08)",
+                        border: "1px solid var(--nw-primary-20)",
+                        color: "var(--nw-primary)",
                         fontWeight: 600,
                         fontSize: "0.8rem",
                       }}
@@ -317,24 +317,24 @@ export default function BookingDetail() {
 
           {/* Meals Summary */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
-            <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
+            <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
               <Typography sx={sectionHeadingSx}>
                 <RestaurantMenuIcon sx={{ fontSize: 16 }} />
                 Meals Summary
               </Typography>
               {ticketData?.mealSkipped || !ticketData?.foodOrders?.length ? (
-                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>No meals selected.</Typography>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>No meals selected.</Typography>
               ) : (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                   {ticketData.foodOrders.filter(o => o.items.length > 0).map((order) => (
-                    <Box key={order.seatNumber} sx={{ background: "rgba(249,115,22,0.04)", border: "1px solid rgba(249,115,22,0.1)", borderRadius: "10px", p: 2 }}>
-                      <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.85rem", mb: 0.8 }}>
+                    <Box key={order.seatNumber} sx={{ background: "var(--nw-primary-04)", border: "1px solid var(--nw-primary-10)", borderRadius: "10px", p: 2 }}>
+                      <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem", mb: 0.8 }}>
                         Seat {order.seatNumber}
                       </Typography>
                       {order.items.map((item) => (
                         <Box key={item.foodItemId} sx={{ display: "flex", justifyContent: "space-between", mb: 0.3 }}>
-                          <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>{item.foodItemName} × {item.quantity}</Typography>
-                          <Typography sx={{ color: "#FFFFFF", fontSize: "0.8rem" }}>₹{(item.price * item.quantity).toLocaleString("en-IN")}</Typography>
+                          <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem" }}>{item.foodItemName} × {item.quantity}</Typography>
+                          <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.8rem" }}>₹{(item.price * item.quantity).toLocaleString("en-IN")}</Typography>
                         </Box>
                       ))}
                     </Box>
@@ -346,7 +346,7 @@ export default function BookingDetail() {
 
           {/* Payment Details */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
-            <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
+            <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
               <Typography sx={sectionHeadingSx}>
                 <PaymentIcon sx={{ fontSize: 16 }} />
                 Payment Details
@@ -354,32 +354,32 @@ export default function BookingDetail() {
               {ticketData && (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Base Fare</Typography>
-                    <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{ticketData.baseFare.toLocaleString("en-IN")}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Base Fare</Typography>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem" }}>₹{ticketData.baseFare.toLocaleString("en-IN")}</Typography>
                   </Box>
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Taxes & Fees</Typography>
-                    <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{ticketData.taxes.toLocaleString("en-IN")}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Taxes & Fees</Typography>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem" }}>₹{ticketData.taxes.toLocaleString("en-IN")}</Typography>
                   </Box>
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Convenience Fee</Typography>
-                    <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{ticketData.convenienceFee.toLocaleString("en-IN")}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Convenience Fee</Typography>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem" }}>₹{ticketData.convenienceFee.toLocaleString("en-IN")}</Typography>
                   </Box>
                   {(ticketData.foodTotal || 0) > 0 && (
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Meals</Typography>
-                      <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{ticketData.foodTotal?.toLocaleString("en-IN")}</Typography>
+                      <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Meals</Typography>
+                      <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem" }}>₹{ticketData.foodTotal?.toLocaleString("en-IN")}</Typography>
                     </Box>
                   )}
-                  <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+                  <Divider sx={{ borderColor: "var(--nw-border)" }} />
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
-                    <Typography sx={{ fontWeight: 800, fontSize: "1.1rem", background: "linear-gradient(135deg, #F97316, #F59E0B)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
+                    <Typography sx={{ fontWeight: 800, fontSize: "1.1rem", background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                       ₹{ticketData.totalAmount.toLocaleString("en-IN")}
                     </Typography>
                   </Box>
                   {payment?.razorpayPaymentId && (
-                    <Typography sx={{ color: "#4B5563", fontSize: "0.75rem", fontFamily: "monospace", mt: 1 }}>
+                    <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem", fontFamily: "monospace", mt: 1 }}>
                       Payment ID: {payment.razorpayPaymentId}
                     </Typography>
                   )}
@@ -390,19 +390,19 @@ export default function BookingDetail() {
 
           {/* Cancellation Policy */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}>
-            <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
+            <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
               <Typography sx={sectionHeadingSx}>
                 <GavelIcon sx={{ fontSize: 16 }} />
                 Cancellation Policy
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {[
-                  { time: "24+ hrs before departure", refund: "Full refund", color: "#22C55E" },
-                  { time: "12-24 hrs before departure", refund: "50% refund", color: "#F59E0B" },
-                  { time: "Less than 12 hrs", refund: "No refund", color: "#EF4444" },
+                  { time: "24+ hrs before departure", refund: "Full refund", color: "var(--nw-success-bright)" },
+                  { time: "12-24 hrs before departure", refund: "50% refund", color: "var(--nw-secondary)" },
+                  { time: "Less than 12 hrs", refund: "No refund", color: "var(--nw-error)" },
                 ].map((row) => (
                   <Box key={row.time} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>{row.time}</Typography>
+                    <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem" }}>{row.time}</Typography>
                     <Typography sx={{ color: row.color, fontSize: "0.85rem", fontWeight: 600 }}>{row.refund}</Typography>
                   </Box>
                 ))}
@@ -414,7 +414,7 @@ export default function BookingDetail() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}>
             <Paper
               sx={{
-                border: "2px dashed rgba(249,115,22,0.3)",
+                border: "2px dashed var(--nw-primary-30)",
                 borderRadius: "16px",
                 p: 2,
                 background: "transparent",
@@ -428,8 +428,8 @@ export default function BookingDetail() {
         {/* RIGHT — Actions Sidebar */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
-            <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3, position: "sticky", top: 86 }}>
-              <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 2.5 }}>
+            <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3, position: "sticky", top: 86 }}>
+              <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--nw-primary)", fontWeight: 700, mb: 2.5 }}>
                 Actions
               </Typography>
 
@@ -447,9 +447,9 @@ export default function BookingDetail() {
                       borderRadius: "12px",
                       fontWeight: 700,
                       fontSize: "0.9rem",
-                      background: "linear-gradient(135deg, #F97316, #EA580C)",
-                      "&:hover": { background: "linear-gradient(135deg, #EA580C, #DC2626)" },
-                      "&.Mui-disabled": { background: "rgba(255,255,255,0.06)", color: "#4B5563" },
+                      background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
+                      "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-error))" },
+                      "&.Mui-disabled": { background: "var(--nw-border)", color: "var(--nw-text-disabled)" },
                     }}
                   >
                     {isDownloading ? "Generating..." : "Download Ticket"}
@@ -467,11 +467,11 @@ export default function BookingDetail() {
                       borderRadius: "12px",
                       fontWeight: 600,
                       fontSize: "0.9rem",
-                      color: "#EF4444",
-                      border: "1px solid rgba(239,68,68,0.2)",
-                      background: "rgba(239,68,68,0.06)",
+                      color: "var(--nw-error)",
+                      border: "1px solid var(--nw-error-20)",
+                      background: "var(--nw-error-06)",
                       textTransform: "none",
-                      "&:hover": { background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)" },
+                      "&:hover": { background: "var(--nw-error-12)", border: "1px solid var(--nw-error-30)" },
                     }}
                   >
                     Cancel Booking
@@ -488,10 +488,10 @@ export default function BookingDetail() {
                     borderRadius: "12px",
                     fontWeight: 600,
                     fontSize: "0.9rem",
-                    color: "#6B7280",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "var(--nw-text-muted)",
+                    border: "1px solid var(--nw-border-strong)",
                     textTransform: "none",
-                    "&.Mui-disabled": { color: "#4B5563" },
+                    "&.Mui-disabled": { color: "var(--nw-text-disabled)" },
                   }}
                 >
                   Contact Support
@@ -510,10 +510,10 @@ export default function BookingDetail() {
                     borderRadius: "12px",
                     fontWeight: 600,
                     fontSize: "0.9rem",
-                    color: "#9CA3AF",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "var(--nw-text-secondary)",
+                    border: "1px solid var(--nw-border-strong)",
                     textTransform: "none",
-                    "&:hover": { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)" },
+                    "&:hover": { background: "var(--nw-border-soft)", border: "1px solid var(--nw-border-strong)" },
                   }}
                 >
                   Copy Booking Link
@@ -530,21 +530,21 @@ export default function BookingDetail() {
         onClose={() => setShowModal(false)}
         PaperProps={{
           sx: {
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.08)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-border-strong)",
             borderRadius: "16px",
             maxWidth: 400,
           },
         }}
       >
         <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
-          <WarningAmberIcon sx={{ color: "#EF4444" }} />
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.1rem" }}>
+          <WarningAmberIcon sx={{ color: "var(--nw-error)" }} />
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>
             Cancel Booking?
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.9rem" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.9rem" }}>
             Are you sure you want to cancel this booking? This action cannot be undone.
           </Typography>
         </DialogContent>
@@ -553,11 +553,11 @@ export default function BookingDetail() {
             onClick={() => setShowModal(false)}
             sx={{
               borderRadius: "10px",
-              color: "#9CA3AF",
-              border: "1px solid rgba(255,255,255,0.1)",
+              color: "var(--nw-text-secondary)",
+              border: "1px solid var(--nw-border-strong)",
               textTransform: "none",
               fontWeight: 600,
-              "&:hover": { background: "rgba(255,255,255,0.04)" },
+              "&:hover": { background: "var(--nw-border-soft)" },
             }}
           >
             Keep Booking
@@ -567,12 +567,12 @@ export default function BookingDetail() {
             disabled={cancelMutation.isPending}
             sx={{
               borderRadius: "10px",
-              background: "rgba(239,68,68,0.1)",
-              border: "1px solid rgba(239,68,68,0.3)",
-              color: "#EF4444",
+              background: "var(--nw-error-10)",
+              border: "1px solid var(--nw-error-30)",
+              color: "var(--nw-error)",
               textTransform: "none",
               fontWeight: 700,
-              "&:hover": { background: "rgba(239,68,68,0.2)" },
+              "&:hover": { background: "var(--nw-error-20)" },
             }}
           >
             {cancelMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
@@ -582,3 +582,7 @@ export default function BookingDetail() {
     </Box>
   );
 }
+
+
+
+

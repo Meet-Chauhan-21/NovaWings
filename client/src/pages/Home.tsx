@@ -82,7 +82,7 @@ const fadeRight = {
 
 // ── Airline color helper ────────────────────
 function getAirlineColor(name: string): string {
-  const colors = ["#EF4444", "#3B82F6", "#10B981", "#8B5CF6", "#F97316", "#EC4899", "#14B8A6", "#6366F1", "#F59E0B", "#06B6D4"];
+  const colors = ["var(--nw-error)", "var(--nw-info)", "var(--nw-success)", "var(--nw-accent-violet)", "var(--nw-primary)", "var(--nw-accent-pink)", "var(--nw-accent-teal)", "var(--nw-accent-indigo)", "var(--nw-secondary)", "var(--nw-accent-cyan)"];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];
@@ -293,7 +293,7 @@ export default function Home() {
   const categoryIndex = categories.indexOf(activeCategory);
 
   return (
-    <Box sx={{ background: "#0A0A0A", minHeight: "100vh" }}>
+    <Box sx={{ background: "var(--nw-bg)", minHeight: "100vh" }}>
 
       {/* ═══════════════════════════════════════
           SECTION 1 — HERO
@@ -316,7 +316,7 @@ export default function Home() {
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)",
+              "radial-gradient(var(--nw-glass) 1px, transparent 1px)",
             backgroundSize: "32px 32px",
             zIndex: 0,
           }}
@@ -329,7 +329,7 @@ export default function Home() {
             width: { xs: 300, md: 600 },
             height: { xs: 300, md: 600 },
             background:
-              "radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)",
+              "radial-gradient(circle, var(--nw-primary-12) 0%, transparent 70%)",
             borderRadius: "50%",
             filter: "blur(80px)",
             pointerEvents: "none",
@@ -344,7 +344,7 @@ export default function Home() {
             width: 400,
             height: 400,
             background:
-              "radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%)",
+              "radial-gradient(circle, var(--nw-warning-08) 0%, transparent 70%)",
             borderRadius: "50%",
             filter: "blur(100px)",
             pointerEvents: "none",
@@ -359,7 +359,7 @@ export default function Home() {
             width: 250,
             height: 250,
             background:
-              "radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%)",
+              "radial-gradient(circle, var(--nw-primary-06) 0%, transparent 70%)",
             borderRadius: "50%",
             filter: "blur(60px)",
             pointerEvents: "none",
@@ -392,12 +392,12 @@ export default function Home() {
               custom={0}
             >
               <Chip
-                icon={<FlightTakeoffIcon sx={{ fontSize: 14, color: "#F97316 !important" }} />}
+                icon={<FlightTakeoffIcon sx={{ fontSize: 14, color: "var(--nw-primary) !important" }} />}
                 label="India's Premier Flight Experience"
                 sx={{
-                  background: "rgba(249,115,22,0.1)",
+                  background: "var(--nw-primary-10)",
                   border: "1px solid rgba(249,115,22,0.25)",
-                  color: "#F97316",
+                  color: "var(--nw-primary)",
                   fontWeight: 500,
                   fontSize: "0.8rem",
                   mb: 3,
@@ -410,8 +410,8 @@ export default function Home() {
             {/* Headline */}
             {configLoading ? (
               <Box sx={{ mb: 3 }}>
-                <Skeleton variant="text" width="80%" height={60} sx={{ bgcolor: "rgba(255,255,255,0.06)" }} />
-                <Skeleton variant="text" width="60%" height={60} sx={{ bgcolor: "rgba(255,255,255,0.06)" }} />
+                <Skeleton variant="text" width="80%" height={60} sx={{ bgcolor: "var(--nw-border)" }} />
+                <Skeleton variant="text" width="60%" height={60} sx={{ bgcolor: "var(--nw-border)" }} />
               </Box>
             ) : (
               <Box sx={{ mb: 3 }}>
@@ -422,7 +422,7 @@ export default function Home() {
                       fontWeight: 800,
                       fontSize: "clamp(2.5rem, 5vw, 4rem)",
                       lineHeight: 1.1,
-                      color: "#FFFFFF",
+                      color: "var(--nw-text-primary)",
                       mb: 0.5,
                     }}
                   >
@@ -436,7 +436,7 @@ export default function Home() {
                       fontWeight: 800,
                       fontSize: "clamp(2.5rem, 5vw, 4rem)",
                       lineHeight: 1.1,
-                      background: "linear-gradient(135deg, #F97316 0%, #F59E0B 100%)",
+                      background: "linear-gradient(135deg, var(--nw-primary) 0%, var(--nw-secondary) 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -453,7 +453,7 @@ export default function Home() {
                       fontWeight: 800,
                       fontSize: "clamp(2.5rem, 5vw, 4rem)",
                       lineHeight: 1.1,
-                      color: "#FFFFFF",
+                      color: "var(--nw-text-primary)",
                     }}
                   >
                     Your Way.
@@ -466,7 +466,7 @@ export default function Home() {
             <motion.div variants={fadeIn} initial="hidden" animate="visible" custom={0.3}>
               <Typography
                 sx={{
-                  color: "#9CA3AF",
+                  color: "var(--nw-text-secondary)",
                   fontSize: { xs: "1rem", md: "1.1rem" },
                   lineHeight: 1.7,
                   maxWidth: 500,
@@ -488,7 +488,7 @@ export default function Home() {
                         sx={{
                           width: 1,
                           height: 36,
-                          background: "rgba(255,255,255,0.1)",
+                          background: "var(--nw-border-strong)",
                           mr: { xs: 0, md: 0 },
                         }}
                       />
@@ -498,7 +498,7 @@ export default function Home() {
                         sx={{
                           fontWeight: 800,
                           fontSize: "1.5rem",
-                          background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                          background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
                           backgroundClip: "text",
@@ -507,7 +507,7 @@ export default function Home() {
                       >
                         {stat.value}
                       </Typography>
-                      <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", fontWeight: 500 }}>
+                      <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", fontWeight: 500 }}>
                         {stat.label}
                       </Typography>
                     </Box>
@@ -547,8 +547,8 @@ export default function Home() {
               <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                 {TRUST_BADGES.map((badge) => (
                   <Box key={badge.text} sx={{ display: "flex", alignItems: "center", gap: 0.7 }}>
-                    <Box sx={{ color: "#4B5563" }}>{badge.icon}</Box>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 500 }}>
+                    <Box sx={{ color: "var(--nw-text-disabled)" }}>{badge.icon}</Box>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 500 }}>
                       {badge.text}
                     </Typography>
                   </Box>
@@ -582,7 +582,7 @@ export default function Home() {
                     position: "absolute",
                     width: size,
                     height: size,
-                    border: `1px solid rgba(249,115,22,${0.12 - i * 0.03})`,
+                    border: `1px solid rgba(249,115,22,${0.16 - i * 0.035})`,
                     borderRadius: "50%",
                     animation: `spin ${20 + i * 10}s linear infinite${i % 2 === 1 ? " reverse" : ""}`,
                     "@keyframes spin": {
@@ -598,15 +598,15 @@ export default function Home() {
                   width: 100,
                   height: 100,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, rgba(249,115,22,0.2), rgba(245,158,11,0.1))",
+                  background: "linear-gradient(135deg, var(--nw-primary-20), var(--nw-warning-10))",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  border: "1px solid rgba(249,115,22,0.3)",
-                  boxShadow: "0 0 60px rgba(249,115,22,0.15)",
+                  border: "1px solid var(--nw-primary-30)",
+                  boxShadow: "0 0 60px var(--nw-primary-15)",
                 }}
               >
-                <FlightTakeoffIcon sx={{ fontSize: 44, color: "#F97316" }} />
+                <FlightTakeoffIcon sx={{ fontSize: 44, color: "var(--nw-primary)" }} />
               </Box>
               {/* Floating HUD cards */}
               {[
@@ -619,12 +619,13 @@ export default function Home() {
                   sx={{
                     position: "absolute",
                     ...card,
-                    background: "rgba(17,17,17,0.9)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "var(--nw-card)",
+                    border: "1px solid var(--nw-border-strong)",
                     borderRadius: "12px",
                     px: 2,
                     py: 1.2,
                     backdropFilter: "blur(12px)",
+                    boxShadow: "0 10px 26px rgba(15,23,42,0.12)",
                     animation: `float ${3 + i * 0.5}s ease-in-out infinite`,
                     "@keyframes float": {
                       "0%, 100%": { transform: "translateY(0px)" },
@@ -632,10 +633,10 @@ export default function Home() {
                     },
                   }}
                 >
-                  <Typography sx={{ color: "#fff", fontSize: "0.75rem", fontWeight: 600 }}>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.75rem", fontWeight: 700 }}>
                     {card.text}
                   </Typography>
-                  <Typography sx={{ color: "#F97316", fontSize: "0.65rem", fontWeight: 500 }}>
+                  <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.7rem", fontWeight: 700 }}>
                     {card.sub}
                   </Typography>
                 </Box>
@@ -663,11 +664,11 @@ export default function Home() {
         <Paper
           elevation={0}
           sx={{
-            background: "#111111",
-            border: "1px solid rgba(249,115,22,0.2)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-primary-20)",
             borderRadius: "24px",
             p: { xs: 3, md: 5 },
-            boxShadow: "0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.1)",
+            boxShadow: "0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px var(--nw-primary-10)",
           }}
         >
           {/* Trip type tabs */}
@@ -675,9 +676,9 @@ export default function Home() {
             <Chip
               label="One Way"
               sx={{
-                background: "rgba(249,115,22,0.15)",
-                color: "#F97316",
-                border: "1px solid rgba(249,115,22,0.3)",
+                background: "var(--nw-primary-15)",
+                color: "var(--nw-primary)",
+                border: "1px solid var(--nw-primary-30)",
                 fontWeight: 600,
               }}
             />
@@ -685,14 +686,14 @@ export default function Home() {
               <Chip
                 label="Round Trip"
                 variant="outlined"
-                sx={{ borderColor: "rgba(255,255,255,0.1)", color: "#6B7280" }}
+                sx={{ borderColor: "var(--nw-border-strong)", color: "var(--nw-text-muted)" }}
               />
             </Tooltip>
             <Tooltip title="Coming Soon" arrow>
               <Chip
                 label="Multi-City"
                 variant="outlined"
-                sx={{ borderColor: "rgba(255,255,255,0.1)", color: "#6B7280" }}
+                sx={{ borderColor: "var(--nw-border-strong)", color: "var(--nw-text-muted)" }}
               />
             </Tooltip>
           </Box>
@@ -710,7 +711,7 @@ export default function Home() {
             >
               {/* From */}
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   From
                 </Typography>
                 <CityCombobox
@@ -729,26 +730,26 @@ export default function Home() {
                     width: 40,
                     height: 40,
                     borderRadius: "50%",
-                    border: "1px solid rgba(249,115,22,0.3)",
+                    border: "1px solid var(--nw-primary-30)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
                     "&:hover": {
-                      background: "rgba(249,115,22,0.1)",
-                      borderColor: "#F97316",
+                      background: "var(--nw-primary-10)",
+                      borderColor: "var(--nw-primary)",
                       transform: "rotate(180deg)",
                     },
                   }}
                 >
-                  <SwapHorizIcon sx={{ color: "#F97316", fontSize: 20 }} />
+                  <SwapHorizIcon sx={{ color: "var(--nw-primary)", fontSize: 20 }} />
                 </Box>
               </Box>
 
               {/* To */}
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   To
                 </Typography>
                 <CityCombobox
@@ -761,7 +762,7 @@ export default function Home() {
 
               {/* Date */}
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Date
                 </Typography>
                 <DateInput value={date} onChange={setDate} min={today} showQuickButtons />
@@ -769,7 +770,7 @@ export default function Home() {
 
               {/* Passengers */}
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, mb: 0.8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Passengers
                 </Typography>
                 <NumberInput value={passengers} onChange={setPassengers} min={1} max={9} />
@@ -806,7 +807,7 @@ export default function Home() {
           {/* Subtle radial background */}
           <Box sx={{
             position: "absolute", inset: 0,
-            background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(249,115,22,0.04), transparent)",
+            background: "radial-gradient(ellipse 80% 50% at 50% 0%, var(--nw-primary-04), transparent)",
             pointerEvents: "none",
           }} />
 
@@ -814,24 +815,24 @@ export default function Home() {
           <Box sx={{ textAlign: "center", mb: 8, position: "relative" }}>
             <Box sx={{
               display: "inline-flex", alignItems: "center", gap: 0.8, mb: 2,
-              background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)",
+              background: "var(--nw-primary-08)", border: "1px solid var(--nw-primary-20)",
               borderRadius: "20px", px: 2, py: 0.7,
             }}>
-              <VerifiedIcon sx={{ fontSize: 13, color: "#F97316" }} />
-              <Typography sx={{ color: "#F97316", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              <VerifiedIcon sx={{ fontSize: 13, color: "var(--nw-primary)" }} />
+              <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                 Trusted Partners
               </Typography>
             </Box>
             <Typography variant="h4" sx={{
               fontWeight: 800, mb: 1.5,
-              background: "linear-gradient(135deg, #FFFFFF 0%, #9CA3AF 100%)",
+              background: "linear-gradient(135deg, var(--nw-text-primary) 0%, var(--nw-text-secondary) 100%)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             }}>
               Our Airline Partners
             </Typography>
-            <Typography sx={{ color: "#6B7280", fontSize: "1rem" }}>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "1rem" }}>
               Search and book from{" "}
-              <Box component="span" sx={{ color: "#F97316", fontWeight: 600 }}>
+              <Box component="span" sx={{ color: "var(--nw-primary)", fontWeight: 600 }}>
                 {airlines.length > 0 ? `${airlines.length}+` : "India's top"} verified airlines
               </Box>
             </Typography>
@@ -842,7 +843,7 @@ export default function Home() {
             <Box sx={{ display: "flex", justifyContent: "center", gap: 3, px: 4 }}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} variant="rounded" width={210} height={82}
-                  sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "16px" }} />
+                  sx={{ bgcolor: "var(--nw-border)", borderRadius: "16px" }} />
               ))}
             </Box>
           ) : (
@@ -850,13 +851,13 @@ export default function Home() {
               {/* Left fade */}
               <Box sx={{
                 position: "absolute", left: 0, top: 0, bottom: 0, width: 140, zIndex: 10,
-                background: "linear-gradient(to right, #0A0A0A 20%, transparent)",
+                background: "linear-gradient(to right, var(--nw-bg) 20%, transparent)",
                 pointerEvents: "none",
               }} />
               {/* Right fade */}
               <Box sx={{
                 position: "absolute", right: 0, top: 0, bottom: 0, width: 140, zIndex: 10,
-                background: "linear-gradient(to left, #0A0A0A 20%, transparent)",
+                background: "linear-gradient(to left, var(--nw-bg) 20%, transparent)",
                 pointerEvents: "none",
               }} />
               <Box
@@ -882,7 +883,7 @@ export default function Home() {
                         display: "flex",
                         alignItems: "center",
                         gap: 1.8,
-                        background: `linear-gradient(135deg, ${color}0A 0%, rgba(255,255,255,0.02) 100%)`,
+                        background: `linear-gradient(135deg, ${color}0A 0%, var(--nw-glass) 100%)`,
                         border: `1px solid ${color}28`,
                         borderRadius: "16px",
                         px: 2.5,
@@ -894,7 +895,7 @@ export default function Home() {
                         "&:hover": {
                           borderColor: `${color}60`,
                           transform: "translateY(-5px)",
-                          background: `linear-gradient(135deg, ${color}15 0%, rgba(255,255,255,0.04) 100%)`,
+                          background: `linear-gradient(135deg, ${color}15 0%, var(--nw-border-soft) 100%)`,
                           boxShadow: `0 16px 40px ${color}18`,
                         },
                       }}
@@ -915,14 +916,14 @@ export default function Home() {
                       {/* Airline details */}
                       <Box>
                         <Typography sx={{
-                          color: "#E5E7EB", fontWeight: 700, fontSize: "0.9rem",
+                          color: "var(--nw-text-secondary)", fontWeight: 700, fontSize: "0.9rem",
                           whiteSpace: "nowrap", lineHeight: 1.3, mb: 0.4,
                         }}>
                           {airline}
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
-                          <VerifiedIcon sx={{ fontSize: 11, color: "#10B981" }} />
-                          <Typography sx={{ color: "#6B7280", fontSize: "0.63rem", letterSpacing: "0.02em" }}>
+                          <VerifiedIcon sx={{ fontSize: 11, color: "var(--nw-success)" }} />
+                          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.63rem", letterSpacing: "0.02em" }}>
                             Verified Partner
                           </Typography>
                         </Box>
@@ -936,7 +937,7 @@ export default function Home() {
 
           {/* Bottom CTA */}
           <Box sx={{ textAlign: "center", mt: 8, position: "relative" }}>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.85rem", mb: 2.5 }}>
+            <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.85rem", mb: 2.5 }}>
               Expanding our network every month — more airlines coming soon.
             </Typography>
             <Button
@@ -944,13 +945,13 @@ export default function Home() {
               endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
               onClick={() => navigate("/search")}
               sx={{
-                borderColor: "rgba(249,115,22,0.3)",
-                color: "#F97316",
+                borderColor: "var(--nw-primary-30)",
+                color: "var(--nw-primary)",
                 borderRadius: "12px",
                 px: 3.5,
                 py: 1,
                 fontWeight: 600,
-                "&:hover": { background: "rgba(249,115,22,0.06)", borderColor: "rgba(249,115,22,0.5)" },
+                "&:hover": { background: "var(--nw-primary-06)", borderColor: "rgba(249,115,22,0.5)" },
               }}
             >
               Search All Flights
@@ -964,10 +965,10 @@ export default function Home() {
           ═══════════════════════════════════════ */}
       <SectionWrapper>
         <Box sx={{ textAlign: "center", mb: 8 }}>
-          <Typography variant="h4" sx={{ color: "#FFFFFF", fontWeight: 700, mb: 1 }}>
+          <Typography variant="h4" sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 1 }}>
             Why Choose NovaWings?
           </Typography>
-          <Typography sx={{ color: "#6B7280" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)" }}>
             Everything you need for seamless travel
           </Typography>
         </Box>
@@ -988,7 +989,7 @@ export default function Home() {
                     height: "100%",
                     borderTop: "3px solid transparent",
                     "&:hover": {
-                      borderTopColor: "#F97316 !important",
+                      borderTopColor: "var(--nw-primary) !important",
                     },
                   }}
                 >
@@ -998,20 +999,20 @@ export default function Home() {
                         width: 52,
                         height: 52,
                         borderRadius: "50%",
-                        background: "rgba(249,115,22,0.1)",
+                        background: "var(--nw-primary-10)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         mb: 2.5,
-                        color: "#F97316",
+                        color: "var(--nw-primary)",
                       }}
                     >
                       {feat.icon}
                     </Box>
-                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "1.05rem", mb: 1 }}>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "1.05rem", mb: 1 }}>
                       {feat.title}
                     </Typography>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.85rem", lineHeight: 1.6 }}>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem", lineHeight: 1.6 }}>
                       {feat.description}
                     </Typography>
                   </CardContent>
@@ -1025,13 +1026,21 @@ export default function Home() {
       {/* ═══════════════════════════════════════
           SECTION 5 — HOW IT WORKS
           ═══════════════════════════════════════ */}
-      <Box component="section" sx={{ background: "#060606", py: 10 }}>
+      <Box
+        component="section"
+        sx={{
+          background: "linear-gradient(180deg, var(--nw-elevated) 0%, var(--nw-bg) 100%)",
+          py: 10,
+          borderTop: "1px solid var(--nw-border-soft)",
+          borderBottom: "1px solid var(--nw-border-soft)",
+        }}
+      >
         <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 3, md: 4 } }}>
           <Box sx={{ textAlign: "center", mb: 8 }}>
-            <Typography variant="h4" sx={{ color: "#FFFFFF", fontWeight: 700, mb: 1 }}>
+            <Typography variant="h4" sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 1 }}>
               How It Works
             </Typography>
-            <Typography sx={{ color: "#6B7280" }}>
+            <Typography sx={{ color: "var(--nw-text-muted)" }}>
               Your journey in 4 simple steps
             </Typography>
           </Box>
@@ -1055,7 +1064,7 @@ export default function Home() {
                 left: "15%",
                 right: "15%",
                 height: 2,
-                borderTop: "2px dashed rgba(249,115,22,0.3)",
+                borderTop: "2px dashed var(--nw-primary-30)",
                 zIndex: 0,
               }}
             />
@@ -1073,7 +1082,7 @@ export default function Home() {
                 {/* Step number badge */}
                 <Typography
                   sx={{
-                    color: "#F97316",
+                    color: "var(--nw-primary)",
                     fontSize: "0.7rem",
                     fontWeight: 700,
                     letterSpacing: "0.1em",
@@ -1088,18 +1097,19 @@ export default function Home() {
                     width: 64,
                     height: 64,
                     borderRadius: "50%",
-                    background: "rgba(249,115,22,0.1)",
-                    border: "1px solid rgba(249,115,22,0.25)",
+                    background: "linear-gradient(135deg, var(--nw-primary-10), var(--nw-warning-08))",
+                    border: "1px solid var(--nw-primary-30)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#F97316",
+                    color: "var(--nw-primary)",
                     mb: 2,
+                    boxShadow: "0 6px 18px rgba(249,115,22,0.12)",
                   }}
                 >
                   {step.icon}
                 </Box>
-                <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.95rem", textAlign: "center" }}>
+                <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.95rem", textAlign: "center" }}>
                   {step.label}
                 </Typography>
               </motion.div>
@@ -1113,10 +1123,10 @@ export default function Home() {
           ═══════════════════════════════════════ */}
       <SectionWrapper>
         <Box sx={{ textAlign: "center", mb: 2 }}>
-          <Typography variant="h4" sx={{ color: "#FFFFFF", fontWeight: 700, mb: 1 }}>
+          <Typography variant="h4" sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 1 }}>
             Top Destinations
           </Typography>
-          <Typography sx={{ color: "#6B7280", mb: 4 }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", mb: 4 }}>
             Handpicked places for every kind of traveller
           </Typography>
         </Box>
@@ -1146,7 +1156,7 @@ export default function Home() {
                 <Skeleton
                   variant="rounded"
                   height={280}
-                  sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "16px" }}
+                  sx={{ bgcolor: "var(--nw-border)", borderRadius: "16px" }}
                 />
               </Grid>
             ))}
@@ -1165,9 +1175,9 @@ export default function Home() {
                     overflow: "hidden",
                     position: "relative",
                     height: 300,
-                    border: "1px solid rgba(255,255,255,0.06)",
+                    border: "1px solid var(--nw-border)",
                     "&:hover": {
-                      borderColor: "rgba(249,115,22,0.3)",
+                      borderColor: "var(--nw-primary-30)",
                       "& .dest-img": { transform: "scale(1.08)" },
                       "& .dest-arrow": { opacity: 1, transform: "translateX(0)" },
                     },
@@ -1198,7 +1208,7 @@ export default function Home() {
                     sx={{
                       position: "absolute",
                       inset: 0,
-                      background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
+                      background: "linear-gradient(to top, var(--nw-black-90) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
                     }}
                   />
 
@@ -1211,8 +1221,8 @@ export default function Home() {
                         position: "absolute",
                         top: 12,
                         right: 12,
-                        background: "linear-gradient(135deg, #F97316, #EA580C)",
-                        color: "#fff",
+                        background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
+                        color: "#FFFFFF",
                         fontWeight: 600,
                         fontSize: "0.7rem",
                         zIndex: 2,
@@ -1228,9 +1238,9 @@ export default function Home() {
                       position: "absolute",
                       top: 12,
                       left: 12,
-                      background: "rgba(0,0,0,0.6)",
+                      background: "var(--nw-black-60)",
                       backdropFilter: "blur(8px)",
-                      color: "#fff",
+                      color: "#FFFFFF",
                       fontSize: "0.65rem",
                       zIndex: 2,
                     }}
@@ -1247,10 +1257,10 @@ export default function Home() {
                       zIndex: 2,
                     }}
                   >
-                    <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1.15rem", lineHeight: 1.2, mb: 0.3 }}>
+                    <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.15rem", lineHeight: 1.2, mb: 0.3 }}>
                       {card.title}
                     </Typography>
-                    <Typography sx={{ color: "rgba(255,255,255,0.6)", fontSize: "0.75rem", mb: 1.5 }}>
+                    <Typography sx={{ color: "rgba(255,255,255,0.72)", fontSize: "0.75rem", mb: 1.5 }}>
                       {card.tagline}
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -1258,15 +1268,15 @@ export default function Home() {
                         size="small"
                         variant="outlined"
                         sx={{
-                          borderColor: "rgba(249,115,22,0.4)",
-                          color: "#F97316",
+                          borderColor: "var(--nw-primary-40)",
+                          color: "var(--nw-primary)",
                           fontSize: "0.75rem",
                           px: 2,
                           py: 0.5,
                           borderRadius: "8px",
                           "&:hover": {
-                            borderColor: "#F97316",
-                            background: "rgba(249,115,22,0.1)",
+                            borderColor: "var(--nw-primary)",
+                            background: "var(--nw-primary-10)",
                           },
                         }}
                       >
@@ -1275,7 +1285,7 @@ export default function Home() {
                       <ArrowForwardIcon
                         className="dest-arrow"
                         sx={{
-                          color: "#F97316",
+                          color: "var(--nw-primary)",
                           fontSize: 20,
                           opacity: 0,
                           transform: "translateX(-8px)",
@@ -1293,7 +1303,7 @@ export default function Home() {
         {/* Empty State */}
         {!cardsLoading && allCards.length === 0 && (
           <Box sx={{ textAlign: "center", py: 10 }}>
-            <Typography sx={{ color: "#4B5563" }}>
+            <Typography sx={{ color: "var(--nw-text-disabled)" }}>
               No destinations available. Admin can add destinations from the dashboard.
             </Typography>
           </Box>
@@ -1302,7 +1312,7 @@ export default function Home() {
         {/* No Results for Filter */}
         {!cardsLoading && allCards.length > 0 && filteredCards.length === 0 && (
           <Box sx={{ textAlign: "center", py: 10 }}>
-            <Typography sx={{ color: "#4B5563" }}>
+            <Typography sx={{ color: "var(--nw-text-disabled)" }}>
               No destinations found in "{activeCategory}" category.
             </Typography>
           </Box>
@@ -1313,13 +1323,13 @@ export default function Home() {
           SECTION — HOT DEALS (if routes exist)
           ═══════════════════════════════════════ */}
       {dealRoutes.length > 0 && (
-        <Box component="section" sx={{ background: "#060606", py: 10 }}>
+        <Box component="section" sx={{ background: "var(--nw-footer-bg)", py: 10 }}>
           <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 3, md: 4 } }}>
             <Box sx={{ textAlign: "center", mb: 6 }}>
-              <Typography variant="h4" sx={{ color: "#FFFFFF", fontWeight: 700, mb: 1 }}>
+              <Typography variant="h4" sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 1 }}>
                 Hot Deals
               </Typography>
-              <Typography sx={{ color: "#6B7280" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)" }}>
                 Cheapest flights on trending routes — prices from real-time data
               </Typography>
             </Box>
@@ -1328,7 +1338,7 @@ export default function Home() {
                 if (query.isLoading)
                   return (
                     <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-                      <Skeleton variant="rounded" height={200} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "16px" }} />
+                      <Skeleton variant="rounded" height={200} sx={{ bgcolor: "var(--nw-border)", borderRadius: "16px" }} />
                     </Grid>
                   );
                 if (!query.data) return null;
@@ -1348,10 +1358,10 @@ export default function Home() {
           ═══════════════════════════════════════ */}
       <SectionWrapper>
         <Box sx={{ textAlign: "center", mb: 8 }}>
-          <Typography variant="h4" sx={{ color: "#FFFFFF", fontWeight: 700, mb: 1 }}>
+          <Typography variant="h4" sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 1 }}>
             Trusted by Travelers
           </Typography>
-          <Typography sx={{ color: "#6B7280" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)" }}>
             What our passengers say
           </Typography>
         </Box>
@@ -1375,7 +1385,7 @@ export default function Home() {
                           key={i}
                           sx={{
                             fontSize: 20,
-                            color: i < t.stars ? "#F97316" : "#4B5563",
+                            color: i < t.stars ? "var(--nw-primary)" : "var(--nw-text-disabled)",
                           }}
                         />
                       ))}
@@ -1384,7 +1394,7 @@ export default function Home() {
                     {/* Quote */}
                     <Typography
                       sx={{
-                        color: "#9CA3AF",
+                        color: "var(--nw-text-secondary)",
                         fontSize: "0.9rem",
                         fontStyle: "italic",
                         lineHeight: 1.7,
@@ -1394,7 +1404,7 @@ export default function Home() {
                       "{t.text}"
                     </Typography>
 
-                    <Divider sx={{ mb: 2, borderColor: "rgba(255,255,255,0.06)" }} />
+                    <Divider sx={{ mb: 2, borderColor: "var(--nw-border)" }} />
 
                     {/* Author */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
@@ -1402,7 +1412,7 @@ export default function Home() {
                         sx={{
                           width: 40,
                           height: 40,
-                          background: "linear-gradient(135deg, #F97316, #EA580C)",
+                          background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
                           fontWeight: 700,
                           fontSize: "0.9rem",
                         }}
@@ -1410,23 +1420,23 @@ export default function Home() {
                         {t.initial}
                       </Avatar>
                       <Box sx={{ flex: 1 }}>
-                        <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", lineHeight: 1.2 }}>
+                        <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem", lineHeight: 1.2 }}>
                           {t.name}
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                          <FlightIcon sx={{ fontSize: 12, color: "#6B7280" }} />
-                          <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                          <FlightIcon sx={{ fontSize: 12, color: "var(--nw-text-muted)" }} />
+                          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem" }}>
                             {t.route}
                           </Typography>
                         </Box>
                       </Box>
                       <Chip
-                        icon={<VerifiedIcon sx={{ fontSize: 12, color: "#10B981 !important" }} />}
+                        icon={<VerifiedIcon sx={{ fontSize: 12, color: "var(--nw-success) !important" }} />}
                         label="Verified"
                         size="small"
                         sx={{
                           background: "rgba(16,185,129,0.1)",
-                          color: "#10B981",
+                          color: "var(--nw-success)",
                           fontSize: "0.65rem",
                           fontWeight: 600,
                           height: 24,
@@ -1458,7 +1468,7 @@ export default function Home() {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(135deg, rgba(249,115,22,0.04) 0%, transparent 40%, transparent 60%, rgba(245,158,11,0.04) 100%)",
+              "linear-gradient(135deg, var(--nw-primary-04) 0%, transparent 40%, transparent 60%, var(--nw-warning-04) 100%)",
             pointerEvents: "none",
           }}
         />
@@ -1471,10 +1481,10 @@ export default function Home() {
             textAlign: "center",
           }}
         >
-          <Typography variant="h4" sx={{ color: "#FFFFFF", fontWeight: 700, mb: 1.5 }}>
+          <Typography variant="h4" sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 1.5 }}>
             Get Exclusive Flight Deals
           </Typography>
-          <Typography sx={{ color: "#6B7280", mb: 4 }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", mb: 4 }}>
             Subscribe for early access to sales and special fares
           </Typography>
 
@@ -1517,7 +1527,7 @@ export default function Home() {
             </Button>
           </Box>
 
-          <Typography sx={{ color: "#4B5563", fontSize: "0.7rem" }}>
+          <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.7rem" }}>
             No spam. Unsubscribe anytime.
           </Typography>
         </Box>
@@ -1549,44 +1559,44 @@ function DealCard({ flight, route }: { flight: Flight; route: RouteConfig }) {
         cursor: "pointer",
         overflow: "hidden",
         "&:hover": {
-          borderColor: "rgba(249,115,22,0.3)",
+          borderColor: "var(--nw-primary-30)",
           transform: "translateY(-3px)",
-          boxShadow: "0 12px 40px rgba(249,115,22,0.1)",
+          boxShadow: "0 12px 40px var(--nw-primary-10)",
         },
       }}
     >
       {/* Top banner */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #F97316, #EA580C)",
+          background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
           px: 2.5,
           py: 1,
         }}
       >
-        <Typography sx={{ color: "#fff", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
           {route.label || "Hot Deal"}
         </Typography>
       </Box>
 
       <CardContent>
-        <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", fontWeight: 500, mb: 0.5 }}>
+        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", fontWeight: 500, mb: 0.5 }}>
           {flight.airlineName}
         </Typography>
-        <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1rem", mb: 0.3 }}>
+        <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem", mb: 0.3 }}>
           {route.source} → {route.destination}
         </Typography>
-        <Typography sx={{ color: "#4B5563", fontSize: "0.7rem", mb: 2 }}>
+        <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.7rem", mb: 2 }}>
           Flight {flight.flightNumber}
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
           <Box>
-            <Typography sx={{ color: "#6B7280", fontSize: "0.65rem" }}>Starting from</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem" }}>Starting from</Typography>
             <Typography
               sx={{
                 fontWeight: 800,
                 fontSize: "1.25rem",
-                background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -1612,3 +1622,7 @@ function DealCard({ flight, route }: { flight: Flight; route: RouteConfig }) {
     </Card>
   );
 }
+
+
+
+

@@ -92,7 +92,7 @@ function formatPrice(price: number): string {
 }
 
 function airlineColorHex(name: string): string {
-  const colors = ["#EF4444", "#3B82F6", "#10B981", "#8B5CF6", "#F97316", "#EC4899", "#14B8A6", "#6366F1"];
+  const colors = ["var(--nw-error)", "var(--nw-info)", "var(--nw-success)", "var(--nw-accent-violet)", "var(--nw-primary)", "var(--nw-accent-pink)", "var(--nw-accent-teal)", "var(--nw-accent-indigo)"];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];
@@ -330,32 +330,32 @@ export default function SearchResults() {
             valueLabelDisplay="auto"
             valueLabelFormat={(v) => `₹${v.toLocaleString("en-IN")}`}
             sx={{
-              color: "#F97316",
+              color: "var(--nw-primary)",
               "& .MuiSlider-thumb": {
                 width: 16, height: 16,
-                border: "2px solid #F97316",
-                background: "#0A0A0A",
+                border: "2px solid var(--nw-primary)",
+                background: "var(--nw-bg)",
                 "&:hover, &.Mui-focusVisible": { boxShadow: "0 0 0 8px rgba(249,115,22,0.16)" },
               },
-              "& .MuiSlider-rail": { background: "rgba(255,255,255,0.08)", opacity: 1 },
-              "& .MuiSlider-valueLabel": { background: "#F97316", borderRadius: "8px", fontSize: "0.65rem" },
+              "& .MuiSlider-rail": { background: "var(--nw-border-strong)", opacity: 1 },
+              "& .MuiSlider-valueLabel": { background: "var(--nw-primary)", borderRadius: "8px", fontSize: "0.65rem" },
             }}
           />
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
-            <Box sx={{ flex: 1, textAlign: "center", py: 0.8, px: 1, background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)", borderRadius: "8px" }}>
-              <Typography sx={{ color: "#F97316", fontSize: "0.72rem", fontWeight: 700 }}>{formatPrice(priceRange[0])}</Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.6rem", mt: 0.2 }}>Min</Typography>
+            <Box sx={{ flex: 1, textAlign: "center", py: 0.8, px: 1, background: "var(--nw-primary-08)", border: "1px solid var(--nw-primary-20)", borderRadius: "8px" }}>
+              <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.72rem", fontWeight: 700 }}>{formatPrice(priceRange[0])}</Typography>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6rem", mt: 0.2 }}>Min</Typography>
             </Box>
-            <Typography sx={{ color: "#3F4756", fontSize: "0.75rem" }}>–</Typography>
-            <Box sx={{ flex: 1, textAlign: "center", py: 0.8, px: 1, background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)", borderRadius: "8px" }}>
-              <Typography sx={{ color: "#F97316", fontSize: "0.72rem", fontWeight: 700 }}>{formatPrice(priceRange[1])}</Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.6rem", mt: 0.2 }}>Max</Typography>
+            <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem" }}>–</Typography>
+            <Box sx={{ flex: 1, textAlign: "center", py: 0.8, px: 1, background: "var(--nw-primary-08)", border: "1px solid var(--nw-primary-20)", borderRadius: "8px" }}>
+              <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.72rem", fontWeight: 700 }}>{formatPrice(priceRange[1])}</Typography>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6rem", mt: 0.2 }}>Max</Typography>
             </Box>
           </Box>
         </Box>
       </FilterSection>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+      <Divider sx={{ borderColor: "var(--nw-border-soft)" }} />
 
       {/* Departure Time */}
       <FilterSection
@@ -384,22 +384,22 @@ export default function SearchResults() {
                   py: 1.2,
                   textAlign: "center",
                   cursor: "pointer",
-                  border: active ? "1px solid rgba(249,115,22,0.5)" : "1px solid rgba(255,255,255,0.07)",
-                  background: active ? "rgba(249,115,22,0.1)" : "rgba(255,255,255,0.02)",
+                  border: active ? "1px solid rgba(249,115,22,0.5)" : "1px solid var(--nw-border)",
+                  background: active ? "var(--nw-primary-10)" : "var(--nw-glass)",
                   transition: "all 0.18s ease",
                   "&:hover": {
                     borderColor: "rgba(249,115,22,0.35)",
-                    background: active ? "rgba(249,115,22,0.12)" : "rgba(249,115,22,0.04)",
+                    background: active ? "var(--nw-primary-12)" : "var(--nw-primary-04)",
                   },
                 }}
               >
-                <Box sx={{ display: "flex", justifyContent: "center", mb: 0.5, color: active ? "#F97316" : "#4B5563" }}>
+                <Box sx={{ display: "flex", justifyContent: "center", mb: 0.5, color: active ? "var(--nw-primary)" : "var(--nw-text-disabled)" }}>
                   {slot.icon}
                 </Box>
-                <Typography sx={{ color: active ? "#F97316" : "#9CA3AF", fontSize: "0.72rem", fontWeight: 600, lineHeight: 1.2 }}>
+                <Typography sx={{ color: active ? "var(--nw-primary)" : "var(--nw-text-secondary)", fontSize: "0.72rem", fontWeight: 600, lineHeight: 1.2 }}>
                   {slot.label}
                 </Typography>
-                <Typography sx={{ color: active ? "rgba(249,115,22,0.7)" : "#374151", fontSize: "0.6rem", mt: 0.2 }}>
+                <Typography sx={{ color: active ? "rgba(249,115,22,0.7)" : "var(--nw-text-disabled)", fontSize: "0.6rem", mt: 0.2 }}>
                   {slot.sub}
                 </Typography>
               </Box>
@@ -408,7 +408,7 @@ export default function SearchResults() {
         </Box>
       </FilterSection>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+      <Divider sx={{ borderColor: "var(--nw-border-soft)" }} />
 
       {/* Airlines */}
       <FilterSection
@@ -422,13 +422,13 @@ export default function SearchResults() {
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.2 }}>
           <Typography
             onClick={() => setSelectedAirlines([...allAirlines])}
-            sx={{ color: "#F97316", fontSize: "0.7rem", fontWeight: 500, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+            sx={{ color: "var(--nw-primary)", fontSize: "0.7rem", fontWeight: 500, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
           >
             Select All
           </Typography>
           <Typography
             onClick={() => setSelectedAirlines([])}
-            sx={{ color: "#6B7280", fontSize: "0.7rem", cursor: "pointer", "&:hover": { color: "#F97316" } }}
+            sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", cursor: "pointer", "&:hover": { color: "var(--nw-primary)" } }}
           >
             Clear
           </Typography>
@@ -437,7 +437,7 @@ export default function SearchResults() {
           maxHeight: 200, overflowY: "auto", display: "flex", flexDirection: "column", gap: 0.4,
           "&::-webkit-scrollbar": { width: 3 },
           "&::-webkit-scrollbar-track": { background: "transparent" },
-          "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.08)", borderRadius: 2 },
+          "&::-webkit-scrollbar-thumb": { background: "var(--nw-border-strong)", borderRadius: 2 },
         }}>
           {allAirlines.map((airline) => {
             const isChecked = selectedAirlines.length === 0 || selectedAirlines.includes(airline);
@@ -457,20 +457,20 @@ export default function SearchResults() {
                   transition: "all 0.15s",
                   border: isChecked && selectedAirlines.length > 0 ? `1px solid ${color}30` : "1px solid transparent",
                   background: isChecked && selectedAirlines.length > 0 ? `${color}0D` : "transparent",
-                  "&:hover": { background: "rgba(249,115,22,0.04)", borderColor: "rgba(249,115,22,0.12)" },
+                  "&:hover": { background: "var(--nw-primary-04)", borderColor: "var(--nw-primary-12)" },
                 }}
               >
                 <Box sx={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0, opacity: isChecked ? 1 : 0.25 }} />
-                <Typography sx={{ flex: 1, color: isChecked ? "#D1D5DB" : "#4B5563", fontSize: "0.8rem", fontWeight: isChecked && selectedAirlines.length > 0 ? 600 : 400 }}>
+                <Typography sx={{ flex: 1, color: isChecked ? "var(--nw-text-secondary)" : "var(--nw-text-disabled)", fontSize: "0.8rem", fontWeight: isChecked && selectedAirlines.length > 0 ? 600 : 400 }}>
                   {airline}
                 </Typography>
                 <Box sx={{
                   minWidth: 24, height: 20, borderRadius: "6px", px: 0.8,
-                  background: isChecked ? `${color}20` : "rgba(255,255,255,0.03)",
-                  border: `1px solid ${isChecked ? color + "40" : "rgba(255,255,255,0.06)"}`,
+                  background: isChecked ? `${color}20` : "var(--nw-glass)",
+                  border: `1px solid ${isChecked ? color + "40" : "var(--nw-border)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                  <Typography sx={{ color: isChecked ? color : "#4B5563", fontSize: "0.65rem", fontWeight: 700 }}>
+                  <Typography sx={{ color: isChecked ? color : "var(--nw-text-disabled)", fontSize: "0.65rem", fontWeight: 700 }}>
                     {airlineCounts[airline]}
                   </Typography>
                 </Box>
@@ -480,7 +480,7 @@ export default function SearchResults() {
         </Box>
       </FilterSection>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+      <Divider sx={{ borderColor: "var(--nw-border-soft)" }} />
 
       {/* Duration */}
       <FilterSection
@@ -506,26 +506,26 @@ export default function SearchResults() {
                   py: 0.9,
                   borderRadius: "10px",
                   cursor: "pointer",
-                  border: active ? "1px solid rgba(249,115,22,0.4)" : "1px solid rgba(255,255,255,0.06)",
-                  background: active ? "rgba(249,115,22,0.1)" : "rgba(255,255,255,0.02)",
+                  border: active ? "1px solid var(--nw-primary-40)" : "1px solid var(--nw-border)",
+                  background: active ? "var(--nw-primary-10)" : "var(--nw-glass)",
                   transition: "all 0.15s",
-                  "&:hover": { borderColor: "rgba(249,115,22,0.3)", background: active ? "rgba(249,115,22,0.12)" : "rgba(249,115,22,0.04)" },
+                  "&:hover": { borderColor: "var(--nw-primary-30)", background: active ? "var(--nw-primary-12)" : "var(--nw-primary-04)" },
                 }}
               >
                 <Box sx={{
                   width: 14, height: 14, borderRadius: "50%",
-                  border: `2px solid ${active ? "#F97316" : "rgba(255,255,255,0.15)"}`,
-                  background: active ? "#F97316" : "transparent",
+                  border: `2px solid ${active ? "var(--nw-primary)" : "var(--nw-border-strong)"}`,
+                  background: active ? "var(--nw-primary)" : "transparent",
                   flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
                   transition: "all 0.15s",
                 }}>
-                  {active && <Box sx={{ width: 5, height: 5, borderRadius: "50%", background: "#fff" }} />}
+                  {active && <Box sx={{ width: 5, height: 5, borderRadius: "50%", background: "var(--nw-text-primary)" }} />}
                 </Box>
-                <Typography sx={{ color: active ? "#F97316" : "#9CA3AF", fontSize: "0.8rem", fontWeight: active ? 600 : 400, flex: 1 }}>
+                <Typography sx={{ color: active ? "var(--nw-primary)" : "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: active ? 600 : 400, flex: 1 }}>
                   {opt.label}
                 </Typography>
                 {opt.val !== null && (
-                  <Typography sx={{ color: "#4B5563", fontSize: "0.65rem" }}>≤ {opt.val}h</Typography>
+                  <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.65rem" }}>≤ {opt.val}h</Typography>
                 )}
               </Box>
             );
@@ -538,11 +538,11 @@ export default function SearchResults() {
   // ── Loading ──
   if (isLoading) {
     return (
-      <Box sx={{ background: "#0A0A0A", minHeight: "100vh", pt: 4, pb: 8 }}>
+      <Box sx={{ background: "var(--nw-bg)", minHeight: "100vh", pt: 4, pb: 8 }}>
         <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 } }}>
           <Box sx={{ display: "flex", gap: 3 }}>
             <Box sx={{ width: 280, display: { xs: "none", md: "block" } }}>
-              <Skeleton variant="rounded" height={500} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "16px" }} />
+              <Skeleton variant="rounded" height={500} sx={{ bgcolor: "var(--nw-border)", borderRadius: "16px" }} />
             </Box>
             <Box sx={{ flex: 1 }}>
               {Array.from({ length: 6 }).map((_, i) => (
@@ -550,7 +550,7 @@ export default function SearchResults() {
                   key={i}
                   variant="rounded"
                   height={140}
-                  sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "16px", mb: 2 }}
+                  sx={{ bgcolor: "var(--nw-border)", borderRadius: "16px", mb: 2 }}
                 />
               ))}
             </Box>
@@ -563,11 +563,11 @@ export default function SearchResults() {
   // ── Error ──
   if (isError) {
     return (
-      <Box sx={{ background: "#0A0A0A", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Box sx={{ background: "var(--nw-bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Box sx={{ textAlign: "center" }}>
-          <AirplanemodeInactiveIcon sx={{ fontSize: 64, color: "#EF4444", mb: 2 }} />
-          <Typography variant="h5" sx={{ color: "#fff", mb: 1 }}>Something went wrong</Typography>
-          <Typography sx={{ color: "#6B7280", mb: 3 }}>Failed to search flights. Please try again.</Typography>
+          <AirplanemodeInactiveIcon sx={{ fontSize: 64, color: "var(--nw-error)", mb: 2 }} />
+          <Typography variant="h5" sx={{ color: "var(--nw-text-primary)", mb: 1 }}>Something went wrong</Typography>
+          <Typography sx={{ color: "var(--nw-text-muted)", mb: 3 }}>Failed to search flights. Please try again.</Typography>
           <Button variant="contained" onClick={() => window.location.reload()}>Retry</Button>
         </Box>
       </Box>
@@ -575,7 +575,7 @@ export default function SearchResults() {
   }
 
   return (
-    <Box sx={{ background: "#0A0A0A", minHeight: "100vh" }}>
+    <Box sx={{ background: "var(--nw-bg)", minHeight: "100vh" }}>
 
       {/* ── Sticky Search Bar ── */}
       <Box
@@ -583,35 +583,35 @@ export default function SearchResults() {
           position: "sticky",
           top: 70,
           zIndex: 30,
-          background: "rgba(10,10,10,0.92)",
+          background: "var(--nw-overlay-heavy)",
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid var(--nw-border)",
         }}
       >
         <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 }, py: 1.5 }}>
           {/* Summary row */}
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem" }}>
-                {source} <ArrowForwardIcon sx={{ fontSize: 14, mx: 0.5, color: "#F97316" }} /> {destination}
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.9rem" }}>
+                {source} <ArrowForwardIcon sx={{ fontSize: 14, mx: 0.5, color: "var(--nw-primary)" }} /> {destination}
               </Typography>
               {date && (
                 <Chip
                   label={formatDate(date + "T00:00:00")}
                   size="small"
-                  sx={{ background: "rgba(249,115,22,0.1)", color: "#F97316", fontSize: "0.7rem" }}
+                  sx={{ background: "var(--nw-primary-10)", color: "var(--nw-primary)", fontSize: "0.7rem" }}
                 />
               )}
               <Chip
                 label={`${passengers} Passenger${passengers > 1 ? "s" : ""}`}
                 size="small"
-                sx={{ background: "rgba(255,255,255,0.05)", color: "#9CA3AF", fontSize: "0.7rem" }}
+                sx={{ background: "var(--nw-border-soft)", color: "var(--nw-text-secondary)", fontSize: "0.7rem" }}
               />
               <IconButton
                 size="small"
                 onClick={() => setSearchBarExpanded((p) => !p)}
-                sx={{ color: "#F97316" }}
+                sx={{ color: "var(--nw-primary)" }}
               >
                 {searchBarExpanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
               </IconButton>
@@ -619,14 +619,14 @@ export default function SearchResults() {
 
             {/* Sort (desktop) */}
             <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1.5 }}>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>Sort by:</Typography>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>Sort by:</Typography>
               <Select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
                 size="small"
                 sx={{
                   minWidth: 160,
-                  ".MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                  ".MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
                   ".MuiSelect-select": { py: 0.8, fontSize: "0.8rem" },
                 }}
               >
@@ -641,10 +641,10 @@ export default function SearchResults() {
                 size="small"
                 sx={{
                   "& .MuiToggleButton-root": {
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "#6B7280",
+                    border: "1px solid var(--nw-border-strong)",
+                    color: "var(--nw-text-muted)",
                     px: 1,
-                    "&.Mui-selected": { background: "rgba(249,115,22,0.12)", color: "#F97316" },
+                    "&.Mui-selected": { background: "var(--nw-primary-12)", color: "var(--nw-primary)" },
                   },
                 }}
               >
@@ -667,7 +667,7 @@ export default function SearchResults() {
               }}
             >
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>From</Typography>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>From</Typography>
                 <CityCombobox value={from} onChange={setFrom} excludeCity={to} placeholder="Departure city" />
               </Box>
               <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", alignSelf: "center", pb: { md: "1px" } }}>
@@ -675,9 +675,9 @@ export default function SearchResults() {
                   onClick={() => { const t = from; setFrom(to); setTo(t); }}
                   size="small"
                   sx={{
-                    border: "1px solid rgba(249,115,22,0.3)",
-                    color: "#F97316",
-                    "&:hover": { background: "rgba(249,115,22,0.1)", transform: "rotate(180deg)" },
+                    border: "1px solid var(--nw-primary-30)",
+                    color: "var(--nw-primary)",
+                    "&:hover": { background: "var(--nw-primary-10)", transform: "rotate(180deg)" },
                     transition: "all 0.2s",
                   }}
                 >
@@ -685,15 +685,15 @@ export default function SearchResults() {
                 </IconButton>
               </Box>
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>To</Typography>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>To</Typography>
                 <CityCombobox value={to} onChange={setTo} excludeCity={from} placeholder="Destination city" />
               </Box>
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>Date</Typography>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>Date</Typography>
                 <DateInput value={searchDate} onChange={setSearchDate} min={today} />
               </Box>
               <Box>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>Passengers</Typography>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", fontWeight: 600, mb: 0.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>Passengers</Typography>
                 <NumberInput value={searchPassengers} onChange={setSearchPassengers} min={1} max={9} />
               </Box>
               <Button variant="contained" onClick={handleSearch} startIcon={<SearchIcon />} sx={{ borderRadius: "12px", height: 42 }}>
@@ -711,9 +711,9 @@ export default function SearchResults() {
           position: "sticky",
           top: 140,
           zIndex: 25,
-          background: "rgba(17,17,17,0.95)",
+          background: "var(--nw-overlay-mid)",
           backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid var(--nw-border)",
           px: 2,
           py: 1,
           gap: 1,
@@ -734,7 +734,7 @@ export default function SearchResults() {
           size="small"
           sx={{
             flex: 1,
-            ".MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+            ".MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
             ".MuiSelect-select": { py: 0.8, fontSize: "0.8rem" },
           }}
         >
@@ -751,7 +751,7 @@ export default function SearchResults() {
         onClose={() => setMobileFilterOpen(false)}
         PaperProps={{
           sx: {
-            background: "#111111",
+            background: "var(--nw-card)",
             borderRadius: "20px 20px 0 0",
             maxHeight: "80vh",
             p: 3,
@@ -759,8 +759,8 @@ export default function SearchResults() {
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-          <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem" }}>Filters</Typography>
-          <IconButton onClick={() => setMobileFilterOpen(false)} sx={{ color: "#6B7280" }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>Filters</Typography>
+          <IconButton onClick={() => setMobileFilterOpen(false)} sx={{ color: "var(--nw-text-muted)" }}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -785,8 +785,8 @@ export default function SearchResults() {
               sx={{
                 position: "sticky",
                 top: 160,
-                background: "linear-gradient(180deg, #141414 0%, #111111 100%)",
-                border: "1px solid rgba(255,255,255,0.07)",
+                background: "linear-gradient(180deg, var(--nw-elevated) 0%, var(--nw-card) 100%)",
+                border: "1px solid var(--nw-border)",
                 borderRadius: "18px",
                 overflow: "hidden",
                 maxHeight: "calc(100vh - 180px)",
@@ -798,19 +798,19 @@ export default function SearchResults() {
               <Box sx={{
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 px: 2.5, py: 1.8,
-                borderBottom: "1px solid rgba(255,255,255,0.05)",
-                background: "rgba(255,255,255,0.02)",
+                borderBottom: "1px solid var(--nw-border-soft)",
+                background: "var(--nw-glass)",
               }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <TuneIcon sx={{ fontSize: 17, color: "#F97316" }} />
-                  <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "0.9rem" }}>Filters</Typography>
+                  <TuneIcon sx={{ fontSize: 17, color: "var(--nw-primary)" }} />
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "0.9rem" }}>Filters</Typography>
                   {activeFilterCount > 0 && (
                     <Box sx={{
-                      background: "linear-gradient(135deg, #F97316, #EA580C)",
+                      background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
                       borderRadius: "10px", px: 0.9, py: 0.15,
                       display: "flex", alignItems: "center",
                     }}>
-                      <Typography sx={{ color: "#fff", fontSize: "0.62rem", fontWeight: 700 }}>{activeFilterCount}</Typography>
+                      <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.62rem", fontWeight: 700 }}>{activeFilterCount}</Typography>
                     </Box>
                   )}
                 </Box>
@@ -819,11 +819,11 @@ export default function SearchResults() {
                     size="small"
                     onClick={resetFilters}
                     sx={{
-                      color: "#EF4444", fontSize: "0.7rem", textTransform: "none",
+                      color: "var(--nw-error)", fontSize: "0.7rem", textTransform: "none",
                       px: 1, py: 0.3, borderRadius: "8px",
-                      background: "rgba(239,68,68,0.08)",
-                      border: "1px solid rgba(239,68,68,0.15)",
-                      "&:hover": { background: "rgba(239,68,68,0.15)" },
+                      background: "var(--nw-error-08)",
+                      border: "1px solid var(--nw-error-15)",
+                      "&:hover": { background: "var(--nw-error-15)" },
                     }}
                   >
                     Clear All
@@ -835,7 +835,7 @@ export default function SearchResults() {
                 px: 2.5, pb: 2, overflowY: "auto", flex: 1,
                 "&::-webkit-scrollbar": { width: 3 },
                 "&::-webkit-scrollbar-track": { background: "transparent" },
-                "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.08)", borderRadius: 2 },
+                "&::-webkit-scrollbar-thumb": { background: "var(--nw-border-strong)", borderRadius: 2 },
               }}>
                 {filterPanel}
               </Box>
@@ -846,7 +846,7 @@ export default function SearchResults() {
           <Box sx={{ flex: 1, minWidth: 0 }}>
             {/* Results summary */}
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2, flexWrap: "wrap", gap: 1 }}>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>
                 Showing {filteredAndSortedFlights.length} flight{filteredAndSortedFlights.length !== 1 ? "s" : ""}
               </Typography>
               {hasActiveFilters && (
@@ -857,7 +857,7 @@ export default function SearchResults() {
                       label={TIME_SLOTS.find((s) => s.key === ts)?.label}
                       size="small"
                       onDelete={() => toggleTimeSlot(ts)}
-                      sx={{ background: "rgba(249,115,22,0.1)", color: "#F97316", fontSize: "0.7rem" }}
+                      sx={{ background: "var(--nw-primary-10)", color: "var(--nw-primary)", fontSize: "0.7rem" }}
                     />
                   ))}
                   {selectedAirlines.map((a) => (
@@ -866,7 +866,7 @@ export default function SearchResults() {
                       label={a}
                       size="small"
                       onDelete={() => toggleAirline(a)}
-                      sx={{ background: "rgba(249,115,22,0.1)", color: "#F97316", fontSize: "0.7rem" }}
+                      sx={{ background: "var(--nw-primary-10)", color: "var(--nw-primary)", fontSize: "0.7rem" }}
                     />
                   ))}
                   {maxDuration !== null && (
@@ -874,10 +874,10 @@ export default function SearchResults() {
                       label={DURATION_OPTIONS.find((d) => d.val === maxDuration)?.label}
                       size="small"
                       onDelete={() => setMaxDuration(null)}
-                      sx={{ background: "rgba(249,115,22,0.1)", color: "#F97316", fontSize: "0.7rem" }}
+                      sx={{ background: "var(--nw-primary-10)", color: "var(--nw-primary)", fontSize: "0.7rem" }}
                     />
                   )}
-                  <Button size="small" onClick={resetFilters} sx={{ color: "#6B7280", fontSize: "0.7rem", textTransform: "none" }}>
+                  <Button size="small" onClick={resetFilters} sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", textTransform: "none" }}>
                     Clear all
                   </Button>
                 </Box>
@@ -887,15 +887,15 @@ export default function SearchResults() {
             {/* Empty state */}
             {filteredAndSortedFlights.length === 0 ? (
               <Box sx={{ textAlign: "center", py: 12 }}>
-                <AirplanemodeInactiveIcon sx={{ fontSize: 72, color: "#4B5563", mb: 2 }} />
-                <Typography variant="h5" sx={{ color: "#fff", fontWeight: 600, mb: 1 }}>
+                <AirplanemodeInactiveIcon sx={{ fontSize: 72, color: "var(--nw-text-disabled)", mb: 2 }} />
+                <Typography variant="h5" sx={{ color: "var(--nw-text-primary)", fontWeight: 600, mb: 1 }}>
                   No flights found
                 </Typography>
-                <Typography sx={{ color: "#6B7280", mb: 1 }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", mb: 1 }}>
                   {source} → {destination}
                   {date && ` on ${formatDate(date + "T00:00:00")}`}
                 </Typography>
-                <Typography sx={{ color: "#4B5563", fontSize: "0.85rem", mb: 3 }}>
+                <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.85rem", mb: 3 }}>
                   Try modifying your search or clearing filters
                 </Typography>
                 <Button variant="outlined" onClick={resetFilters}>
@@ -962,27 +962,27 @@ function FilterSection({
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.7 }}>
           {icon && (
-            <Box sx={{ color: activeCount > 0 ? "#F97316" : "#6B7280", display: "flex", alignItems: "center" }}>
+            <Box sx={{ color: activeCount > 0 ? "var(--nw-primary)" : "var(--nw-text-muted)", display: "flex", alignItems: "center" }}>
               {icon}
             </Box>
           )}
-          <Typography sx={{ color: activeCount > 0 ? "#F97316" : "#D1D5DB", fontWeight: 600, fontSize: "0.82rem" }}>
+          <Typography sx={{ color: activeCount > 0 ? "var(--nw-primary)" : "var(--nw-text-secondary)", fontWeight: 600, fontSize: "0.82rem" }}>
             {title}
           </Typography>
           {activeCount > 0 && (
             <Box sx={{
               width: 17, height: 17, borderRadius: "50%",
-              background: "linear-gradient(135deg, #F97316, #EA580C)",
+              background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <Typography sx={{ color: "#fff", fontSize: "0.58rem", fontWeight: 700 }}>{activeCount}</Typography>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.58rem", fontWeight: 700 }}>{activeCount}</Typography>
             </Box>
           )}
         </Box>
         {open ? (
-          <ExpandLessIcon sx={{ fontSize: 15, color: "#4B5563" }} />
+          <ExpandLessIcon sx={{ fontSize: 15, color: "var(--nw-text-disabled)" }} />
         ) : (
-          <ExpandMoreIcon sx={{ fontSize: 15, color: "#4B5563" }} />
+          <ExpandMoreIcon sx={{ fontSize: 15, color: "var(--nw-text-disabled)" }} />
         )}
       </Box>
       <Collapse in={open}>{children}</Collapse>
@@ -1014,14 +1014,14 @@ function FlightResultCard({
   return (
     <Card
       sx={{
-        background: "#111111",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--nw-card)",
+        border: "1px solid var(--nw-border)",
         borderRadius: "16px",
         cursor: "pointer",
         transition: "all 0.2s ease",
         "&:hover": {
           borderColor: "rgba(249,115,22,0.25)",
-          boxShadow: "0 4px 20px rgba(249,115,22,0.06)",
+          boxShadow: "0 4px 20px var(--nw-primary-06)",
         },
       }}
       onClick={goToDetail}
@@ -1051,10 +1051,10 @@ function FlightResultCard({
               {flight.airlineName.substring(0, 2)}
             </Box>
             <Box>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", lineHeight: 1.2 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem", lineHeight: 1.2 }}>
                 {flight.airlineName}
               </Typography>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.7rem" }}>
+              <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.7rem" }}>
                 {flight.flightNumber}
               </Typography>
             </Box>
@@ -1064,23 +1064,23 @@ function FlightResultCard({
           <Box sx={{ flex: 1, display: "flex", alignItems: "center", gap: { xs: 1.5, md: 3 } }}>
             {/* Departure */}
             <Box sx={{ textAlign: "center", minWidth: 70 }}>
-              <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: { xs: "1.2rem", md: "1.5rem" } }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: { xs: "1.2rem", md: "1.5rem" } }}>
                 {formatTime(flight.departureTime)}
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem" }}>
                 {flight.source}
               </Typography>
             </Box>
 
             {/* Duration line */}
             <Box sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", px: 1 }}>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.65rem", mb: 0.5 }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.65rem", mb: 0.5 }}>
                 {duration}
               </Typography>
               <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
-                <Box sx={{ height: 1, flex: 1, background: "rgba(255,255,255,0.1)", borderStyle: "dashed" }} />
-                <FlightTakeoffIcon sx={{ fontSize: 14, color: "#F97316", mx: 0.5 }} />
-                <Box sx={{ height: 1, flex: 1, background: "rgba(255,255,255,0.1)", borderStyle: "dashed" }} />
+                <Box sx={{ height: 1, flex: 1, background: "var(--nw-border-strong)", borderStyle: "dashed" }} />
+                <FlightTakeoffIcon sx={{ fontSize: 14, color: "var(--nw-primary)", mx: 0.5 }} />
+                <Box sx={{ height: 1, flex: 1, background: "var(--nw-border-strong)", borderStyle: "dashed" }} />
               </Box>
               <Chip
                 label="NON-STOP"
@@ -1091,7 +1091,7 @@ function FlightResultCard({
                   fontWeight: 700,
                   mt: 0.5,
                   background: "rgba(16,185,129,0.1)",
-                  color: "#10B981",
+                  color: "var(--nw-success)",
                   letterSpacing: "0.05em",
                 }}
               />
@@ -1099,10 +1099,10 @@ function FlightResultCard({
 
             {/* Arrival */}
             <Box sx={{ textAlign: "center", minWidth: 70 }}>
-              <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: { xs: "1.2rem", md: "1.5rem" } }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: { xs: "1.2rem", md: "1.5rem" } }}>
                 {formatTime(flight.arrivalTime)}
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem" }}>
                 {flight.destination}
               </Typography>
             </Box>
@@ -1113,13 +1113,13 @@ function FlightResultCard({
             <Chip
               label="Economy"
               size="small"
-              sx={{ mb: 0.5, height: 20, fontSize: "0.6rem", background: "rgba(255,255,255,0.05)", color: "#6B7280" }}
+              sx={{ mb: 0.5, height: 20, fontSize: "0.6rem", background: "var(--nw-border-soft)", color: "var(--nw-text-muted)" }}
             />
             <Typography
               sx={{
                 fontWeight: 800,
                 fontSize: "1.4rem",
-                background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -1128,9 +1128,9 @@ function FlightResultCard({
             >
               {formatPrice(flight.price)}
             </Typography>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.65rem" }}>per person</Typography>
+            <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.65rem" }}>per person</Typography>
             {flight.availableSeats < 5 && (
-              <Typography sx={{ color: "#F97316", fontSize: "0.7rem", fontWeight: 600, mt: 0.3 }}>
+              <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.7rem", fontWeight: 600, mt: 0.3 }}>
                 Only {flight.availableSeats} left!
               </Typography>
             )}
@@ -1151,7 +1151,7 @@ function FlightResultCard({
             size="small"
             onClick={(e) => { e.stopPropagation(); onToggleExpand(); }}
             endIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            sx={{ color: "#6B7280", fontSize: "0.75rem", textTransform: "none" }}
+            sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "none" }}
           >
             {expanded ? "Hide Details" : "Flight Details"}
           </Button>
@@ -1162,8 +1162,8 @@ function FlightResultCard({
       <Collapse in={expanded}>
         <Box
           sx={{
-            borderTop: "1px solid rgba(255,255,255,0.04)",
-            background: "rgba(255,255,255,0.02)",
+            borderTop: "1px solid var(--nw-border-soft)",
+            background: "var(--nw-glass)",
             px: { xs: 2.5, md: 3 },
             py: 2.5,
           }}
@@ -1172,7 +1172,7 @@ function FlightResultCard({
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 3 }}>
             {/* Flight Info */}
             <Box>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", mb: 1.5 }}>Flight Info</Typography>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem", mb: 1.5 }}>Flight Info</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
                 {[
                   `Airline: ${flight.airlineName}`,
@@ -1181,34 +1181,34 @@ function FlightResultCard({
                   `Arrival: ${formatDate(flight.arrivalTime)}`,
                   `Duration: ${duration}`,
                 ].map((line) => (
-                  <Typography key={line} sx={{ color: "#6B7280", fontSize: "0.8rem" }}>{line}</Typography>
+                  <Typography key={line} sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>{line}</Typography>
                 ))}
               </Box>
             </Box>
 
             {/* Fare Breakdown */}
             <Box>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", mb: 1.5 }}>Fare Breakdown</Typography>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem", mb: 1.5 }}>Fare Breakdown</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>Base Fare ({passengers}x)</Typography>
-                  <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>{formatPrice(baseFare)}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>Base Fare ({passengers}x)</Typography>
+                  <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem" }}>{formatPrice(baseFare)}</Typography>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>Taxes (18%)</Typography>
-                  <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>{formatPrice(tax)}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>Taxes (18%)</Typography>
+                  <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem" }}>{formatPrice(tax)}</Typography>
                 </Box>
-                <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+                <Divider sx={{ borderColor: "var(--nw-border)" }} />
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem" }}>Total</Typography>
-                  <Typography sx={{ color: "#F97316", fontWeight: 700, fontSize: "0.9rem" }}>{formatPrice(total)}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem" }}>Total</Typography>
+                  <Typography sx={{ color: "var(--nw-primary)", fontWeight: 700, fontSize: "0.9rem" }}>{formatPrice(total)}</Typography>
                 </Box>
               </Box>
             </Box>
 
             {/* Amenities */}
             <Box>
-              <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", mb: 1.5 }}>Amenities</Typography>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem", mb: 1.5 }}>Amenities</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {[
                   { icon: <LuggageOutlinedIcon sx={{ fontSize: 16 }} />, text: "Cabin: 7 kg" },
@@ -1217,8 +1217,8 @@ function FlightResultCard({
                   { icon: <EventSeatOutlinedIcon sx={{ fontSize: 16 }} />, text: "Seat Selection: Available" },
                 ].map((item) => (
                   <Box key={item.text} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Box sx={{ color: "#F97316" }}>{item.icon}</Box>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.8rem" }}>{item.text}</Typography>
+                    <Box sx={{ color: "var(--nw-primary)" }}>{item.icon}</Box>
+                    <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem" }}>{item.text}</Typography>
                   </Box>
                 ))}
               </Box>
@@ -1247,15 +1247,15 @@ function FlightGridCard({ flight, passengers }: { flight: Flight; passengers: nu
     <Card
       onClick={goToDetail}
       sx={{
-        background: "#111111",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--nw-card)",
+        border: "1px solid var(--nw-border)",
         borderRadius: "16px",
         cursor: "pointer",
         transition: "all 0.2s ease",
         "&:hover": {
           borderColor: "rgba(249,115,22,0.25)",
           transform: "translateY(-2px)",
-          boxShadow: "0 8px 24px rgba(249,115,22,0.08)",
+          boxShadow: "0 8px 24px var(--nw-primary-08)",
         },
       }}
     >
@@ -1280,37 +1280,37 @@ function FlightGridCard({ flight, passengers }: { flight: Flight; passengers: nu
             {flight.airlineName.substring(0, 2)}
           </Box>
           <Box>
-            <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.8rem", lineHeight: 1.1 }}>
+            <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.8rem", lineHeight: 1.1 }}>
               {flight.airlineName}
             </Typography>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.65rem" }}>{flight.flightNumber}</Typography>
+            <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.65rem" }}>{flight.flightNumber}</Typography>
           </Box>
         </Box>
 
         {/* Times */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-          <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem" }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>
             {formatTime(flight.departureTime)}
           </Typography>
           <Box sx={{ textAlign: "center" }}>
-            <Typography sx={{ color: "#6B7280", fontSize: "0.6rem" }}>{duration}</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6rem" }}>{duration}</Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.3, my: 0.3 }}>
-              <Box sx={{ height: 1, width: 20, background: "rgba(255,255,255,0.1)" }} />
-              <FlightTakeoffIcon sx={{ fontSize: 10, color: "#F97316" }} />
-              <Box sx={{ height: 1, width: 20, background: "rgba(255,255,255,0.1)" }} />
+              <Box sx={{ height: 1, width: 20, background: "var(--nw-border-strong)" }} />
+              <FlightTakeoffIcon sx={{ fontSize: 10, color: "var(--nw-primary)" }} />
+              <Box sx={{ height: 1, width: 20, background: "var(--nw-border-strong)" }} />
             </Box>
-            <Chip label="Non-stop" size="small" sx={{ height: 16, fontSize: "0.5rem", background: "rgba(16,185,129,0.1)", color: "#10B981" }} />
+            <Chip label="Non-stop" size="small" sx={{ height: 16, fontSize: "0.5rem", background: "rgba(16,185,129,0.1)", color: "var(--nw-success)" }} />
           </Box>
-          <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem" }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>
             {formatTime(flight.arrivalTime)}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>{flight.source}</Typography>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>{flight.destination}</Typography>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem" }}>{flight.source}</Typography>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem" }}>{flight.destination}</Typography>
         </Box>
 
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.04)", mb: 2 }} />
+        <Divider sx={{ borderColor: "var(--nw-border-soft)", mb: 2 }} />
 
         {/* Price + CTA */}
         <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
@@ -1319,7 +1319,7 @@ function FlightGridCard({ flight, passengers }: { flight: Flight; passengers: nu
               sx={{
                 fontWeight: 800,
                 fontSize: "1.2rem",
-                background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -1327,7 +1327,7 @@ function FlightGridCard({ flight, passengers }: { flight: Flight; passengers: nu
             >
               {formatPrice(flight.price)}
             </Typography>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.6rem" }}>per person</Typography>
+            <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.6rem" }}>per person</Typography>
           </Box>
           <Button
             variant="contained"
@@ -1342,3 +1342,7 @@ function FlightGridCard({ flight, passengers }: { flight: Flight; passengers: nu
     </Card>
   );
 }
+
+
+
+

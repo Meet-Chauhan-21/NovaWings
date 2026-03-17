@@ -72,11 +72,11 @@ function getPasswordStrength(password: string): number {
 }
 
 function getStrengthLabel(score: number): { label: string; color: string } {
-  if (score <= 20) return { label: "Very Weak", color: "#EF4444" };
-  if (score <= 40) return { label: "Weak", color: "#F97316" };
-  if (score <= 60) return { label: "Fair", color: "#F59E0B" };
-  if (score <= 80) return { label: "Strong", color: "#22C55E" };
-  return { label: "Very Strong", color: "#10B981" };
+  if (score <= 20) return { label: "Very Weak", color: "var(--nw-error)" };
+  if (score <= 40) return { label: "Weak", color: "var(--nw-primary)" };
+  if (score <= 60) return { label: "Fair", color: "var(--nw-secondary)" };
+  if (score <= 80) return { label: "Strong", color: "var(--nw-success-bright)" };
+  return { label: "Very Strong", color: "var(--nw-success)" };
 }
 
 /**
@@ -130,7 +130,7 @@ export default function Register() {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", background: "#0A0A0A" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", background: "var(--nw-bg)" }}>
       {/* ── Left Branding Panel (55%) ─────────────────────────────── */}
       <Box
         sx={{
@@ -140,7 +140,7 @@ export default function Register() {
           width: "55%",
           minHeight: "100vh",
           p: 6,
-          background: "linear-gradient(160deg, #0A0A0A 0%, #1A0800 50%, #0A0A0A 100%)",
+          background: "linear-gradient(160deg, var(--nw-bg) 0%, var(--nw-warm-bg) 50%, var(--nw-bg) 100%)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -155,7 +155,7 @@ export default function Register() {
             width: 520,
             height: 520,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(249,115,22,0.18) 0%, rgba(249,115,22,0.06) 45%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(249,115,22,0.18) 0%, var(--nw-primary-06) 45%, transparent 70%)",
             pointerEvents: "none",
           }}
         />
@@ -167,20 +167,20 @@ export default function Register() {
               width: 44,
               height: 44,
               borderRadius: "12px",
-              background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
+              background: "linear-gradient(135deg, var(--nw-primary) 0%, var(--nw-primary-dark) 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 14px rgba(249,115,22,0.4)",
+              boxShadow: "0 4px 14px var(--nw-primary-40)",
             }}
           >
-            <FlightTakeoffIcon sx={{ color: "#fff", fontSize: 22 }} />
+            <FlightTakeoffIcon sx={{ color: "var(--nw-text-primary)", fontSize: 22 }} />
           </Box>
           <Typography
             sx={{
               fontSize: "1.5rem",
               fontWeight: 800,
-              background: "linear-gradient(90deg, #F97316, #F59E0B)",
+              background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.01em",
@@ -197,7 +197,7 @@ export default function Register() {
               sx={{
                 fontSize: "2.75rem",
                 fontWeight: 800,
-                color: "#FFFFFF",
+                color: "var(--nw-text-primary)",
                 letterSpacing: "-0.02em",
                 lineHeight: 1.15,
                 mb: 1.5,
@@ -207,7 +207,7 @@ export default function Register() {
               <Box
                 component="span"
                 sx={{
-                  background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                  background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -216,7 +216,7 @@ export default function Register() {
               </Box>{" "}
               Smart Travelers
             </Typography>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "1.05rem", lineHeight: 1.7 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "1.05rem", lineHeight: 1.7 }}>
               Create your free account and start booking in seconds.
             </Typography>
           </Box>
@@ -225,8 +225,8 @@ export default function Register() {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
             {FEATURES.map((feat) => (
               <Box key={feat} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <CheckCircleOutlinedIcon sx={{ color: "#F97316", fontSize: 20 }} />
-                <Typography sx={{ color: "#D1D5DB", fontSize: "0.9375rem", fontWeight: 500 }}>
+                <CheckCircleOutlinedIcon sx={{ color: "var(--nw-primary)", fontSize: 20 }} />
+                <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.9375rem", fontWeight: 500 }}>
                   {feat}
                 </Typography>
               </Box>
@@ -238,10 +238,10 @@ export default function Register() {
             <svg viewBox="0 0 400 200" width="340" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M20 140 Q80 100 160 110 L340 60 L320 80 L160 130 L200 155 L170 160 L130 140 L80 155 L70 145 L100 130 L60 125 Z"
-                fill="#F97316"
+                fill="var(--nw-primary)"
               />
-              <circle cx="345" cy="58" r="6" fill="#F59E0B" />
-              <path d="M350 58 Q380 50 395 55" stroke="#F59E0B" strokeWidth="2" fill="none" strokeDasharray="4 3" />
+              <circle cx="345" cy="58" r="6" fill="var(--nw-secondary)" />
+              <path d="M350 58 Q380 50 395 55" stroke="var(--nw-secondary)" strokeWidth="2" fill="none" strokeDasharray="4 3" />
             </svg>
           </Box>
         </Box>
@@ -252,15 +252,15 @@ export default function Register() {
             zIndex: 1,
             p: 3,
             borderRadius: "16px",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.07)",
+            background: "var(--nw-border-soft)",
+            border: "1px solid var(--nw-border)",
           }}
         >
-          <FormatQuoteIcon sx={{ color: "#F97316", fontSize: 28, mb: 1, opacity: 0.8 }} />
-          <Typography sx={{ color: "#D1D5DB", fontSize: "0.9rem", lineHeight: 1.7, fontStyle: "italic" }}>
+          <FormatQuoteIcon sx={{ color: "var(--nw-primary)", fontSize: 28, mb: 1, opacity: 0.8 }} />
+          <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.9rem", lineHeight: 1.7, fontStyle: "italic" }}>
             "Signing up was free and the very first booking saved me ₹2,400 over other platforms. Zero regrets."
           </Typography>
-          <Typography sx={{ color: "#F97316", fontSize: "0.8rem", fontWeight: 600, mt: 1.5 }}>
+          <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.8rem", fontWeight: 600, mt: 1.5 }}>
             — Rahul K., Bengaluru
           </Typography>
         </Box>
@@ -275,7 +275,7 @@ export default function Register() {
           justifyContent: "center",
           width: { xs: "100%", md: "45%" },
           minHeight: "100vh",
-          background: "#0F0F0F",
+          background: "var(--nw-panel-dark)",
           p: { xs: 3, sm: 5 },
           overflowY: "auto",
         }}
@@ -283,16 +283,16 @@ export default function Register() {
         <Box sx={{ width: "100%", maxWidth: 400, py: 4 }}>
           {/* Mobile logo */}
           <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 1, mb: 4 }}>
-            <FlightTakeoffIcon sx={{ color: "#F97316", fontSize: 24 }} />
-            <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "#F97316" }}>
+            <FlightTakeoffIcon sx={{ color: "var(--nw-primary)", fontSize: 24 }} />
+            <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "var(--nw-primary)" }}>
               NovaWings
             </Typography>
           </Box>
 
-          <Typography variant="h4" sx={{ fontWeight: 800, color: "#FFFFFF", mb: 0.75 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: "var(--nw-text-primary)", mb: 0.75 }}>
             Create Account
           </Typography>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.9375rem", mb: 4 }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.9375rem", mb: 4 }}>
             Join 100,000+ smart travelers today
           </Typography>
 
@@ -319,7 +319,7 @@ export default function Register() {
                             input: {
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <PersonOutlineIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                  <PersonOutlineIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                                 </InputAdornment>
                               ),
                             },
@@ -343,7 +343,7 @@ export default function Register() {
                             input: {
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <EmailOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                  <EmailOutlinedIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                                 </InputAdornment>
                               ),
                             },
@@ -368,7 +368,7 @@ export default function Register() {
                               input: {
                                 startAdornment: (
                                   <InputAdornment position="start">
-                                    <LockOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                    <LockOutlinedIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                                   </InputAdornment>
                                 ),
                                 endAdornment: (
@@ -377,7 +377,7 @@ export default function Register() {
                                       onClick={() => setShowPassword((s) => !s)}
                                       edge="end"
                                       size="small"
-                                      sx={{ color: "#6B7280" }}
+                                      sx={{ color: "var(--nw-text-muted)" }}
                                     >
                                       {showPassword ? (
                                         <VisibilityOffOutlinedIcon fontSize="small" />
@@ -399,7 +399,7 @@ export default function Register() {
                                 sx={{
                                   height: 5,
                                   borderRadius: 3,
-                                  background: "rgba(255,255,255,0.06)",
+                                  background: "var(--nw-border)",
                                   "& .MuiLinearProgress-bar": {
                                     background: strengthColor,
                                     borderRadius: 3,
@@ -431,7 +431,7 @@ export default function Register() {
                             input: {
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <LockOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                  <LockOutlinedIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                                 </InputAdornment>
                               ),
                               endAdornment: (
@@ -440,7 +440,7 @@ export default function Register() {
                                     onClick={() => setShowConfirm((s) => !s)}
                                     edge="end"
                                     size="small"
-                                    sx={{ color: "#6B7280" }}
+                                    sx={{ color: "var(--nw-text-muted)" }}
                                   >
                                     {showConfirm ? (
                                       <VisibilityOffOutlinedIcon fontSize="small" />
@@ -470,7 +470,7 @@ export default function Register() {
                             input: {
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <PhoneOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                  <PhoneOutlinedIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                                 </InputAdornment>
                               ),
                             },
@@ -490,24 +490,24 @@ export default function Register() {
                                 checked={field.value}
                                 size="small"
                                 sx={{
-                                  color: meta.touched && meta.error ? "#EF4444" : "#4B5563",
-                                  "&.Mui-checked": { color: "#F97316" },
+                                  color: meta.touched && meta.error ? "var(--nw-error)" : "var(--nw-text-disabled)",
+                                  "&.Mui-checked": { color: "var(--nw-primary)" },
                                 }}
                               />
                             }
                             label={
-                              <Typography sx={{ color: "#9CA3AF", fontSize: "0.8125rem" }}>
+                              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8125rem" }}>
                                 I agree to the{" "}
                                 <Box
                                   component="span"
-                                  sx={{ color: "#F97316", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+                                  sx={{ color: "var(--nw-primary)", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
                                 >
                                   Terms & Conditions
                                 </Box>{" "}
                                 and{" "}
                                 <Box
                                   component="span"
-                                  sx={{ color: "#F97316", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+                                  sx={{ color: "var(--nw-primary)", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
                                 >
                                   Privacy Policy
                                 </Box>
@@ -515,7 +515,7 @@ export default function Register() {
                             }
                           />
                           {meta.touched && meta.error && (
-                            <Typography sx={{ color: "#EF4444", fontSize: "0.75rem", ml: 1.5 }}>
+                            <Typography sx={{ color: "var(--nw-error)", fontSize: "0.75rem", ml: 1.5 }}>
                               {meta.error}
                             </Typography>
                           )}
@@ -542,30 +542,30 @@ export default function Register() {
                         fontSize: "1rem",
                         fontWeight: 700,
                         borderRadius: "12px",
-                        background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
-                        boxShadow: "0 4px 20px rgba(249,115,22,0.4)",
+                        background: "linear-gradient(135deg, var(--nw-primary) 0%, var(--nw-primary-dark) 100%)",
+                        boxShadow: "0 4px 20px var(--nw-primary-40)",
                         "&:hover": {
-                          background: "linear-gradient(135deg, #FB923C 0%, #F97316 100%)",
+                          background: "linear-gradient(135deg, var(--nw-primary-light) 0%, var(--nw-primary) 100%)",
                           boxShadow: "0 6px 24px rgba(249,115,22,0.55)",
                         },
                         "&:disabled": { opacity: 0.6 },
                       }}
                     >
                       {isSubmitting ? (
-                        <CircularProgress size={22} sx={{ color: "#fff" }} />
+                        <CircularProgress size={22} sx={{ color: "var(--nw-text-primary)" }} />
                       ) : (
                         "Create Account"
                       )}
                     </Button>
 
                     {/* Login link */}
-                    <Typography sx={{ textAlign: "center", color: "#6B7280", fontSize: "0.9rem" }}>
+                    <Typography sx={{ textAlign: "center", color: "var(--nw-text-muted)", fontSize: "0.9rem" }}>
                       Already have an account?{" "}
                       <Box
                         component={Link}
                         to="/login"
                         sx={{
-                          color: "#F97316",
+                          color: "var(--nw-primary)",
                           fontWeight: 600,
                           textDecoration: "none",
                           "&:hover": { textDecoration: "underline" },
@@ -585,3 +585,7 @@ export default function Register() {
     </Box>
   );
 }
+
+
+
+

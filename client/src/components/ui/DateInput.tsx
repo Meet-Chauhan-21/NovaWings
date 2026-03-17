@@ -43,6 +43,10 @@ const DateInput: React.FC<DateInputProps> = ({
   id,
   showQuickButtons = false,
 }) => {
+  const isLightMode =
+    typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-theme") === "light";
+
   const today = getToday();
   const tomorrow = getTomorrow();
   const isToday = value === today;
@@ -58,7 +62,7 @@ const DateInput: React.FC<DateInputProps> = ({
       {label && (
         <Typography
           sx={{
-            color: "#6B7280",
+            color: "var(--nw-text-muted)",
             fontSize: "0.7rem",
             fontWeight: 600,
             mb: 0.8,
@@ -77,8 +81,8 @@ const DateInput: React.FC<DateInputProps> = ({
           alignItems: "center",
           gap: 1,
           px: 1.5,
-          background: "#1a1a1a",
-          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+          background: "var(--nw-elevated)",
+          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "var(--nw-border-strong)"}`,
           borderRadius: "12px",
           transition: "all 0.2s ease",
           "&:hover": {
@@ -109,12 +113,12 @@ const DateInput: React.FC<DateInputProps> = ({
             background: "transparent",
             border: "none",
             outline: "none",
-            color: value ? "#FFFFFF" : "#6B7280",
+            color: value ? "var(--nw-text-primary)" : "var(--nw-text-muted)",
             fontSize: "0.9375rem",
             fontWeight: 500,
             padding: "16px 0",
             cursor: disabled ? "not-allowed" : "pointer",
-            colorScheme: "dark",
+            colorScheme: isLightMode ? "light" : "dark",
             fontFamily: "inherit",
             width: "100%",
             opacity: disabled ? 0.5 : 1,
@@ -144,11 +148,11 @@ const DateInput: React.FC<DateInputProps> = ({
                 transition: "all 0.18s ease",
                 border: btn.active
                   ? "1px solid rgba(249,115,22,0.6)"
-                  : "1px solid rgba(255,255,255,0.1)",
+                  : "1px solid var(--nw-border-strong)",
                 background: btn.active
                   ? "rgba(249,115,22,0.18)"
-                  : "rgba(255,255,255,0.03)",
-                color: btn.active ? "#FB923C" : "#6B7280",
+                  : "var(--nw-glass)",
+                color: btn.active ? "#FB923C" : "var(--nw-text-muted)",
                 boxShadow: btn.active
                   ? "0 0 0 1px rgba(249,115,22,0.15) inset"
                   : "none",

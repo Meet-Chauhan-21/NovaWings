@@ -95,7 +95,7 @@ export default function MyBookings() {
       <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 3 }, py: 6 }}>
         <Box sx={{ display: "flex", gap: 2, mb: 4 }}>
           {[...Array(3)].map((_, i) => (
-            <Box key={i} sx={{ flex: 1, height: 80, background: "rgba(255,255,255,0.04)", borderRadius: "12px", animation: "pulse 1.5s ease-in-out infinite" }} />
+            <Box key={i} sx={{ flex: 1, height: 80, background: "var(--nw-border-soft)", borderRadius: "12px", animation: "pulse 1.5s ease-in-out infinite" }} />
           ))}
         </Box>
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2.5 }}>
@@ -111,7 +111,7 @@ export default function MyBookings() {
       <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 3 }, py: 4 }}>
         <IconButton
           onClick={() => navigate("/")}
-          sx={{ mb: 3, color: "#9CA3AF", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+          sx={{ mb: 3, color: "var(--nw-text-secondary)", background: "var(--nw-border-soft)", border: "1px solid var(--nw-border-strong)" }}
         >
           <ArrowBackIcon fontSize="small" />
         </IconButton>
@@ -127,27 +127,27 @@ export default function MyBookings() {
   }
 
   return (
-    <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 3 }, py: { xs: 4, md: 6 } }}>
+    <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 3 }, pt: { xs: 3, md: 4 }, pb: { xs: 5, md: 7 } }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 4, flexWrap: "wrap", gap: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: { xs: 3, md: 4 }, flexWrap: "wrap", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <IconButton
               onClick={() => navigate("/")}
               sx={{
-                color: "#9CA3AF",
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                "&:hover": { background: "rgba(249,115,22,0.1)", color: "#F97316" },
+                color: "var(--nw-text-secondary)",
+                background: "var(--nw-border-soft)",
+                border: "1px solid var(--nw-border-strong)",
+                "&:hover": { background: "var(--nw-primary-10)", color: "var(--nw-primary)" },
               }}
             >
               <ArrowBackIcon fontSize="small" />
             </IconButton>
             <Box>
-              <Typography sx={{ fontSize: { xs: "1.5rem", md: "1.8rem" }, fontWeight: 800, color: "#FFFFFF" }}>
+              <Typography sx={{ fontSize: { xs: "1.5rem", md: "1.8rem" }, fontWeight: 800, color: "var(--nw-text-primary)" }}>
                 My Bookings
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>
                 {stats.total} booking{stats.total !== 1 ? "s" : ""} across {stats.routes} route{stats.routes !== 1 ? "s" : ""}
               </Typography>
             </Box>
@@ -161,8 +161,8 @@ export default function MyBookings() {
               borderRadius: "10px",
               fontWeight: 600,
               fontSize: "0.85rem",
-              background: "linear-gradient(135deg, #F97316, #EA580C)",
-              "&:hover": { background: "linear-gradient(135deg, #EA580C, #DC2626)" },
+              background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
+              "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-error))" },
             }}
           >
             New Booking
@@ -172,18 +172,18 @@ export default function MyBookings() {
 
       {/* Stats Chips */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
-        <Box sx={{ display: "flex", gap: 1.5, mb: 4, flexWrap: "wrap" }}>
+        <Box sx={{ display: "flex", gap: 1.5, mb: { xs: 3, md: 4 }, flexWrap: "wrap" }}>
           {[
-            { label: "Total", value: stats.total, color: "#3B82F6" },
-            { label: "Confirmed", value: stats.confirmed, color: "#22C55E" },
-            { label: "Cancelled", value: stats.cancelled, color: "#EF4444" },
-            { label: "Spent", value: `₹${stats.totalSpent.toLocaleString("en-IN")}`, color: "#F97316" },
+            { label: "Total", value: stats.total, color: "var(--nw-info)" },
+            { label: "Confirmed", value: stats.confirmed, color: "var(--nw-success-bright)" },
+            { label: "Cancelled", value: stats.cancelled, color: "var(--nw-error)" },
+            { label: "Spent", value: `₹${stats.totalSpent.toLocaleString("en-IN")}`, color: "var(--nw-primary)" },
           ].map((stat) => (
             <Paper
               key={stat.label}
               sx={{
-                background: "#111111",
-                border: "1px solid rgba(255,255,255,0.06)",
+                background: "var(--nw-card)",
+                border: "1px solid var(--nw-border)",
                 borderRadius: "12px",
                 px: 2.5,
                 py: 1.5,
@@ -195,10 +195,10 @@ export default function MyBookings() {
             >
               <Box sx={{ width: 8, height: 8, borderRadius: "50%", background: stat.color, flexShrink: 0 }} />
               <Box>
-                <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1rem" }}>
+                <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem" }}>
                   {stat.value}
                 </Typography>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem" }}>
                   {stat.label}
                 </Typography>
               </Box>
@@ -211,11 +211,11 @@ export default function MyBookings() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}>
         <Paper
           sx={{
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-border)",
             borderRadius: "16px",
-            p: 2.5,
-            mb: 4,
+            p: { xs: 2, md: 2.5 },
+            mb: { xs: 3, md: 4 },
           }}
         >
           <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, alignItems: { lg: "center" }, gap: 2 }}>
@@ -226,18 +226,18 @@ export default function MyBookings() {
               sx={{
                 minHeight: 40,
                 "& .MuiTabs-indicator": {
-                  background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                  background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))",
                   height: 3,
                   borderRadius: "3px 3px 0 0",
                 },
                 "& .MuiTab-root": {
-                  color: "#6B7280",
+                  color: "var(--nw-text-muted)",
                   fontSize: "0.85rem",
                   fontWeight: 500,
                   textTransform: "none",
                   minHeight: 40,
                   px: 2,
-                  "&.Mui-selected": { color: "#F97316" },
+                  "&.Mui-selected": { color: "var(--nw-primary)" },
                 },
               }}
             >
@@ -246,7 +246,7 @@ export default function MyBookings() {
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     All
                     <Badge badgeContent={stats.total} sx={{
-                      "& .MuiBadge-badge": { background: activeTab === 0 ? "#F97316" : "rgba(255,255,255,0.1)", color: activeTab === 0 ? "#fff" : "#6B7280", fontSize: "0.65rem", minWidth: 20, height: 20 },
+                      "& .MuiBadge-badge": { background: activeTab === 0 ? "var(--nw-primary)" : "var(--nw-border-strong)", color: activeTab === 0 ? "var(--nw-text-primary)" : "var(--nw-text-muted)", fontSize: "0.65rem", minWidth: 20, height: 20 },
                     }}><Box /></Badge>
                   </Box>
                 }
@@ -256,7 +256,7 @@ export default function MyBookings() {
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     Confirmed
                     <Badge badgeContent={stats.confirmed} sx={{
-                      "& .MuiBadge-badge": { background: activeTab === 1 ? "#22C55E" : "rgba(255,255,255,0.1)", color: activeTab === 1 ? "#fff" : "#6B7280", fontSize: "0.65rem", minWidth: 20, height: 20 },
+                      "& .MuiBadge-badge": { background: activeTab === 1 ? "var(--nw-success-bright)" : "var(--nw-border-strong)", color: activeTab === 1 ? "var(--nw-text-primary)" : "var(--nw-text-muted)", fontSize: "0.65rem", minWidth: 20, height: 20 },
                     }}><Box /></Badge>
                   </Box>
                 }
@@ -266,7 +266,7 @@ export default function MyBookings() {
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     Cancelled
                     <Badge badgeContent={stats.cancelled} sx={{
-                      "& .MuiBadge-badge": { background: activeTab === 2 ? "#EF4444" : "rgba(255,255,255,0.1)", color: activeTab === 2 ? "#fff" : "#6B7280", fontSize: "0.65rem", minWidth: 20, height: 20 },
+                      "& .MuiBadge-badge": { background: activeTab === 2 ? "var(--nw-error)" : "var(--nw-border-strong)", color: activeTab === 2 ? "var(--nw-text-primary)" : "var(--nw-text-muted)", fontSize: "0.65rem", minWidth: 20, height: 20 },
                     }}><Box /></Badge>
                   </Box>
                 }
@@ -284,25 +284,25 @@ export default function MyBookings() {
                   flex: 1,
                   maxWidth: 360,
                   "& .MuiOutlinedInput-root": {
-                    background: "rgba(255,255,255,0.03)",
+                    background: "var(--nw-glass)",
                     borderRadius: "10px",
                     fontSize: "0.85rem",
-                    color: "#FFFFFF",
-                    "& fieldset": { borderColor: "rgba(255,255,255,0.08)" },
-                    "&:hover fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                    "&.Mui-focused fieldset": { borderColor: "#F97316" },
+                    color: "var(--nw-text-primary)",
+                    "& fieldset": { borderColor: "var(--nw-border-strong)" },
+                    "&:hover fieldset": { borderColor: "var(--nw-border-strong)" },
+                    "&.Mui-focused fieldset": { borderColor: "var(--nw-primary)" },
                   },
                 }}
                 slotProps={{
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                        <SearchIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                       </InputAdornment>
                     ),
                     endAdornment: search ? (
                       <InputAdornment position="end">
-                        <IconButton size="small" onClick={() => setSearch("")} sx={{ color: "#6B7280" }}>
+                        <IconButton size="small" onClick={() => setSearch("")} sx={{ color: "var(--nw-text-muted)" }}>
                           <CloseIcon sx={{ fontSize: 16 }} />
                         </IconButton>
                       </InputAdornment>
@@ -319,25 +319,25 @@ export default function MyBookings() {
                   sx={{
                     borderRadius: "10px",
                     fontSize: "0.85rem",
-                    color: "#FFFFFF",
-                    background: "rgba(255,255,255,0.03)",
-                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.08)" },
-                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.15)" },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#F97316" },
-                    "& .MuiSvgIcon-root": { color: "#6B7280" },
+                    color: "var(--nw-text-primary)",
+                    background: "var(--nw-glass)",
+                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
+                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-primary)" },
+                    "& .MuiSvgIcon-root": { color: "var(--nw-text-muted)" },
                   }}
                   MenuProps={{
                     PaperProps: {
                       sx: {
-                        background: "#1A1A1A",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "var(--nw-elevated)",
+                        border: "1px solid var(--nw-border-strong)",
                         borderRadius: "10px",
                       },
                     },
                   }}
                 >
                   {SORT_OPTIONS.map((o) => (
-                    <MenuItem key={o.value} value={o.value} sx={{ fontSize: "0.85rem", color: "#FFFFFF" }}>
+                    <MenuItem key={o.value} value={o.value} sx={{ fontSize: "0.85rem", color: "var(--nw-text-primary)" }}>
                       {o.label}
                     </MenuItem>
                   ))}
@@ -350,8 +350,12 @@ export default function MyBookings() {
 
       {/* Search results count */}
       {search && (
-        <Typography sx={{ color: "#6B7280", fontSize: "0.85rem", mb: 2 }}>
-          {filtered.length} result{filtered.length !== 1 ? "s" : ""} for "<span style={{ color: "#FFFFFF", fontWeight: 500 }}>{search}</span>"
+        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem", mb: 2.5 }}>
+          {filtered.length} result{filtered.length !== 1 ? "s" : ""} for "
+          <Box component="span" sx={{ color: "var(--nw-text-primary)", fontWeight: 500 }}>
+            {search}
+          </Box>
+          "
         </Typography>
       )}
 
@@ -359,37 +363,38 @@ export default function MyBookings() {
       {filtered.length === 0 ? (
         <Paper
           sx={{
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-border)",
             borderRadius: "16px",
             py: 12,
             textAlign: "center",
           }}
         >
-          <FlightTakeoffIcon sx={{ fontSize: 48, color: "#4B5563", mb: 2 }} />
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "1.1rem", mb: 0.5 }}>
+          <FlightTakeoffIcon sx={{ fontSize: 48, color: "var(--nw-text-disabled)", mb: 2 }} />
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "1.1rem", mb: 0.5 }}>
             No bookings found
           </Typography>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>
             Try adjusting your search or filters
           </Typography>
           {search && (
             <Button
               onClick={() => setSearch("")}
-              sx={{ mt: 2, color: "#F97316", textTransform: "none", fontSize: "0.85rem" }}
+              sx={{ mt: 2, color: "var(--nw-primary)", textTransform: "none", fontSize: "0.85rem" }}
             >
               Clear search
             </Button>
           )}
         </Paper>
       ) : (
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", xl: "1fr 1fr 1fr" }, gap: 2.5 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", xl: "1fr 1fr 1fr" }, gap: { xs: 2, md: 3 }, alignItems: "stretch" }}>
           {filtered.map((b, i) => (
             <motion.div
               key={b.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
+              style={{ display: "flex" }}
             >
               <BookingCard booking={b} />
             </motion.div>
@@ -399,3 +404,6 @@ export default function MyBookings() {
     </Box>
   );
 }
+
+
+

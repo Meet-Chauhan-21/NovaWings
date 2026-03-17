@@ -67,14 +67,14 @@ export default function AddFlight() {
     width: "100%",
     px: 2,
     py: 1.5,
-    background: "rgba(255,255,255,0.03)",
-    border: `1px solid ${hasError ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.08)"}`,
+    background: "var(--nw-glass)",
+    border: `1px solid ${hasError ? "rgba(239,68,68,0.5)" : "var(--nw-border-strong)"}`,
     borderRadius: "10px",
-    color: "#FFFFFF",
+    color: "var(--nw-text-primary)",
     fontSize: "0.9rem",
     outline: "none",
-    "&:focus": { borderColor: "#F97316" },
-    "&::placeholder": { color: "#4B5563" },
+    "&:focus": { borderColor: "var(--nw-primary)" },
+    "&::placeholder": { color: "var(--nw-text-disabled)" },
   });
 
   return (
@@ -84,10 +84,10 @@ export default function AddFlight() {
         onClick={() => navigate("/admin")}
         sx={{
           mb: 3,
-          color: "#9CA3AF",
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          "&:hover": { background: "rgba(249,115,22,0.1)", color: "#F97316" },
+          color: "var(--nw-text-secondary)",
+          background: "var(--nw-border-soft)",
+          border: "1px solid var(--nw-border-strong)",
+          "&:hover": { background: "var(--nw-primary-10)", color: "var(--nw-primary)" },
         }}
       >
         <ArrowBackIcon fontSize="small" />
@@ -100,37 +100,37 @@ export default function AddFlight() {
             width: 48,
             height: 48,
             borderRadius: "12px",
-            background: "rgba(249,115,22,0.1)",
-            border: "1px solid rgba(249,115,22,0.2)",
+            background: "var(--nw-primary-10)",
+            border: "1px solid var(--nw-primary-20)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <FlightTakeoffIcon sx={{ color: "#F97316", fontSize: 24 }} />
+          <FlightTakeoffIcon sx={{ color: "var(--nw-primary)", fontSize: 24 }} />
         </Box>
         <Box>
-          <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#FFFFFF" }}>Add New Flight</Typography>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Fill in the details to create a new flight</Typography>
+          <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--nw-text-primary)" }}>Add New Flight</Typography>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Fill in the details to create a new flight</Typography>
         </Box>
       </Box>
 
       {/* Form Card */}
       <Paper
         sx={{
-          background: "#111111",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--nw-card)",
+          border: "1px solid var(--nw-border)",
           borderRadius: "16px",
           overflow: "hidden",
         }}
       >
-        <Box sx={{ height: 3, background: "linear-gradient(90deg, #F97316, #F59E0B)" }} />
+        <Box sx={{ height: 3, background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))" }} />
         <Box sx={{ p: { xs: 3, sm: 4 } }}>
           <Formik initialValues={initialValues} validationSchema={flightSchema} onSubmit={handleSubmit}>
             {({ isSubmitting, touched, errors }) => (
               <Form>
                 {/* Basic Info */}
-                <Typography sx={{ color: "#F97316", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", mb: 2 }}>
+                <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", mb: 2 }}>
                   Basic Information
                 </Typography>
                 <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5, mb: 4 }}>
@@ -139,7 +139,7 @@ export default function AddFlight() {
                 </Box>
 
                 {/* Route */}
-                <Typography sx={{ color: "#F97316", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", mb: 2 }}>
+                <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", mb: 2 }}>
                   Route
                 </Typography>
                 <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5, mb: 4 }}>
@@ -150,7 +150,7 @@ export default function AddFlight() {
                 </Box>
 
                 {/* Pricing */}
-                <Typography sx={{ color: "#F97316", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", mb: 2 }}>
+                <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", mb: 2 }}>
                   Capacity & Pricing
                 </Typography>
                 <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5, mb: 4 }}>
@@ -168,9 +168,9 @@ export default function AddFlight() {
                     borderRadius: "12px",
                     fontWeight: 700,
                     fontSize: "0.95rem",
-                    background: "linear-gradient(135deg, #F97316, #EA580C)",
-                    color: "#FFFFFF",
-                    "&:hover": { background: "linear-gradient(135deg, #EA580C, #DC2626)" },
+                    background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
+                    color: "var(--nw-text-primary)",
+                    "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-error))" },
                     "&:disabled": { opacity: 0.5 },
                   }}
                 >
@@ -208,7 +208,7 @@ function DarkField({
       <Typography
         component="label"
         htmlFor={name}
-        sx={{ display: "block", color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}
+        sx={{ display: "block", color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}
       >
         {label}
       </Typography>
@@ -220,10 +220,10 @@ function DarkField({
         style={{
           width: "100%",
           padding: "12px 16px",
-          background: "rgba(255,255,255,0.03)",
-          border: `1px solid ${hasError ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.08)"}`,
+          background: "var(--nw-glass)",
+          border: `1px solid ${hasError ? "rgba(239,68,68,0.5)" : "var(--nw-border-strong)"}`,
           borderRadius: "10px",
-          color: "#FFFFFF",
+          color: "var(--nw-text-primary)",
           fontSize: "0.9rem",
           outline: "none",
           boxSizing: "border-box" as const,
@@ -233,3 +233,6 @@ function DarkField({
     </Box>
   );
 }
+
+
+

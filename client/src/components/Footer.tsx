@@ -1,8 +1,9 @@
 // src/components/Footer.tsx
-// Professional dark footer for NovaWings
+// Professional theme-aware footer for NovaWings
 
 import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -76,39 +77,39 @@ const FOOTER_STATS = [
 
 const BOTTOM_LINKS = ["Privacy", "Terms", "Sitemap", "Cookies"];
 
-// ── Link styles ─────────────────────────────
-const linkSx = {
-  color: "#9CA3AF",
-  fontSize: "0.85rem",
-  textDecoration: "none",
-  display: "flex",
-  alignItems: "center",
-  gap: 0.5,
-  transition: "all 0.2s ease",
-  cursor: "pointer",
-  py: 0.5,
-  "&:hover": {
-    color: "#F97316",
-    transform: "translateX(4px)",
-    textDecoration: "none",
-  },
-};
-
-const headingSx = {
-  fontSize: "0.6875rem",
-  textTransform: "uppercase" as const,
-  color: "#F97316",
-  letterSpacing: "0.12em",
-  fontWeight: 700,
-  mb: 2.5,
-};
-
 export default function Footer() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDark, footerBg, footerBottom, textPrimary, textMuted, textDisabled, textSecondary, border, socialBg, overlayBg, comingSoonBg, comingSoonBorder } = useThemeColors();
 
   // Hide footer on admin pages
   if (location.pathname.startsWith("/admin")) return null;
+
+  const headingSx = {
+    fontSize: "0.6875rem",
+    textTransform: "uppercase" as const,
+    color: "#F97316",
+    letterSpacing: "0.12em",
+    fontWeight: 700,
+    mb: 2.5,
+  };
+
+  const linkSx = {
+    color: textSecondary,
+    fontSize: "0.85rem",
+    textDecoration: "none",
+    display: "flex",
+    alignItems: "center",
+    gap: 0.5,
+    transition: "all 0.2s ease",
+    cursor: "pointer",
+    py: 0.5,
+    "&:hover": {
+      color: "#F97316",
+      transform: "translateX(4px)",
+      textDecoration: "none",
+    },
+  };
 
   return (
     <motion.footer
@@ -120,8 +121,8 @@ export default function Footer() {
       <Box
         component="footer"
         sx={{
-          background: "#060606",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
+          background: footerBg,
+          borderTop: `1px solid ${border}`,
         }}
       >
         {/* ── Upper Section ─────────────────── */}
@@ -153,7 +154,7 @@ export default function Footer() {
                 India's smartest flight booking platform
               </Typography>
 
-              <Typography sx={{ color: "#6B7280", fontSize: "0.85rem", lineHeight: 1.7, mb: 3, maxWidth: 280 }}>
+              <Typography sx={{ color: textMuted, fontSize: "0.85rem", lineHeight: 1.7, mb: 3, maxWidth: 280 }}>
                 Smart search, transparent pricing, and instant booking across 90+ Indian cities.
                 Your journey starts here.
               </Typography>
@@ -167,8 +168,8 @@ export default function Footer() {
                     sx={{
                       width: 36,
                       height: 36,
-                      background: "rgba(255,255,255,0.04)",
-                      color: "#9CA3AF",
+                      background: socialBg,
+                      color: textSecondary,
                       transition: "all 0.2s ease",
                       "&:hover": {
                         background: "rgba(249,115,22,0.15)",
@@ -209,7 +210,7 @@ export default function Footer() {
                   <Typography
                     key={link.label}
                     sx={{
-                      color: "#4B5563",
+                      color: textDisabled,
                       fontSize: "0.85rem",
                       display: "flex",
                       alignItems: "center",
@@ -233,11 +234,11 @@ export default function Footer() {
                   <Box key={item.label} sx={{ display: "flex", gap: 1.2, alignItems: "flex-start" }}>
                     <Box sx={{ mt: 0.3 }}>{item.icon}</Box>
                     <Box>
-                      <Typography sx={{ color: "#FFFFFF", fontSize: "0.875rem" }}>
+                      <Typography sx={{ color: textPrimary, fontSize: "0.875rem" }}>
                         {item.label}
                       </Typography>
                       {item.sub && (
-                        <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+                        <Typography sx={{ color: textMuted, fontSize: "0.75rem" }}>
                           {item.sub}
                         </Typography>
                       )}
@@ -250,7 +251,7 @@ export default function Footer() {
             {/* Column 5 — Download App */}
             <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <Typography sx={headingSx}>NovaWings App</Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.8rem", mb: 2 }}>
+              <Typography sx={{ color: textMuted, fontSize: "0.8rem", mb: 2 }}>
                 Coming soon on iOS and Android
               </Typography>
 
@@ -266,8 +267,8 @@ export default function Footer() {
                       display: "flex",
                       alignItems: "center",
                       gap: 1.2,
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: comingSoonBg,
+                      border: `1px solid ${comingSoonBorder}`,
                       borderRadius: "10px",
                       px: 2,
                       py: 1.2,
@@ -278,12 +279,12 @@ export default function Footer() {
                       "&:hover .coming-soon-overlay": { opacity: 1 },
                     }}
                   >
-                    <Box sx={{ color: "#9CA3AF" }}>{app.icon}</Box>
+                    <Box sx={{ color: textSecondary }}>{app.icon}</Box>
                     <Box>
-                      <Typography sx={{ color: "#6B7280", fontSize: "0.55rem", lineHeight: 1 }}>
+                      <Typography sx={{ color: textMuted, fontSize: "0.55rem", lineHeight: 1 }}>
                         GET IT ON
                       </Typography>
-                      <Typography sx={{ color: "#FFFFFF", fontSize: "0.75rem", fontWeight: 600, lineHeight: 1.2 }}>
+                      <Typography sx={{ color: textPrimary, fontSize: "0.75rem", fontWeight: 600, lineHeight: 1.2 }}>
                         {app.store}
                       </Typography>
                     </Box>
@@ -293,7 +294,7 @@ export default function Footer() {
                       sx={{
                         position: "absolute",
                         inset: 0,
-                        background: "rgba(10,10,10,0.85)",
+                        background: overlayBg,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -314,7 +315,7 @@ export default function Footer() {
         </Box>
 
         {/* ── Middle Section — Stats Ribbon ──── */}
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+        <Divider sx={{ borderColor: border }} />
         <Box
           sx={{
             background: "rgba(249,115,22,0.03)",
@@ -347,19 +348,19 @@ export default function Footer() {
                 >
                   {stat.value}
                 </Typography>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", fontWeight: 500 }}>
+                <Typography sx={{ color: textMuted, fontSize: "0.75rem", fontWeight: 500 }}>
                   {stat.label}
                 </Typography>
               </Box>
             ))}
           </Box>
         </Box>
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+        <Divider sx={{ borderColor: border }} />
 
         {/* ── Lower Section — Bottom Bar ────── */}
         <Box
           sx={{
-            background: "#040404",
+            background: footerBottom,
             py: 2.5,
           }}
         >
@@ -377,10 +378,10 @@ export default function Footer() {
           >
             {/* Left */}
             <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.75rem" }}>
+              <Typography sx={{ color: textDisabled, fontSize: "0.75rem" }}>
                 &copy; 2025 NovaWings. All rights reserved.
               </Typography>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5, justifyContent: { xs: "center", md: "flex-start" } }}>
+              <Typography sx={{ color: textDisabled, fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5, justifyContent: { xs: "center", md: "flex-start" } }}>
                 Made with <FavoriteIcon sx={{ fontSize: 12, color: "#EF4444" }} /> in India
               </Typography>
             </Box>
@@ -390,11 +391,11 @@ export default function Footer() {
               {BOTTOM_LINKS.map((link, idx) => (
                 <Box key={link} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   {idx > 0 && (
-                    <Typography sx={{ color: "#2a2a2a", fontSize: "0.75rem" }}>|</Typography>
+                    <Typography sx={{ color: isDark ? "#2a2a2a" : "#D1D5DB", fontSize: "0.75rem" }}>|</Typography>
                   )}
                   <MuiLink
                     sx={{
-                      color: "#4B5563",
+                      color: textDisabled,
                       fontSize: "0.75rem",
                       textDecoration: "none",
                       cursor: "pointer",

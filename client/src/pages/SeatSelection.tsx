@@ -178,21 +178,21 @@ export default function SeatSelection() {
           onClick={() => navigate(-1)}
           sx={{
             mb: 2,
-            color: "#9CA3AF",
+            color: "var(--nw-text-secondary)",
             textTransform: "none",
             fontWeight: 500,
             fontSize: "0.875rem",
             px: 0,
-            "&:hover": { color: "#F97316", background: "transparent" },
+            "&:hover": { color: "var(--nw-primary)", background: "transparent" },
           }}
         >
           Back
         </Button>
 
-        <Typography sx={{ fontSize: { xs: "1.5rem", md: "1.8rem" }, fontWeight: 800, color: "#FFFFFF", mb: 0.5 }}>
+        <Typography sx={{ fontSize: { xs: "1.5rem", md: "1.8rem" }, fontWeight: 800, color: "var(--nw-text-primary)", mb: 0.5 }}>
           Select Your Seats
         </Typography>
-        <Typography sx={{ color: "#6B7280", fontSize: "0.9rem", mb: 4 }}>
+        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.9rem", mb: 4 }}>
           Choose {numberOfSeats} seat{numberOfSeats > 1 ? "s" : ""} for your flight
         </Typography>
       </motion.div>
@@ -202,8 +202,8 @@ export default function SeatSelection() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
           <Paper
             sx={{
-              background: "#111111",
-              border: "1px solid rgba(255,255,255,0.06)",
+              background: "var(--nw-card)",
+              border: "1px solid var(--nw-border)",
               borderRadius: "20px",
               p: { xs: 3, sm: 5 },
               overflow: "hidden",
@@ -216,14 +216,14 @@ export default function SeatSelection() {
                   width: 60,
                   height: 60,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, rgba(249,115,22,0.15), rgba(249,115,22,0.05))",
-                  border: "1px solid rgba(249,115,22,0.2)",
+                  background: "linear-gradient(135deg, var(--nw-primary-15), rgba(249,115,22,0.05))",
+                  border: "1px solid var(--nw-primary-20)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <FlightIcon sx={{ color: "#F97316", fontSize: 28 }} />
+                <FlightIcon sx={{ color: "var(--nw-primary)", fontSize: 28 }} />
               </Box>
             </Box>
 
@@ -238,7 +238,7 @@ export default function SeatSelection() {
                     textAlign: "center",
                   }}
                 >
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600 }}>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600 }}>
                     {letter}
                   </Typography>
                 </Box>
@@ -258,7 +258,7 @@ export default function SeatSelection() {
                         textAlign: "center",
                         fontSize: "0.75rem",
                         fontWeight: 500,
-                        color: "#6B7280",
+                        color: "var(--nw-text-muted)",
                       }}
                     >
                       {rowIdx + 1}
@@ -267,30 +267,30 @@ export default function SeatSelection() {
                       const isSelected = selectedSeats.has(seat.id);
                       const isBookedSeat = seat.isBooked;
 
-                      let bg = "rgba(255,255,255,0.04)";
-                      let border = "1px solid rgba(255,255,255,0.08)";
-                      let color = "#9CA3AF";
+                      let bg = "var(--nw-border-soft)";
+                      let border = "1px solid var(--nw-border-strong)";
+                      let color = "var(--nw-text-secondary)";
                       let cursor = "pointer";
-                      let hoverBg = "rgba(249,115,22,0.1)";
+                      let hoverBg = "var(--nw-primary-10)";
                       let transform = "none";
 
                       if (isBookedSeat) {
-                        bg = "rgba(255,255,255,0.02)";
-                        border = "1px solid rgba(255,255,255,0.04)";
-                        color = "#374151";
+                        bg = "var(--nw-glass)";
+                        border = "1px solid var(--nw-border-soft)";
+                        color = "var(--nw-text-disabled)";
                         cursor = "not-allowed";
                         hoverBg = bg;
                       } else if (isSelected) {
-                        bg = "linear-gradient(135deg, #F97316, #EA580C)";
-                        border = "1px solid #F97316";
-                        color = "#FFFFFF";
+                        bg = "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))";
+                        border = "1px solid var(--nw-primary)";
+                        color = "var(--nw-text-primary)";
                         transform = "scale(1.08)";
                         hoverBg = bg;
                       } else if (isBizRow) {
-                        bg = "rgba(245,158,11,0.08)";
-                        border = "1px solid rgba(245,158,11,0.2)";
-                        color = "#F59E0B";
-                        hoverBg = "rgba(245,158,11,0.15)";
+                        bg = "var(--nw-warning-08)";
+                        border = "1px solid var(--nw-warning-20)";
+                        color = "var(--nw-secondary)";
+                        hoverBg = "var(--nw-warning-15)";
                       }
 
                       return (
@@ -337,17 +337,17 @@ export default function SeatSelection() {
 
             {/* Airplane tail */}
             <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-              <Box sx={{ width: 40, height: 2, background: "rgba(255,255,255,0.1)", borderRadius: 1 }} />
+              <Box sx={{ width: 40, height: 2, background: "var(--nw-border-strong)", borderRadius: 1 }} />
             </Box>
 
             {/* Legend */}
-            <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", my: 3 }} />
+            <Divider sx={{ borderColor: "var(--nw-border)", my: 3 }} />
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)" }, gap: 2 }}>
               {[
-                { bg: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.08)", label: "Available" },
-                { bg: "linear-gradient(135deg, #F97316, #EA580C)", border: "#F97316", label: "Selected" },
-                { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.2)", label: "Business" },
-                { bg: "rgba(255,255,255,0.02)", border: "rgba(255,255,255,0.04)", label: "Booked" },
+                { bg: "var(--nw-border-soft)", border: "var(--nw-border-strong)", label: "Available" },
+                { bg: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))", border: "var(--nw-primary)", label: "Selected" },
+                { bg: "var(--nw-warning-08)", border: "var(--nw-warning-20)", label: "Business" },
+                { bg: "var(--nw-glass)", border: "var(--nw-border-soft)", label: "Booked" },
               ].map((item) => (
                 <Box key={item.label} sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
                   <Box
@@ -360,7 +360,7 @@ export default function SeatSelection() {
                       flexShrink: 0,
                     }}
                   />
-                  <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem" }}>{item.label}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem" }}>{item.label}</Typography>
                 </Box>
               ))}
             </Box>
@@ -371,8 +371,8 @@ export default function SeatSelection() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
           <Paper
             sx={{
-              background: "#111111",
-              border: "1px solid rgba(255,255,255,0.06)",
+              background: "var(--nw-card)",
+              border: "1px solid var(--nw-border)",
               borderRadius: "20px",
               p: 3,
               position: "sticky",
@@ -380,7 +380,7 @@ export default function SeatSelection() {
             }}
           >
             {/* Flight summary */}
-            <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 2 }}>
+            <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--nw-primary)", fontWeight: 700, mb: 2 }}>
               Flight Summary
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2, mb: 3 }}>
@@ -390,10 +390,10 @@ export default function SeatSelection() {
                 { label: "Per Seat", value: `₹${flight.price.toLocaleString("en-IN")}`, highlight: true },
               ].map((item) => (
                 <Box key={item.label} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>{item.label}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>{item.label}</Typography>
                   <Typography
                     sx={{
-                      color: item.highlight ? "#F97316" : "#FFFFFF",
+                      color: item.highlight ? "var(--nw-primary)" : "var(--nw-text-primary)",
                       fontSize: "0.85rem",
                       fontWeight: item.highlight ? 700 : 500,
                     }}
@@ -404,14 +404,14 @@ export default function SeatSelection() {
               ))}
             </Box>
 
-            <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mb: 3 }} />
+            <Divider sx={{ borderColor: "var(--nw-border)", mb: 3 }} />
 
             {/* Selected seats */}
-            <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 1.5 }}>
+            <Typography sx={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--nw-primary)", fontWeight: 700, mb: 1.5 }}>
               Selected Seats
             </Typography>
             {selectedSeats.size === 0 ? (
-              <Typography sx={{ color: "#4B5563", fontSize: "0.85rem", fontStyle: "italic", mb: 1.5 }}>
+              <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.85rem", fontStyle: "italic", mb: 1.5 }}>
                 No seats selected yet
               </Typography>
             ) : (
@@ -422,9 +422,9 @@ export default function SeatSelection() {
                     label={seat}
                     size="small"
                     sx={{
-                      background: "rgba(249,115,22,0.1)",
-                      border: "1px solid rgba(249,115,22,0.2)",
-                      color: "#F97316",
+                      background: "var(--nw-primary-10)",
+                      border: "1px solid var(--nw-primary-20)",
+                      color: "var(--nw-primary)",
                       fontWeight: 700,
                       fontSize: "0.8rem",
                     }}
@@ -436,10 +436,10 @@ export default function SeatSelection() {
             {/* Progress bar */}
             <Box sx={{ mb: 3 }}>
               <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>
                   {selectedSeats.size}/{numberOfSeats} selected
                 </Typography>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>
                   {Math.round((selectedSeats.size / numberOfSeats) * 100)}%
                 </Typography>
               </Box>
@@ -449,41 +449,41 @@ export default function SeatSelection() {
                 sx={{
                   height: 6,
                   borderRadius: 3,
-                  background: "rgba(255,255,255,0.06)",
+                  background: "var(--nw-border)",
                   "& .MuiLinearProgress-bar": {
-                    background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                    background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))",
                     borderRadius: 3,
                   },
                 }}
               />
             </Box>
 
-            <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mb: 3 }} />
+            <Divider sx={{ borderColor: "var(--nw-border)", mb: 3 }} />
 
             {/* Price breakdown */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2, mb: 3 }}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Seat Price</Typography>
-                <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Seat Price</Typography>
+                <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem" }}>
                   ₹{flight.price.toLocaleString("en-IN")} × {numberOfSeats}
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Taxes & Fees (18%)</Typography>
-                <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{taxPrice.toLocaleString("en-IN")}</Typography>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Taxes & Fees (18%)</Typography>
+                <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem" }}>₹{taxPrice.toLocaleString("en-IN")}</Typography>
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>Convenience Fee</Typography>
-                <Typography sx={{ color: "#FFFFFF", fontSize: "0.85rem" }}>₹{convenienceFee.toLocaleString("en-IN")}</Typography>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>Convenience Fee</Typography>
+                <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "0.85rem" }}>₹{convenienceFee.toLocaleString("en-IN")}</Typography>
               </Box>
-              <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+              <Divider sx={{ borderColor: "var(--nw-border)" }} />
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
+                <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem" }}>Total</Typography>
                 <Typography
                   sx={{
                     fontWeight: 800,
                     fontSize: "1.2rem",
-                    background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                    background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -507,16 +507,16 @@ export default function SeatSelection() {
                 fontWeight: 700,
                 fontSize: "0.95rem",
                 background: isFull
-                  ? "linear-gradient(135deg, #F97316, #EA580C)"
-                  : "rgba(255,255,255,0.06)",
-                color: isFull ? "#FFFFFF" : "#4B5563",
+                  ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                  : "var(--nw-border)",
+                color: isFull ? "var(--nw-text-primary)" : "var(--nw-text-disabled)",
                 "&:hover": {
                   background: isFull
-                    ? "linear-gradient(135deg, #EA580C, #DC2626)"
-                    : "rgba(255,255,255,0.06)",
+                    ? "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-error))"
+                    : "var(--nw-border)",
                 },
                 "&.Mui-disabled": {
-                  color: "#4B5563",
+                  color: "var(--nw-text-disabled)",
                 },
                 mb: 2,
               }}
@@ -531,14 +531,14 @@ export default function SeatSelection() {
                 { icon: <VerifiedIcon sx={{ fontSize: 12 }} />, label: "Razorpay" },
               ].map((badge) => (
                 <Box key={badge.label} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Box sx={{ color: "#4B5563" }}>{badge.icon}</Box>
-                  <Typography sx={{ color: "#4B5563", fontSize: "0.7rem" }}>{badge.label}</Typography>
+                  <Box sx={{ color: "var(--nw-text-disabled)" }}>{badge.icon}</Box>
+                  <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.7rem" }}>{badge.label}</Typography>
                 </Box>
               ))}
             </Box>
 
             {!isFull && selectedSeats.size > 0 && (
-              <Typography sx={{ color: "#F59E0B", fontSize: "0.8rem", textAlign: "center", mt: 2 }}>
+              <Typography sx={{ color: "var(--nw-secondary)", fontSize: "0.8rem", textAlign: "center", mt: 2 }}>
                 Select {numberOfSeats - selectedSeats.size} more seat{numberOfSeats - selectedSeats.size > 1 ? "s" : ""}
               </Typography>
             )}
@@ -548,3 +548,7 @@ export default function SeatSelection() {
     </Box>
   );
 }
+
+
+
+

@@ -123,7 +123,7 @@ export default function BookingConfirmation() {
   if (!paymentResult && !booking) return <ErrorMessage message="Booking not found." />;
 
   // Confetti colors
-  const confettiColors = ["#F97316", "#F59E0B", "#EF4444", "#3B82F6", "#22C55E", "#A855F7", "#EC4899", "#06B6D4"];
+  const confettiColors = ["var(--nw-primary)", "var(--nw-secondary)", "var(--nw-error)", "var(--nw-info)", "var(--nw-success-bright)", "var(--nw-accent-violet)", "var(--nw-accent-pink)", "var(--nw-accent-cyan)"];
 
   return (
     <Box sx={{ minHeight: "100vh", py: { xs: 6, md: 10 }, px: { xs: 2, md: 3 } }}>
@@ -174,14 +174,14 @@ export default function BookingConfirmation() {
                     width: 88,
                     height: 88,
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05))",
-                    border: "2px solid rgba(34,197,94,0.3)",
+                    background: "linear-gradient(135deg, var(--nw-success-15), var(--nw-success-08))",
+                    border: "2px solid var(--nw-success-30)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <CheckCircleIcon sx={{ fontSize: 48, color: "#22C55E" }} />
+                  <CheckCircleIcon sx={{ fontSize: 48, color: "var(--nw-success-bright)" }} />
                 </Box>
               </motion.div>
             </Box>
@@ -195,13 +195,13 @@ export default function BookingConfirmation() {
                 sx={{
                   fontSize: { xs: "1.5rem", md: "2rem" },
                   fontWeight: 800,
-                  color: "#FFFFFF",
+                  color: "var(--nw-text-primary)",
                   mb: 1,
                 }}
               >
                 Payment Successful!
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.95rem" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.95rem" }}>
                 Your booking has been confirmed
               </Typography>
             </motion.div>
@@ -246,14 +246,14 @@ export default function BookingConfirmation() {
                 borderRadius: "14px",
                 fontWeight: 700,
                 fontSize: "0.95rem",
-                background: "linear-gradient(135deg, #F97316, #EA580C)",
-                boxShadow: "0 8px 30px rgba(249,115,22,0.3)",
+                background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
+                boxShadow: "0 8px 30px var(--nw-primary-30)",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #EA580C, #DC2626)",
+                  background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-error))",
                 },
                 "&.Mui-disabled": {
-                  background: "rgba(255,255,255,0.06)",
-                  color: "#4B5563",
+                  background: "var(--nw-border)",
+                  color: "var(--nw-text-disabled)",
                 },
               }}
             >
@@ -264,7 +264,7 @@ export default function BookingConfirmation() {
                       width: 18,
                       height: 18,
                       border: "2px solid rgba(255,255,255,0.3)",
-                      borderTop: "2px solid #FFFFFF",
+                      borderTop: "2px solid var(--nw-text-primary)",
                       borderRadius: "50%",
                       animation: "spin 1s linear infinite",
                       "@keyframes spin": { "100%": { transform: "rotate(360deg)" } },
@@ -288,12 +288,12 @@ export default function BookingConfirmation() {
                 borderRadius: "14px",
                 fontWeight: 600,
                 fontSize: "0.95rem",
-                borderColor: "rgba(255,255,255,0.12)",
-                color: "#9CA3AF",
+                borderColor: "var(--nw-border-strong)",
+                color: "var(--nw-text-secondary)",
                 "&:hover": {
-                  borderColor: "#F97316",
-                  color: "#F97316",
-                  background: "rgba(249,115,22,0.04)",
+                  borderColor: "var(--nw-primary)",
+                  color: "var(--nw-primary)",
+                  background: "var(--nw-primary-04)",
                 },
               }}
             >
@@ -307,12 +307,12 @@ export default function BookingConfirmation() {
               to="/my-bookings"
               startIcon={<ListAltIcon sx={{ fontSize: 18 }} />}
               sx={{
-                color: "#F97316",
+                color: "var(--nw-primary)",
                 fontSize: "0.85rem",
                 fontWeight: 500,
                 textTransform: "none",
                 "&:hover": {
-                  background: "rgba(249,115,22,0.06)",
+                  background: "var(--nw-primary-06)",
                 },
               }}
             >
@@ -324,3 +324,7 @@ export default function BookingConfirmation() {
     </Box>
   );
 }
+
+
+
+

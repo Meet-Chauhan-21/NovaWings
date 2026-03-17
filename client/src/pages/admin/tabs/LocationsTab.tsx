@@ -152,22 +152,22 @@ export default function LocationsTab() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, position: "relative" }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Typography variant="h5" sx={{ color: "#FFFFFF", fontWeight: 800 }}>Manage Locations</Typography>
+        <Typography variant="h5" sx={{ color: "var(--nw-text-primary)", fontWeight: 800 }}>Manage Locations</Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Button
             onClick={() => locRefreshCountsMutation.mutate()}
             disabled={locRefreshCountsMutation.isPending}
             variant="outlined"
             sx={{
-              color: "#9CA3AF",
-              borderColor: "rgba(255,255,255,0.1)",
+              color: "var(--nw-text-secondary)",
+              borderColor: "var(--nw-border-strong)",
               borderRadius: "12px",
               textTransform: "none",
               fontWeight: 600,
               fontSize: "0.85rem",
               px: 2.5,
               py: 1,
-              "&:hover": { borderColor: "rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.04)" },
+              "&:hover": { borderColor: "var(--nw-border-strong)", background: "var(--nw-border-soft)" },
               "&:disabled": { opacity: 0.5 },
             }}
           >
@@ -176,14 +176,14 @@ export default function LocationsTab() {
           <Button
             onClick={() => { setEditingLocation(null); resetLocForm(); setLocPanelOpen(true); }}
             sx={{
-              background: "linear-gradient(135deg, #F97316, #FB923C)",
-              color: "#FFFFFF",
+              background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-light))",
+              color: "var(--nw-text-primary)",
               borderRadius: "12px",
               textTransform: "none",
               fontWeight: 600,
               px: 3,
               py: 1,
-              "&:hover": { background: "linear-gradient(135deg, #EA580C, #F97316)" },
+              "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-primary))" },
             }}
           >
             + Add Location
@@ -193,26 +193,26 @@ export default function LocationsTab() {
 
       {/* Stats Row */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }, gap: 2 }}>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid #0EA5E9" }}>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Total</Typography>
-          <Typography sx={{ color: "#FFFFFF", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.length}</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid var(--nw-accent-blue)" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Total</Typography>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.length}</Typography>
         </Paper>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid #22C55E" }}>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active</Typography>
-          <Typography sx={{ color: "#FFFFFF", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.filter((l) => l.active).length}</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid var(--nw-success-bright)" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active</Typography>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.filter((l) => l.active).length}</Typography>
         </Paper>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid #A855F7" }}>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Metro</Typography>
-          <Typography sx={{ color: "#FFFFFF", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.filter((l) => l.type === "metro").length}</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid var(--nw-accent-violet)" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Metro</Typography>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.filter((l) => l.type === "metro").length}</Typography>
         </Paper>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid #F59E0B" }}>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>On Explore</Typography>
-          <Typography sx={{ color: "#FFFFFF", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.filter((l) => l.showOnExplore).length}</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 2.5, borderLeft: "4px solid var(--nw-secondary)" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>On Explore</Typography>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "1.5rem", fontWeight: 800, mt: 0.5 }}>{allLocations.filter((l) => l.showOnExplore).length}</Typography>
         </Paper>
       </Box>
 
       {/* Filter Bar */}
-      <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 2.5 }}>
+      <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 2.5 }}>
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(4, 1fr)" }, gap: 1.5 }}>
           <TextField
             size="small"
@@ -221,15 +221,15 @@ export default function LocationsTab() {
             onChange={(e) => setLocSearch(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-root": {
-                color: "#FFFFFF",
+                color: "var(--nw-text-primary)",
                 fontSize: "0.85rem",
                 borderRadius: "10px",
-                background: "rgba(255,255,255,0.03)",
-                "& fieldset": { borderColor: "rgba(255,255,255,0.08)" },
-                "&:hover fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                "&.Mui-focused fieldset": { borderColor: "#F97316" },
+                background: "var(--nw-glass)",
+                "& fieldset": { borderColor: "var(--nw-border-strong)" },
+                "&:hover fieldset": { borderColor: "var(--nw-border-strong)" },
+                "&.Mui-focused fieldset": { borderColor: "var(--nw-primary)" },
               },
-              "& .MuiOutlinedInput-input::placeholder": { color: "#6B7280", opacity: 1 },
+              "& .MuiOutlinedInput-input::placeholder": { color: "var(--nw-text-muted)", opacity: 1 },
             }}
           />
           <FormControl size="small">
@@ -237,14 +237,14 @@ export default function LocationsTab() {
               value={locTypeFilter}
               onChange={(e) => setLocTypeFilter(e.target.value as any)}
               sx={{
-                color: "#FFFFFF",
+                color: "var(--nw-text-primary)",
                 fontSize: "0.85rem",
                 borderRadius: "10px",
-                background: "rgba(255,255,255,0.03)",
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.08)" },
-                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.15)" },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#F97316" },
-                "& .MuiSvgIcon-root": { color: "#6B7280" },
+                background: "var(--nw-glass)",
+                "& .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
+                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-primary)" },
+                "& .MuiSvgIcon-root": { color: "var(--nw-text-muted)" },
               }}
             >
               <MenuItem value="all">All Types</MenuItem>
@@ -258,14 +258,14 @@ export default function LocationsTab() {
               value={locStatusFilter}
               onChange={(e) => setLocStatusFilter(e.target.value as any)}
               sx={{
-                color: "#FFFFFF",
+                color: "var(--nw-text-primary)",
                 fontSize: "0.85rem",
                 borderRadius: "10px",
-                background: "rgba(255,255,255,0.03)",
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.08)" },
-                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.15)" },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#F97316" },
-                "& .MuiSvgIcon-root": { color: "#6B7280" },
+                background: "var(--nw-glass)",
+                "& .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
+                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-border-strong)" },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "var(--nw-primary)" },
+                "& .MuiSvgIcon-root": { color: "var(--nw-text-muted)" },
               }}
             >
               <MenuItem value="all">All Status</MenuItem>
@@ -277,11 +277,11 @@ export default function LocationsTab() {
             <Button
               onClick={() => { setLocSearch(""); setLocTypeFilter("all"); setLocStatusFilter("all"); }}
               sx={{
-                color: "#F97316",
+                color: "var(--nw-primary)",
                 textTransform: "none",
                 fontWeight: 600,
                 fontSize: "0.85rem",
-                "&:hover": { background: "rgba(249,115,22,0.08)" },
+                "&:hover": { background: "var(--nw-primary-08)" },
               }}
             >
               Clear filters
@@ -295,29 +295,29 @@ export default function LocationsTab() {
         <LoadingSpinner />
       ) : (
         <>
-          <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", overflow: "hidden" }}>
+          <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", overflow: "hidden" }}>
             <Box sx={{ overflowX: "auto" }}>
               <table style={{ width: "100%", textAlign: "left" as const, fontSize: "0.85rem", borderCollapse: "collapse" as const }}>
                 <thead>
-                  <tr style={{ background: "rgba(255,255,255,0.03)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>#</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>City</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>State</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Country</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Code</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Airport</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Type</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Flights</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Explore</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Home</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Active</th>
-                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "#6B7280", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Actions</th>
+                  <tr style={{ background: "var(--nw-glass)", borderBottom: "1px solid var(--nw-border)" }}>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>#</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>City</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>State</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Country</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Code</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Airport</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Type</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Flights</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Explore</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Home</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em", textAlign: "center" as const }}>Active</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, color: "var(--nw-text-muted)", fontSize: "0.75rem", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedLocations.length === 0 ? (
                     <tr>
-                      <td colSpan={12} style={{ padding: "48px 24px", textAlign: "center" as const, color: "#4B5563" }}>
+                      <td colSpan={12} style={{ padding: "48px 24px", textAlign: "center" as const, color: "var(--nw-text-disabled)" }}>
                         No locations found
                       </td>
                     </tr>
@@ -325,29 +325,29 @@ export default function LocationsTab() {
                     paginatedLocations.map((loc, i) => {
                       const typeBadge =
                         loc.type === "metro"
-                          ? { background: "rgba(168,85,247,0.15)", color: "#C084FC" }
+                          ? { background: "rgba(168,85,247,0.15)", color: "var(--nw-accent-violet)" }
                           : loc.type === "city"
-                            ? { background: "rgba(59,130,246,0.15)", color: "#60A5FA" }
-                            : { background: "rgba(255,255,255,0.06)", color: "#9CA3AF" };
+                            ? { background: "rgba(59,130,246,0.15)", color: "var(--nw-info)" }
+                            : { background: "var(--nw-border)", color: "var(--nw-text-secondary)" };
                       return (
-                        <tr key={loc.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                          <td style={{ padding: "12px 16px", color: "#4B5563", fontSize: "0.75rem" }}>
+                        <tr key={loc.id} style={{ borderBottom: "1px solid var(--nw-border-soft)" }}>
+                          <td style={{ padding: "12px 16px", color: "var(--nw-text-disabled)", fontSize: "0.75rem" }}>
                             {(locPage - 1) * locPageSize + i + 1}
                           </td>
-                          <td style={{ padding: "12px 16px", color: "#FFFFFF", fontWeight: 500 }}>{loc.city}</td>
-                          <td style={{ padding: "12px 16px", color: "#9CA3AF" }}>{loc.state}</td>
-                          <td style={{ padding: "12px 16px", color: "#9CA3AF" }}>{loc.country}</td>
-                          <td style={{ padding: "12px 16px", fontFamily: "monospace", fontSize: "0.75rem", fontWeight: 700, color: "#FFFFFF" }}>{loc.airportCode}</td>
-                          <td style={{ padding: "12px 16px", color: "#9CA3AF", fontSize: "0.75rem" }}>{loc.airportName}</td>
+                          <td style={{ padding: "12px 16px", color: "var(--nw-text-primary)", fontWeight: 500 }}>{loc.city}</td>
+                          <td style={{ padding: "12px 16px", color: "var(--nw-text-secondary)" }}>{loc.state}</td>
+                          <td style={{ padding: "12px 16px", color: "var(--nw-text-secondary)" }}>{loc.country}</td>
+                          <td style={{ padding: "12px 16px", fontFamily: "monospace", fontSize: "0.75rem", fontWeight: 700, color: "var(--nw-text-primary)" }}>{loc.airportCode}</td>
+                          <td style={{ padding: "12px 16px", color: "var(--nw-text-secondary)", fontSize: "0.75rem" }}>{loc.airportName}</td>
                           <td style={{ padding: "12px 16px" }}>
                             <span style={{ ...typeBadge, borderRadius: "9999px", padding: "2px 10px", fontSize: "0.75rem", fontWeight: 500 }}>
                               {loc.type}
                             </span>
                           </td>
-                          <td style={{ padding: "12px 16px", textAlign: "center" as const, color: "#FFFFFF", fontWeight: 500 }}>
+                          <td style={{ padding: "12px 16px", textAlign: "center" as const, color: "var(--nw-text-primary)", fontWeight: 500 }}>
                             {loc.totalFlights ?? 0}
                             {loc.activeFlights != null && loc.activeFlights !== loc.totalFlights && (
-                              <span style={{ fontSize: "0.75rem", color: "#4B5563", marginLeft: "4px" }}>({loc.activeFlights})</span>
+                              <span style={{ fontSize: "0.75rem", color: "var(--nw-text-disabled)", marginLeft: "4px" }}>({loc.activeFlights})</span>
                             )}
                           </td>
                           <td style={{ padding: "12px 16px", textAlign: "center" as const }}>
@@ -385,8 +385,8 @@ export default function LocationsTab() {
                                 variant="outlined"
                                 size="small"
                                 sx={{
-                                  color: "#F97316",
-                                  borderColor: "rgba(249,115,22,0.3)",
+                                  color: "var(--nw-primary)",
+                                  borderColor: "var(--nw-primary-30)",
                                   textTransform: "none",
                                   fontWeight: 600,
                                   fontSize: "0.75rem",
@@ -394,7 +394,7 @@ export default function LocationsTab() {
                                   px: 1.5,
                                   py: 0.5,
                                   minWidth: "auto",
-                                  "&:hover": { borderColor: "#F97316", background: "rgba(249,115,22,0.08)" },
+                                  "&:hover": { borderColor: "var(--nw-primary)", background: "var(--nw-primary-08)" },
                                 }}
                               >
                                 Edit
@@ -408,8 +408,8 @@ export default function LocationsTab() {
                                 variant="outlined"
                                 size="small"
                                 sx={{
-                                  color: "#EF4444",
-                                  borderColor: "rgba(239,68,68,0.3)",
+                                  color: "var(--nw-error)",
+                                  borderColor: "var(--nw-error-30)",
                                   textTransform: "none",
                                   fontWeight: 600,
                                   fontSize: "0.75rem",
@@ -417,7 +417,7 @@ export default function LocationsTab() {
                                   px: 1.5,
                                   py: 0.5,
                                   minWidth: "auto",
-                                  "&:hover": { borderColor: "#EF4444", background: "rgba(239,68,68,0.08)" },
+                                  "&:hover": { borderColor: "var(--nw-error)", background: "var(--nw-error-08)" },
                                 }}
                               >
                                 Delete
@@ -451,63 +451,63 @@ export default function LocationsTab() {
         PaperProps={{
           sx: {
             width: 420,
-            background: "#111111",
-            borderLeft: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--nw-card)",
+            borderLeft: "1px solid var(--nw-border)",
           },
         }}
       >
-        <Box sx={{ p: 3, borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, background: "#111111", zIndex: 10 }}>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: "1.1rem" }}>
+        <Box sx={{ p: 3, borderBottom: "1px solid var(--nw-border)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, background: "var(--nw-card)", zIndex: 10 }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: "1.1rem" }}>
             {editingLocation ? "Edit Location" : "Add Location"}
           </Typography>
           <IconButton
             onClick={() => { setLocPanelOpen(false); setEditingLocation(null); }}
-            sx={{ color: "#6B7280", "&:hover": { color: "#FFFFFF" } }}
+            sx={{ color: "var(--nw-text-muted)", "&:hover": { color: "var(--nw-text-primary)" } }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
         <Box sx={{ p: 3, display: "flex", flexDirection: "column", gap: 2.5 }}>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>City *</Typography>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>City *</Typography>
             <input
               value={locForm.city}
               onChange={(e) => setLocForm({ ...locForm, city: e.target.value })}
-              style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "10px 14px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
             />
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>State *</Typography>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>State *</Typography>
             <input
               value={locForm.state}
               onChange={(e) => setLocForm({ ...locForm, state: e.target.value })}
-              style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "10px 14px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
             />
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Country</Typography>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Country</Typography>
             <input
               value={locForm.country}
               onChange={(e) => setLocForm({ ...locForm, country: e.target.value })}
-              style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "10px 14px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
             />
           </Box>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
             <Box>
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Airport Code *</Typography>
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Airport Code *</Typography>
               <input
                 value={locForm.airportCode}
                 onChange={(e) => setLocForm({ ...locForm, airportCode: e.target.value.toUpperCase() })}
                 maxLength={4}
-                style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, fontFamily: "monospace" }}
+                style={{ width: "100%", padding: "10px 14px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, fontFamily: "monospace" }}
               />
             </Box>
             <Box>
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Type</Typography>
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Type</Typography>
               <select
                 value={locForm.type}
                 onChange={(e) => setLocForm({ ...locForm, type: e.target.value as any })}
-                style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
+                style={{ width: "100%", padding: "10px 14px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
               >
                 <option value="metro">Metro</option>
                 <option value="city">City</option>
@@ -516,21 +516,21 @@ export default function LocationsTab() {
             </Box>
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Airport Name *</Typography>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Airport Name *</Typography>
             <input
               value={locForm.airportName}
               onChange={(e) => setLocForm({ ...locForm, airportName: e.target.value })}
-              style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "10px 14px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
             />
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Display Order</Typography>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Display Order</Typography>
             <input
               type="text"
               inputMode="numeric"
               value={locForm.displayOrder}
               onChange={(e) => setLocForm({ ...locForm, displayOrder: Number(e.target.value) || 0 })}
-              style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "10px 14px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const }}
             />
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1, pt: 1 }}>
@@ -539,33 +539,33 @@ export default function LocationsTab() {
                 <MuiCheckbox
                   checked={locForm.active}
                   onChange={(e) => setLocForm({ ...locForm, active: e.target.checked })}
-                  sx={{ color: "#6B7280", "&.Mui-checked": { color: "#F97316" } }}
+                  sx={{ color: "var(--nw-text-muted)", "&.Mui-checked": { color: "var(--nw-primary)" } }}
                 />
               }
               label="Active"
-              sx={{ color: "#9CA3AF" }}
+              sx={{ color: "var(--nw-text-secondary)" }}
             />
             <FormControlLabel
               control={
                 <MuiCheckbox
                   checked={locForm.showOnExplore}
                   onChange={(e) => setLocForm({ ...locForm, showOnExplore: e.target.checked })}
-                  sx={{ color: "#6B7280", "&.Mui-checked": { color: "#F97316" } }}
+                  sx={{ color: "var(--nw-text-muted)", "&.Mui-checked": { color: "var(--nw-primary)" } }}
                 />
               }
               label="Show on Explore page"
-              sx={{ color: "#9CA3AF" }}
+              sx={{ color: "var(--nw-text-secondary)" }}
             />
             <FormControlLabel
               control={
                 <MuiCheckbox
                   checked={locForm.showOnHome}
                   onChange={(e) => setLocForm({ ...locForm, showOnHome: e.target.checked })}
-                  sx={{ color: "#6B7280", "&.Mui-checked": { color: "#F97316" } }}
+                  sx={{ color: "var(--nw-text-muted)", "&.Mui-checked": { color: "var(--nw-primary)" } }}
                 />
               }
               label="Show on Home page"
-              sx={{ color: "#9CA3AF" }}
+              sx={{ color: "var(--nw-text-secondary)" }}
             />
           </Box>
           <Button
@@ -573,15 +573,15 @@ export default function LocationsTab() {
             disabled={locCreateMutation.isPending || locUpdateMutation.isPending}
             sx={{
               width: "100%",
-              background: "linear-gradient(135deg, #F97316, #FB923C)",
-              color: "#FFFFFF",
+              background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-light))",
+              color: "var(--nw-text-primary)",
               fontWeight: 700,
               py: 1.5,
               borderRadius: "12px",
               textTransform: "none",
               fontSize: "0.9rem",
               mt: 1,
-              "&:hover": { background: "linear-gradient(135deg, #EA580C, #F97316)" },
+              "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-primary))" },
               "&:disabled": { opacity: 0.5 },
             }}
           >
@@ -605,9 +605,13 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () =>
       onChange={onChange}
       size="small"
       sx={{
-        "& .MuiSwitch-switchBase.Mui-checked": { color: "#F97316" },
-        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "#F97316" },
+        "& .MuiSwitch-switchBase.Mui-checked": { color: "var(--nw-primary)" },
+        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "var(--nw-primary)" },
       }}
     />
   );
 }
+
+
+
+

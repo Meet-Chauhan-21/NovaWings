@@ -205,27 +205,27 @@ export default function CityCombobox({
       >
         {/* City info — 3-line design */}
         <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5, minWidth: 0, flex: 1 }}>
-          <Box sx={{ mt: 0.25, width: 28, height: 28, borderRadius: "6px", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Box sx={{ mt: 0.25, width: 28, height: 28, borderRadius: "6px", background: "var(--nw-glass)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             {loc.type === "metro"
-              ? <CorporateFareOutlinedIcon sx={{ fontSize: 14, color: "#9CA3AF" }} />
-              : <LocationCityOutlinedIcon sx={{ fontSize: 14, color: "#6B7280" }} />
+              ? <CorporateFareOutlinedIcon sx={{ fontSize: 14, color: "var(--nw-text-secondary)" }} />
+              : <LocationCityOutlinedIcon sx={{ fontSize: 14, color: "var(--nw-text-muted)" }} />
             }
           </Box>
           <Box sx={{ minWidth: 0 }}>
             {/* Line 1: City name */}
-            <Typography sx={{ color: isActive || isSelected ? "#FFFFFF" : "#E5E7EB", fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {loc.city}
             </Typography>
             {/* Line 2: State + country + flight count */}
-            <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {loc.state}, {loc.country}
               {loc.activeFlights ? (
-                <Box component="span" sx={{ ml: 0.75, color: "#4B5563" }}>· {loc.activeFlights} flights</Box>
+                <Box component="span" sx={{ ml: 0.75, color: "var(--nw-text-disabled)" }}>· {loc.activeFlights} flights</Box>
               ) : null}
             </Typography>
             {/* Line 3: Airport name */}
             {loc.airportName && (
-              <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", mt: 0.125 }}>
+              <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.6875rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", mt: 0.125 }}>
                 {loc.airportName}
               </Typography>
             )}
@@ -258,7 +258,7 @@ export default function CityCombobox({
         <Typography
           component="label"
           className={labelClassName}
-          sx={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6B7280", mb: 0.75, textTransform: "uppercase", letterSpacing: "0.06em" }}
+          sx={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "var(--nw-text-muted)", mb: 0.75, textTransform: "uppercase", letterSpacing: "0.06em" }}
         >
           {label}
         </Typography>
@@ -269,8 +269,8 @@ export default function CityCombobox({
         sx={{
           display: "flex",
           alignItems: "center",
-          background: "#1a1a1a",
-          border: focused ? "1px solid rgba(249,115,22,0.7)" : "1px solid rgba(255,255,255,0.1)",
+          background: "var(--nw-elevated)",
+          border: focused ? "1px solid rgba(249,115,22,0.7)" : "1px solid var(--nw-border-strong)",
           borderRadius: "12px",
           px: 1.5,
           gap: 1,
@@ -301,7 +301,7 @@ export default function CityCombobox({
             setTimeout(() => setInputValue(value), 200);
           }}
           onKeyDown={handleKeyDown}
-          sx={{ flex: 1, "& input": { color: "#FFFFFF", fontSize: "0.9375rem", fontWeight: 500, padding: "16px 0", "&::placeholder": { color: "#6B7280" } } }}
+          sx={{ flex: 1, "& input": { color: "var(--nw-text-primary)", fontSize: "0.9375rem", fontWeight: 500, padding: "16px 0", "&::placeholder": { color: "var(--nw-text-muted)", opacity: 1 } } }}
         />
 
         {isLoading && <CircularProgress size={14} sx={{ color: "#F97316", flexShrink: 0 }} />}
@@ -311,7 +311,7 @@ export default function CityCombobox({
             size="small"
             onClick={() => { setInputValue(""); onChange(""); setIsOpen(false); }}
             tabIndex={-1}
-            sx={{ color: "#4B5563", "&:hover": { color: "#EF4444" }, p: 0.25 }}
+            sx={{ color: "var(--nw-text-muted)", "&:hover": { color: "#EF4444" }, p: 0.25 }}
           >
             <CloseIcon sx={{ fontSize: 14 }} />
           </IconButton>
@@ -321,7 +321,7 @@ export default function CityCombobox({
           size="small"
           onClick={() => setIsOpen(!isOpen)}
           tabIndex={-1}
-          sx={{ color: "#4B5563", p: 0.25 }}
+          sx={{ color: "var(--nw-text-muted)", p: 0.25 }}
         >
           <ExpandMoreIcon sx={{ fontSize: 16, transition: "transform 0.2s ease", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
         </IconButton>
@@ -338,12 +338,12 @@ export default function CityCombobox({
             mt: 0.75,
             width: "100%",
             minWidth: 300,
-            background: "#161616",
+            background: "var(--nw-card)",
             border: "1px solid rgba(249,115,22,0.25)",
             borderRadius: "14px",
             maxHeight: 320,
             overflowY: "auto",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.6), 0 4px 16px rgba(249,115,22,0.08)",
+            boxShadow: "0 12px 32px rgba(15,23,42,0.16), 0 4px 16px rgba(249,115,22,0.08)",
             "&::-webkit-scrollbar": { width: "4px" },
             "&::-webkit-scrollbar-track": { background: "transparent" },
             "&::-webkit-scrollbar-thumb": { background: "#F97316", borderRadius: "2px" },
@@ -351,8 +351,8 @@ export default function CityCombobox({
         >
           {/* Popular header */}
           {debouncedInput.length < 2 && filtered.length > 0 && (
-            <Box sx={{ px: 2, py: 1, borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <Box sx={{ px: 2, py: 1, borderBottom: "1px solid var(--nw-border-soft)", background: "var(--nw-glass)" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 Popular Cities
               </Typography>
             </Box>
@@ -361,8 +361,8 @@ export default function CityCombobox({
           {/* Metro Cities */}
           {metros.length > 0 && (
             <>
-              <Box sx={{ px: 2, py: 0.75, background: "rgba(255,255,255,0.015)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <Box sx={{ px: 2, py: 0.75, background: "var(--nw-glass)", borderBottom: "1px solid var(--nw-border-soft)" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Metro Cities
                 </Typography>
               </Box>
@@ -373,8 +373,8 @@ export default function CityCombobox({
           {/* Other Cities */}
           {others.length > 0 && (
             <>
-              <Box sx={{ px: 2, py: 0.75, background: "rgba(255,255,255,0.015)", borderTop: "1px solid rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <Box sx={{ px: 2, py: 0.75, background: "var(--nw-glass)", borderTop: "1px solid var(--nw-border-soft)", borderBottom: "1px solid var(--nw-border-soft)" }}>
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Other Cities
                 </Typography>
               </Box>
@@ -385,10 +385,10 @@ export default function CityCombobox({
           {/* No results */}
           {filtered.length === 0 && inputValue && (
             <Box sx={{ px: 3, py: 4, textAlign: "center" }}>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.875rem" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.875rem" }}>
                 No city found for "{inputValue}"
               </Typography>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.75rem", mt: 0.5 }}>
+              <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem", mt: 0.5 }}>
                 Admin can add new cities from the dashboard
               </Typography>
             </Box>
@@ -397,7 +397,7 @@ export default function CityCombobox({
           {/* Empty hint */}
           {filtered.length === 0 && !inputValue && (
             <Box sx={{ px: 3, py: 3, textAlign: "center" }}>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.875rem" }}>
+              <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.875rem" }}>
                 Start typing to search cities…
               </Typography>
             </Box>

@@ -6,6 +6,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toaster } from "react-hot-toast";
+import { useTheme } from "@mui/material/styles";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -39,8 +40,9 @@ const EditFlight = lazy(() => import("./pages/admin/EditFlight"));
  */
 function AppContent() {
   const location = useLocation();
+  const theme = useTheme();
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: theme.palette.background.default }}>
       <Navbar />
       <ScrollToTop />
 
@@ -98,29 +100,37 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              borderRadius: "12px",
-              padding: "14px 20px",
-              fontSize: "14px",
-              background: "#111111",
-              color: "#FFFFFF",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 8px 30px rgba(0,0,0,0.4)",
-            },
-            success: {
-              iconTheme: { primary: "#10b981", secondary: "#fff" },
-            },
-            error: {
-              iconTheme: { primary: "#ef4444", secondary: "#fff" },
-            },
-          }}
-        />
+        <ThemedToaster />
         <AppContent />
       </AuthProvider>
     </BrowserRouter>
+  );
+}
+
+function ThemedToaster() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+  return (
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 3000,
+        style: {
+          borderRadius: "12px",
+          padding: "14px 20px",
+          fontSize: "14px",
+          background: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+          boxShadow: isDark ? "0 8px 30px rgba(0,0,0,0.4)" : "0 8px 30px rgba(0,0,0,0.1)",
+        },
+        success: {
+          iconTheme: { primary: "#10b981", secondary: "#fff" },
+        },
+        error: {
+          iconTheme: { primary: "#ef4444", secondary: "#fff" },
+        },
+      }}
+    />
   );
 }

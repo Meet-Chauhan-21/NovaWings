@@ -64,7 +64,7 @@ export default function BookingsTab({
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box>
-        <Typography sx={{ fontSize: "1.5rem", fontWeight: 700, color: "#FFFFFF", mb: 2 }}>
+        <Typography sx={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--nw-text-primary)", mb: 2 }}>
           All Bookings
         </Typography>
 
@@ -79,14 +79,14 @@ export default function BookingsTab({
               onChange={(e) => setSearchTerm(e.target.value)}
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  background: "rgba(255,255,255,0.04)",
+                  background: "var(--nw-border-soft)",
                   borderRadius: "12px",
-                  color: "#FFFFFF",
-                  "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
-                  "&:hover fieldset": { borderColor: "rgba(249,115,22,0.4)" },
-                  "&.Mui-focused fieldset": { borderColor: "#F97316" },
+                  color: "var(--nw-text-primary)",
+                  "& fieldset": { borderColor: "var(--nw-border-strong)" },
+                  "&:hover fieldset": { borderColor: "var(--nw-primary-40)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--nw-primary)" },
                 },
-                "& .MuiOutlinedInput-input::placeholder": { color: "#6B7280", opacity: 1 },
+                "& .MuiOutlinedInput-input::placeholder": { color: "var(--nw-text-muted)", opacity: 1 },
               }}
             />
           </Box>
@@ -99,14 +99,14 @@ export default function BookingsTab({
               onChange={(e) => setBookingUserSearch(e.target.value)}
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  background: "rgba(255,255,255,0.04)",
+                  background: "var(--nw-border-soft)",
                   borderRadius: "12px",
-                  color: "#FFFFFF",
-                  "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
-                  "&:hover fieldset": { borderColor: "rgba(249,115,22,0.4)" },
-                  "&.Mui-focused fieldset": { borderColor: "#F97316" },
+                  color: "var(--nw-text-primary)",
+                  "& fieldset": { borderColor: "var(--nw-border-strong)" },
+                  "&:hover fieldset": { borderColor: "var(--nw-primary-40)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--nw-primary)" },
                 },
-                "& .MuiOutlinedInput-input::placeholder": { color: "#6B7280", opacity: 1 },
+                "& .MuiOutlinedInput-input::placeholder": { color: "var(--nw-text-muted)", opacity: 1 },
               }}
             />
           </Box>
@@ -119,15 +119,15 @@ export default function BookingsTab({
                 sx={
                   seatFilter === status
                     ? {
-                        background: "rgba(249,115,22,0.15)",
-                        color: "#F97316",
-                        border: "1px solid rgba(249,115,22,0.3)",
+                        background: "var(--nw-primary-15)",
+                        color: "var(--nw-primary)",
+                        border: "1px solid var(--nw-primary-30)",
                         fontWeight: 600,
                         cursor: "pointer",
                       }
                     : {
-                        background: "rgba(255,255,255,0.04)",
-                        color: "#6B7280",
+                        background: "var(--nw-border-soft)",
+                        color: "var(--nw-text-muted)",
                         cursor: "pointer",
                       }
                 }
@@ -137,13 +137,13 @@ export default function BookingsTab({
         </Box>
       </Box>
 
-      <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", overflow: "hidden" }}>
+      <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", overflow: "hidden" }}>
         <Box sx={{ overflowX: "auto" }}>
           <table style={{ width: "100%", textAlign: "left", fontSize: "0.875rem", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,0.03)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <tr style={{ background: "var(--nw-glass)", borderBottom: "1px solid var(--nw-border)" }}>
                 {["ID", "Booked By", "Email", "Flight", "Route", "Seats", "Total", "Status", "Date"].map((h) => (
-                  <th key={h} style={{ padding: "12px 24px", fontWeight: 600, color: "#9CA3AF", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
+                  <th key={h} style={{ padding: "12px 24px", fontWeight: 600, color: "var(--nw-text-secondary)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -151,14 +151,14 @@ export default function BookingsTab({
               {paginatedBookings.map((booking) => {
                 const bookedByUser = userMap.get(booking.userId);
                 const roleBadgeStyle = bookedByUser?.role === "ADMIN"
-                  ? { background: "rgba(168,85,247,0.15)", color: "#A855F7", border: "1px solid rgba(168,85,247,0.3)" }
-                  : { background: "rgba(56,189,248,0.15)", color: "#38BDF8", border: "1px solid rgba(56,189,248,0.3)" };
+                  ? { background: "rgba(168,85,247,0.15)", color: "var(--nw-accent-violet)", border: "1px solid rgba(168,85,247,0.3)" }
+                  : { background: "rgba(56,189,248,0.15)", color: "var(--nw-accent-sky)", border: "1px solid rgba(56,189,248,0.3)" };
                 return (
-                  <tr key={booking.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", transition: "background 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.03)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
-                    <td style={{ padding: "12px 24px", fontFamily: "monospace", fontSize: "0.75rem", color: "#9CA3AF" }}>#{booking.id.slice(0, 8)}</td>
+                  <tr key={booking.id} style={{ borderBottom: "1px solid var(--nw-border-soft)", transition: "background 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "var(--nw-glass)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                    <td style={{ padding: "12px 24px", fontFamily: "monospace", fontSize: "0.75rem", color: "var(--nw-text-secondary)" }}>#{booking.id.slice(0, 8)}</td>
                     <td style={{ padding: "12px 24px" }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography sx={{ fontWeight: 500, color: "#FFFFFF", fontSize: "0.875rem" }}>
+                        <Typography sx={{ fontWeight: 500, color: "var(--nw-text-primary)", fontSize: "0.875rem" }}>
                           {bookedByUser?.name || `User #${booking.userId.slice(0, 6)}`}
                         </Typography>
                         {bookedByUser && (
@@ -168,15 +168,15 @@ export default function BookingsTab({
                         )}
                       </Box>
                     </td>
-                    <td style={{ padding: "12px 24px", color: "#6B7280", fontSize: "0.75rem" }}>
+                    <td style={{ padding: "12px 24px", color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>
                       {bookedByUser?.email || "\u2014"}
                     </td>
-                    <td style={{ padding: "12px 24px", fontFamily: "monospace", fontSize: "0.75rem", color: "#9CA3AF" }}>{booking.flightNumber}</td>
-                    <td style={{ padding: "12px 24px", color: "#D1D5DB" }}>
+                    <td style={{ padding: "12px 24px", fontFamily: "monospace", fontSize: "0.75rem", color: "var(--nw-text-secondary)" }}>{booking.flightNumber}</td>
+                    <td style={{ padding: "12px 24px", color: "var(--nw-text-secondary)" }}>
                       {booking.source} → {booking.destination}
                     </td>
-                    <td style={{ padding: "12px 24px", color: "#D1D5DB" }}>{booking.numberOfSeats}</td>
-                    <td style={{ padding: "12px 24px", fontWeight: 700, color: "#F97316", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "12px 24px", color: "var(--nw-text-secondary)" }}>{booking.numberOfSeats}</td>
+                    <td style={{ padding: "12px 24px", fontWeight: 700, color: "var(--nw-primary)", whiteSpace: "nowrap" }}>
                       ₹{booking.totalPrice.toLocaleString("en-IN")}
                     </td>
                     <td style={{ padding: "12px 24px" }}>
@@ -186,7 +186,7 @@ export default function BookingsTab({
                         onSaved={handleBookingStatusSaved}
                       />
                     </td>
-                    <td style={{ padding: "12px 24px", color: "#6B7280" }}>
+                    <td style={{ padding: "12px 24px", color: "var(--nw-text-muted)" }}>
                       {new Date(booking.bookingDate).toLocaleDateString("en-IN")}
                     </td>
                   </tr>
@@ -206,3 +206,6 @@ export default function BookingsTab({
     </Box>
   );
 }
+
+
+

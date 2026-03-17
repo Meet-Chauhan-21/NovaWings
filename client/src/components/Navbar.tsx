@@ -1,10 +1,12 @@
 // src/components/Navbar.tsx
-// Top navigation bar with links, auth state awareness, and responsive drawer menu
+// Top navigation bar with links, auth state awareness, theme toggle, and responsive drawer
 
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
+import { useThemeContext } from "../context/ThemeContext";
 import { isAdmin } from "../utils/roleHelper";
+import { useTheme } from "@mui/material/styles";
 
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -22,6 +24,7 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Tooltip from "@mui/material/Tooltip";
 
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
@@ -32,6 +35,8 @@ import FlightIcon from "@mui/icons-material/Flight";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 
 // ── Nav links ────────────────────────────
 const NAV_LINKS = [
@@ -42,9 +47,12 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const { user, logout } = useAuthContext();
+  const { mode, toggleTheme } = useThemeContext();
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const userIsAdmin = isAdmin(user?.role);
+  const isDark = mode === "dark";
 
   // ── Mobile drawer ────────────────────────
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -84,18 +92,26 @@ export default function Navbar() {
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || "U";
 
+  // ── Theme-aware colors ───────────────────
+  const navBg = scrolled
+    ? isDark ? "rgba(10,10,10,0.95)" : "rgba(255,255,255,0.95)"
+    : isDark ? "rgba(10,10,10,0.85)" : "rgba(255,255,255,0.85)";
+  const borderColor = scrolled
+    ? "rgba(249,115,22,0.15)"
+    : isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+  const textSecondary = theme.palette.text.secondary;
+  const textMuted = isDark ? "#8892A0" : "#7A8290";
+
   return (
     <>
       <AppBar
         position="fixed"
         elevation={0}
         sx={{
-          background: scrolled ? "rgba(10,10,10,0.95)" : "rgba(10,10,10,0.85)",
+          background: navBg,
           backdropFilter: "blur(24px)",
           WebkitBackdropFilter: "blur(24px)",
-          borderBottom: scrolled
-            ? "1px solid rgba(249,115,22,0.15)"
-            : "1px solid rgba(255,255,255,0.06)",
+          borderBottom: `1px solid ${borderColor}`,
           height: 70,
           transition: "all 0.3s ease",
         }}
@@ -139,7 +155,7 @@ export default function Navbar() {
               <Typography
                 sx={{
                   fontSize: "0.6rem",
-                  color: "#6B7280",
+                  color: textMuted,
                   letterSpacing: "0.08em",
                   lineHeight: 1,
                   display: { xs: "none", md: "block" },
@@ -163,28 +179,24 @@ export default function Navbar() {
             {NAV_LINKS.map((link) => (
               <Box
                 key={link.label}
-                onClick={() => !link.comingSoon && handleNavigate(link.path)}
+                onClick={() => handleNavigate(link.path)}
                 sx={{
                   position: "relative",
-                  cursor: link.comingSoon ? "default" : "pointer",
-                  opacity: link.comingSoon ? 0.4 : 1,
+                  cursor: "pointer",
                   py: 0.5,
                 }}
               >
                 <Typography
                   variant="body2"
                   sx={{
-                    color: isActive(link.path) ? "#F97316" : "#9CA3AF",
+                    color: isActive(link.path) ? "#F97316" : textSecondary,
                     fontWeight: isActive(link.path) ? 600 : 400,
                     transition: "color 0.2s ease",
-                    "&:hover": {
-                      color: link.comingSoon ? "#9CA3AF" : "#F97316",
-                    },
+                    "&:hover": { color: "#F97316" },
                   }}
                 >
                   {link.label}
                 </Typography>
-                {/* Underline */}
                 <Box
                   sx={{
                     position: "absolute",
@@ -195,13 +207,6 @@ export default function Navbar() {
                     background: "linear-gradient(90deg, #F97316, #F59E0B)",
                     borderRadius: 1,
                     transition: "width 0.2s ease",
-                    ...(link.comingSoon
-                      ? {}
-                      : {
-                          ".MuiBox-root:hover > &": {
-                            width: "100%",
-                          },
-                        }),
                   }}
                 />
               </Box>
@@ -215,7 +220,7 @@ export default function Navbar() {
                 <Typography
                   variant="body2"
                   sx={{
-                    color: isActive("/admin") ? "#F97316" : "#9CA3AF",
+                    color: isActive("/admin") ? "#F97316" : textSecondary,
                     fontWeight: isActive("/admin") ? 600 : 400,
                     transition: "color 0.2s ease",
                     "&:hover": { color: "#F97316" },
@@ -240,7 +245,29 @@ export default function Navbar() {
           </Box>
 
           {/* ── Right Side (desktop) ──────────── */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1.5 }}>
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
+            {/* Theme Toggle */}
+            <Tooltip title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}>
+              <IconButton
+                onClick={toggleTheme}
+                sx={{
+                  color: textSecondary,
+                  width: 40,
+                  height: 40,
+                  border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                  borderRadius: "10px",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: "#F97316",
+                    borderColor: "rgba(249,115,22,0.3)",
+                    background: "rgba(249,115,22,0.08)",
+                  },
+                }}
+              >
+                {isDark ? <LightModeOutlinedIcon sx={{ fontSize: 20 }} /> : <DarkModeOutlinedIcon sx={{ fontSize: 20 }} />}
+              </IconButton>
+            </Tooltip>
+
             {!user ? (
               <>
                 <Button
@@ -263,7 +290,7 @@ export default function Navbar() {
             ) : (
               <>
                 {/* Notifications */}
-                <IconButton sx={{ color: "#9CA3AF", "&:hover": { color: "#F97316" } }}>
+                <IconButton sx={{ color: textSecondary, "&:hover": { color: "#F97316" } }}>
                   <Badge
                     badgeContent={2}
                     sx={{
@@ -305,8 +332,8 @@ export default function Navbar() {
                   slotProps={{
                     paper: {
                       sx: {
-                        background: "#111111",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: theme.palette.background.paper,
+                        border: `1px solid ${theme.palette.divider}`,
                         borderRadius: "14px",
                         minWidth: 220,
                         p: 1,
@@ -317,18 +344,17 @@ export default function Navbar() {
                 >
                   {/* User info header */}
                   <Box sx={{ px: 2, py: 1.2 }}>
-                    <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.9rem" }}>
+                    <Typography sx={{ color: theme.palette.text.primary, fontWeight: 600, fontSize: "0.9rem" }}>
                       {user.name}
                     </Typography>
-                    <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+                    <Typography sx={{ color: textMuted, fontSize: "0.75rem" }}>
                       {user.email}
                     </Typography>
                   </Box>
-                  <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.06)" }} />
+                  <Divider sx={{ my: 0.5 }} />
 
-                  {/* Menu items */}
                   <MenuItem disabled sx={{ opacity: 0.4, borderRadius: "8px" }}>
-                    <PersonOutlineIcon sx={{ fontSize: 20, mr: 1.5, color: "#9CA3AF" }} />
+                    <PersonOutlineIcon sx={{ fontSize: 20, mr: 1.5, color: textSecondary }} />
                     <Typography variant="body2">My Profile</Typography>
                   </MenuItem>
 
@@ -336,16 +362,16 @@ export default function Navbar() {
                     onClick={() => handleNavigate("/my-bookings")}
                     sx={{ borderRadius: "8px" }}
                   >
-                    <FlightIcon sx={{ fontSize: 20, mr: 1.5, color: "#9CA3AF" }} />
+                    <FlightIcon sx={{ fontSize: 20, mr: 1.5, color: textSecondary }} />
                     <Typography variant="body2">My Bookings</Typography>
                   </MenuItem>
 
                   <MenuItem disabled sx={{ opacity: 0.4, borderRadius: "8px" }}>
-                    <SettingsOutlinedIcon sx={{ fontSize: 20, mr: 1.5, color: "#9CA3AF" }} />
+                    <SettingsOutlinedIcon sx={{ fontSize: 20, mr: 1.5, color: textSecondary }} />
                     <Typography variant="body2">Settings</Typography>
                   </MenuItem>
 
-                  <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.06)" }} />
+                  <Divider sx={{ my: 0.5 }} />
 
                   <MenuItem onClick={handleLogout} sx={{ borderRadius: "8px" }}>
                     <LogoutIcon sx={{ fontSize: 20, mr: 1.5, color: "#EF4444" }} />
@@ -358,17 +384,24 @@ export default function Navbar() {
             )}
           </Box>
 
-          {/* ── Mobile Hamburger ──────────────── */}
-          <IconButton
-            onClick={toggleDrawer}
-            sx={{
-              display: { xs: "flex", md: "none" },
-              ml: "auto",
-              color: "#9CA3AF",
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
+          {/* ── Mobile Right Side ──────────────── */}
+          <Box sx={{ display: { xs: "flex", md: "none" }, ml: "auto", alignItems: "center", gap: 0.5 }}>
+            <Tooltip title={isDark ? "Light Mode" : "Dark Mode"}>
+              <IconButton
+                onClick={toggleTheme}
+                sx={{
+                  color: textSecondary,
+                  width: 36,
+                  height: 36,
+                }}
+              >
+                {isDark ? <LightModeOutlinedIcon sx={{ fontSize: 20 }} /> : <DarkModeOutlinedIcon sx={{ fontSize: 20 }} />}
+              </IconButton>
+            </Tooltip>
+            <IconButton onClick={toggleDrawer} sx={{ color: textSecondary }}>
+              <MenuIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -383,8 +416,8 @@ export default function Navbar() {
         PaperProps={{
           sx: {
             width: 280,
-            background: "#0F0F0F",
-            borderRight: "1px solid rgba(255,255,255,0.06)",
+            background: theme.palette.background.default,
+            borderRight: `1px solid ${theme.palette.divider}`,
           },
         }}
       >
@@ -405,24 +438,23 @@ export default function Navbar() {
               NovaWings
             </Typography>
           </Box>
-          <IconButton onClick={toggleDrawer} sx={{ color: "#6B7280" }}>
+          <IconButton onClick={toggleDrawer} sx={{ color: textMuted }}>
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
 
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+        <Divider />
 
         {/* Nav Links */}
         <List sx={{ px: 1.5, py: 1 }}>
           {NAV_LINKS.map((link) => (
             <ListItemButton
               key={link.label}
-              disabled={link.comingSoon}
               onClick={() => handleNavigate(link.path)}
               sx={{
                 borderRadius: "10px",
                 mb: 0.5,
-                color: isActive(link.path) ? "#F97316" : "#9CA3AF",
+                color: isActive(link.path) ? "#F97316" : textSecondary,
                 "&:hover": { background: "rgba(249,115,22,0.08)" },
               }}
             >
@@ -439,7 +471,7 @@ export default function Navbar() {
               sx={{
                 borderRadius: "10px",
                 mb: 0.5,
-                color: isActive("/admin") ? "#F97316" : "#9CA3AF",
+                color: isActive("/admin") ? "#F97316" : textSecondary,
                 "&:hover": { background: "rgba(249,115,22,0.08)" },
               }}
             >
@@ -454,7 +486,7 @@ export default function Navbar() {
           )}
         </List>
 
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mx: 2 }} />
+        <Divider sx={{ mx: 2 }} />
 
         {/* Auth section */}
         <Box sx={{ p: 2 }}>
@@ -493,10 +525,10 @@ export default function Navbar() {
                   {userInitial}
                 </Avatar>
                 <Box>
-                  <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", lineHeight: 1.2 }}>
+                  <Typography sx={{ color: theme.palette.text.primary, fontWeight: 600, fontSize: "0.85rem", lineHeight: 1.2 }}>
                     {user.name}
                   </Typography>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                  <Typography sx={{ color: textMuted, fontSize: "0.7rem" }}>
                     {user.email}
                   </Typography>
                 </Box>
@@ -505,7 +537,7 @@ export default function Navbar() {
               <List sx={{ p: 0 }}>
                 <ListItemButton
                   onClick={() => handleNavigate("/my-bookings")}
-                  sx={{ borderRadius: "10px", mb: 0.5, color: "#9CA3AF", "&:hover": { background: "rgba(249,115,22,0.08)" } }}
+                  sx={{ borderRadius: "10px", mb: 0.5, color: textSecondary, "&:hover": { background: "rgba(249,115,22,0.08)" } }}
                 >
                   <ListItemIcon sx={{ minWidth: 36, color: "inherit" }}>
                     <FlightIcon sx={{ fontSize: 20 }} />

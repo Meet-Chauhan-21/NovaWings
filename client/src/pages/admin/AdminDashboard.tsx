@@ -127,14 +127,14 @@ export default function AdminDashboard() {
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", background: "#0A0A0A" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", background: "var(--nw-bg)" }}>
       {/* ─── LEFT SIDEBAR ─── */}
       <Box
         component="aside"
         sx={{
           width: 240,
-          background: "#0A0A0A",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--nw-bg)",
+          borderRight: "1px solid var(--nw-border)",
           position: "fixed",
           top: "70px",
           height: "calc(100vh - 70px)",
@@ -167,12 +167,12 @@ export default function AdminDashboard() {
                 textTransform: "none",
                 fontWeight: activeTab === tab.id ? 700 : 500,
                 fontSize: "0.85rem",
-                color: activeTab === tab.id ? "#F97316" : "#6B7280",
-                background: activeTab === tab.id ? "rgba(249,115,22,0.08)" : "transparent",
-                borderLeft: activeTab === tab.id ? "3px solid #F97316" : "3px solid transparent",
+                color: activeTab === tab.id ? "var(--nw-primary)" : "var(--nw-text-muted)",
+                background: activeTab === tab.id ? "var(--nw-primary-08)" : "transparent",
+                borderLeft: activeTab === tab.id ? "3px solid var(--nw-primary)" : "3px solid transparent",
                 "&:hover": {
-                  background: activeTab === tab.id ? "rgba(249,115,22,0.12)" : "rgba(255,255,255,0.04)",
-                  color: activeTab === tab.id ? "#F97316" : "#9CA3AF",
+                  background: activeTab === tab.id ? "var(--nw-primary-12)" : "var(--nw-border-soft)",
+                  color: activeTab === tab.id ? "var(--nw-primary)" : "var(--nw-text-secondary)",
                 },
               }}
             >
@@ -180,9 +180,9 @@ export default function AdminDashboard() {
             </Button>
           ))}
         </Box>
-        <Box sx={{ p: 2.5, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.85rem" }}>{user?.name}</Typography>
-          <Typography sx={{ color: "#4B5563", fontSize: "0.7rem", mb: 1.5 }}>Administrator</Typography>
+        <Box sx={{ p: 2.5, borderTop: "1px solid var(--nw-border)" }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.85rem" }}>{user?.name}</Typography>
+          <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.7rem", mb: 1.5 }}>Administrator</Typography>
           <Button
             onClick={logout}
             fullWidth
@@ -193,10 +193,10 @@ export default function AdminDashboard() {
               fontSize: "0.8rem",
               fontWeight: 600,
               textTransform: "none",
-              color: "#EF4444",
-              background: "rgba(239,68,68,0.08)",
-              border: "1px solid rgba(239,68,68,0.15)",
-              "&:hover": { background: "rgba(239,68,68,0.15)" },
+              color: "var(--nw-error)",
+              background: "var(--nw-error-08)",
+              border: "1px solid var(--nw-error-15)",
+              "&:hover": { background: "var(--nw-error-15)" },
             }}
           >
             Logout
@@ -268,3 +268,6 @@ export default function AdminDashboard() {
     </Box>
   );
 }
+
+
+

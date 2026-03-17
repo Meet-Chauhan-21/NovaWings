@@ -10,6 +10,10 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.08);
 }
+[data-theme="light"] .nova-glass {
+  background: rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.06);
+}
 
 .nova-glass-orange {
   background: rgba(249,115,22,0.06);
@@ -72,12 +76,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
-/* ── Autofill background fix — dark theme ── */
+/* ── Autofill background fix ── */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 30px #111111 inset !important;
-  -webkit-text-fill-color: #FFFFFF !important;
+  -webkit-box-shadow: 0 0 0 30px var(--nw-elevated) inset !important;
+  -webkit-text-fill-color: var(--nw-text-primary) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -152,4 +156,14 @@ input:-webkit-autofill:focus {
     rgba(249,115,22,0.04),
     transparent
   ) !important;
+}
+
+/* ── Theme transition ── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0s;
+}
+html[data-theme] *, html[data-theme] *::before, html[data-theme] *::after {
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
 }

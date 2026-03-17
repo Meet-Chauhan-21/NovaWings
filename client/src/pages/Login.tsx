@@ -89,7 +89,7 @@ export default function Login() {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        background: "#0A0A0A",
+        background: "var(--nw-bg)",
       }}
     >
       {/* ── Left Branding Panel (55%) ─────────────────────────────── */}
@@ -101,7 +101,7 @@ export default function Login() {
           width: "55%",
           minHeight: "100vh",
           p: 6,
-          background: "linear-gradient(160deg, #0A0A0A 0%, #1A0800 50%, #0A0A0A 100%)",
+          background: "linear-gradient(160deg, var(--nw-bg) 0%, var(--nw-warm-bg) 50%, var(--nw-bg) 100%)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -116,7 +116,7 @@ export default function Login() {
             width: 520,
             height: 520,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(249,115,22,0.18) 0%, rgba(249,115,22,0.06) 45%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(249,115,22,0.18) 0%, var(--nw-primary-06) 45%, transparent 70%)",
             pointerEvents: "none",
           }}
         />
@@ -128,20 +128,20 @@ export default function Login() {
               width: 44,
               height: 44,
               borderRadius: "12px",
-              background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
+              background: "linear-gradient(135deg, var(--nw-primary) 0%, var(--nw-primary-dark) 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 14px rgba(249,115,22,0.4)",
+              boxShadow: "0 4px 14px var(--nw-primary-40)",
             }}
           >
-            <FlightTakeoffIcon sx={{ color: "#fff", fontSize: 22 }} />
+            <FlightTakeoffIcon sx={{ color: "var(--nw-text-primary)", fontSize: 22 }} />
           </Box>
           <Typography
             sx={{
               fontSize: "1.5rem",
               fontWeight: 800,
-              background: "linear-gradient(90deg, #F97316, #F59E0B)",
+              background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.01em",
@@ -159,7 +159,7 @@ export default function Login() {
               sx={{
                 fontSize: "2.75rem",
                 fontWeight: 800,
-                color: "#FFFFFF",
+                color: "var(--nw-text-primary)",
                 letterSpacing: "-0.02em",
                 lineHeight: 1.15,
                 mb: 1.5,
@@ -169,7 +169,7 @@ export default function Login() {
               <Box
                 component="span"
                 sx={{
-                  background: "linear-gradient(90deg, #F97316, #F59E0B)",
+                  background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -177,7 +177,7 @@ export default function Login() {
                 Confidence
               </Box>
             </Typography>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "1.05rem", lineHeight: 1.7 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "1.05rem", lineHeight: 1.7 }}>
               Your journey starts here. Discover seamless travel with NovaWings.
             </Typography>
           </Box>
@@ -186,8 +186,8 @@ export default function Login() {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
             {FEATURES.map((feat) => (
               <Box key={feat} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <CheckCircleOutlinedIcon sx={{ color: "#F97316", fontSize: 20 }} />
-                <Typography sx={{ color: "#D1D5DB", fontSize: "0.9375rem", fontWeight: 500 }}>
+                <CheckCircleOutlinedIcon sx={{ color: "var(--nw-primary)", fontSize: 20 }} />
+                <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.9375rem", fontWeight: 500 }}>
                   {feat}
                 </Typography>
               </Box>
@@ -199,10 +199,10 @@ export default function Login() {
             <svg viewBox="0 0 400 200" width="340" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M20 140 Q80 100 160 110 L340 60 L320 80 L160 130 L200 155 L170 160 L130 140 L80 155 L70 145 L100 130 L60 125 Z"
-                fill="#F97316"
+                fill="var(--nw-primary)"
               />
-              <circle cx="345" cy="58" r="6" fill="#F59E0B" />
-              <path d="M350 58 Q380 50 395 55" stroke="#F59E0B" strokeWidth="2" fill="none" strokeDasharray="4 3" />
+              <circle cx="345" cy="58" r="6" fill="var(--nw-secondary)" />
+              <path d="M350 58 Q380 50 395 55" stroke="var(--nw-secondary)" strokeWidth="2" fill="none" strokeDasharray="4 3" />
             </svg>
           </Box>
         </Box>
@@ -213,16 +213,16 @@ export default function Login() {
             zIndex: 1,
             p: 3,
             borderRadius: "16px",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.07)",
+            background: "var(--nw-border-soft)",
+            border: "1px solid var(--nw-border)",
             backdropFilter: "blur(8px)",
           }}
         >
-          <FormatQuoteIcon sx={{ color: "#F97316", fontSize: 28, mb: 1, opacity: 0.8 }} />
-          <Typography sx={{ color: "#D1D5DB", fontSize: "0.9rem", lineHeight: 1.7, fontStyle: "italic" }}>
+          <FormatQuoteIcon sx={{ color: "var(--nw-primary)", fontSize: 28, mb: 1, opacity: 0.8 }} />
+          <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.9rem", lineHeight: 1.7, fontStyle: "italic" }}>
             "Booked my monsoon getaway in under 3 minutes. NovaWings is the fastest and most reliable booking experience I've tried."
           </Typography>
-          <Typography sx={{ color: "#F97316", fontSize: "0.8rem", fontWeight: 600, mt: 1.5 }}>
+          <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.8rem", fontWeight: 600, mt: 1.5 }}>
             — Priya S., Mumbai
           </Typography>
         </Box>
@@ -237,7 +237,7 @@ export default function Login() {
           justifyContent: "center",
           width: { xs: "100%", md: "45%" },
           minHeight: "100vh",
-          background: "#0F0F0F",
+          background: "var(--nw-panel-dark)",
           p: { xs: 3, sm: 5 },
         }}
       >
@@ -251,16 +251,16 @@ export default function Login() {
               mb: 4,
             }}
           >
-            <FlightTakeoffIcon sx={{ color: "#F97316", fontSize: 24 }} />
-            <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "#F97316" }}>
+            <FlightTakeoffIcon sx={{ color: "var(--nw-primary)", fontSize: 24 }} />
+            <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "var(--nw-primary)" }}>
               NovaWings
             </Typography>
           </Box>
 
-          <Typography variant="h4" sx={{ fontWeight: 800, color: "#FFFFFF", mb: 0.75 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: "var(--nw-text-primary)", mb: 0.75 }}>
             Welcome Back
           </Typography>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.9375rem", mb: 4 }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.9375rem", mb: 4 }}>
             Sign in to your NovaWings account
           </Typography>
 
@@ -285,7 +285,7 @@ export default function Login() {
                             input: {
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <EmailOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                  <EmailOutlinedIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                                 </InputAdornment>
                               ),
                             },
@@ -311,7 +311,7 @@ export default function Login() {
                             input: {
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <LockOutlinedIcon sx={{ color: "#6B7280", fontSize: 20 }} />
+                                  <LockOutlinedIcon sx={{ color: "var(--nw-text-muted)", fontSize: 20 }} />
                                 </InputAdornment>
                               ),
                               endAdornment: (
@@ -320,7 +320,7 @@ export default function Login() {
                                     onClick={() => setShowPassword((s) => !s)}
                                     edge="end"
                                     size="small"
-                                    sx={{ color: "#6B7280" }}
+                                    sx={{ color: "var(--nw-text-muted)" }}
                                   >
                                     {showPassword ? (
                                       <VisibilityOffOutlinedIcon fontSize="small" />
@@ -346,13 +346,13 @@ export default function Login() {
                           onChange={(e) => setRememberMe(e.target.checked)}
                           size="small"
                           sx={{
-                            color: "#4B5563",
-                            "&.Mui-checked": { color: "#F97316" },
+                            color: "var(--nw-text-disabled)",
+                            "&.Mui-checked": { color: "var(--nw-primary)" },
                           }}
                         />
                       }
                       label={
-                        <Typography sx={{ color: "#9CA3AF", fontSize: "0.875rem" }}>
+                        <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.875rem" }}>
                           Remember me
                         </Typography>
                       }
@@ -361,7 +361,7 @@ export default function Login() {
                       component={Link}
                       to="/forgot-password"
                       sx={{
-                        color: "#F97316",
+                        color: "var(--nw-primary)",
                         fontSize: "0.875rem",
                         fontWeight: 500,
                         textDecoration: "none",
@@ -391,17 +391,17 @@ export default function Login() {
                       fontSize: "1rem",
                       fontWeight: 700,
                       borderRadius: "12px",
-                      background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
-                      boxShadow: "0 4px 20px rgba(249,115,22,0.4)",
+                      background: "linear-gradient(135deg, var(--nw-primary) 0%, var(--nw-primary-dark) 100%)",
+                      boxShadow: "0 4px 20px var(--nw-primary-40)",
                       "&:hover": {
-                        background: "linear-gradient(135deg, #FB923C 0%, #F97316 100%)",
+                        background: "linear-gradient(135deg, var(--nw-primary-light) 0%, var(--nw-primary) 100%)",
                         boxShadow: "0 6px 24px rgba(249,115,22,0.55)",
                       },
                       "&:disabled": { opacity: 0.6 },
                     }}
                   >
                     {isSubmitting ? (
-                      <CircularProgress size={22} sx={{ color: "#fff" }} />
+                      <CircularProgress size={22} sx={{ color: "var(--nw-text-primary)" }} />
                     ) : (
                       "Sign In"
                     )}
@@ -409,11 +409,11 @@ export default function Login() {
 
                   {/* Social sign-in */}
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, my: 0.5 }}>
-                    <Divider sx={{ flex: 1, borderColor: "rgba(255,255,255,0.08)" }} />
-                    <Typography sx={{ color: "#4B5563", fontSize: "0.8125rem", whiteSpace: "nowrap" }}>
+                    <Divider sx={{ flex: 1, borderColor: "var(--nw-border-strong)" }} />
+                    <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.8125rem", whiteSpace: "nowrap" }}>
                       Or continue with
                     </Typography>
-                    <Divider sx={{ flex: 1, borderColor: "rgba(255,255,255,0.08)" }} />
+                    <Divider sx={{ flex: 1, borderColor: "var(--nw-border-strong)" }} />
                   </Box>
 
                   <Box sx={{ display: "flex", gap: 1.5 }}>
@@ -423,11 +423,11 @@ export default function Login() {
                       disabled
                       startIcon={<GoogleIcon />}
                       sx={{
-                        borderColor: "rgba(255,255,255,0.1)",
-                        color: "#6B7280",
+                        borderColor: "var(--nw-border-strong)",
+                        color: "var(--nw-text-muted)",
                         borderRadius: "10px",
                         py: 1.25,
-                        "&:disabled": { borderColor: "rgba(255,255,255,0.06)", color: "#4B5563" },
+                        "&:disabled": { borderColor: "var(--nw-border)", color: "var(--nw-text-disabled)" },
                       }}
                     >
                       Google
@@ -438,11 +438,11 @@ export default function Login() {
                       disabled
                       startIcon={<AppleIcon />}
                       sx={{
-                        borderColor: "rgba(255,255,255,0.1)",
-                        color: "#6B7280",
+                        borderColor: "var(--nw-border-strong)",
+                        color: "var(--nw-text-muted)",
                         borderRadius: "10px",
                         py: 1.25,
-                        "&:disabled": { borderColor: "rgba(255,255,255,0.06)", color: "#4B5563" },
+                        "&:disabled": { borderColor: "var(--nw-border)", color: "var(--nw-text-disabled)" },
                       }}
                     >
                       Apple
@@ -450,13 +450,13 @@ export default function Login() {
                   </Box>
 
                   {/* Sign up link */}
-                  <Typography sx={{ textAlign: "center", color: "#6B7280", fontSize: "0.9rem", mt: 0.5 }}>
+                  <Typography sx={{ textAlign: "center", color: "var(--nw-text-muted)", fontSize: "0.9rem", mt: 0.5 }}>
                     Don't have an account?{" "}
                     <Box
                       component={Link}
                       to="/register"
                       sx={{
-                        color: "#F97316",
+                        color: "var(--nw-primary)",
                         fontWeight: 600,
                         textDecoration: "none",
                         "&:hover": { textDecoration: "underline" },
@@ -475,3 +475,6 @@ export default function Login() {
     </Box>
   );
 }
+
+
+

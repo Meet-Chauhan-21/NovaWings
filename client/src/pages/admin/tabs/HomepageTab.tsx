@@ -212,26 +212,26 @@ export default function HomepageTab() {
       {/* Header */}
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 2 }}>
         <Box>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: "1.5rem" }}>Homepage Settings</Typography>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.85rem", mt: 0.5 }}>Control what users see on the public homepage</Typography>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: "1.5rem" }}>Homepage Settings</Typography>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem", mt: 0.5 }}>Control what users see on the public homepage</Typography>
         </Box>
       </Box>
 
       {/* Destination Card Stats */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: 2.5 }}>
         {[
-          { label: "Total Cards", value: allDestCards.length, icon: <MapIcon sx={{ fontSize: 18, color: "#0EA5E9" }} />, accent: "#0EA5E9" },
-          { label: "Active Cards", value: allDestCards.filter((c) => c.active).length, icon: <CheckCircleOutlineIcon sx={{ fontSize: 18, color: "#22C55E" }} />, accent: "#22C55E" },
-          { label: "Featured Cards", value: allDestCards.filter((c) => c.featured).length, icon: <StarOutlineIcon sx={{ fontSize: 18, color: "#F59E0B" }} />, accent: "#F59E0B" },
-          { label: "Categories", value: new Set(allDestCards.map((c) => c.category)).size, icon: <FolderOpenIcon sx={{ fontSize: 18, color: "#A855F7" }} />, accent: "#A855F7" },
+          { label: "Total Cards", value: allDestCards.length, icon: <MapIcon sx={{ fontSize: 18, color: "var(--nw-accent-blue)" }} />, accent: "var(--nw-accent-blue)" },
+          { label: "Active Cards", value: allDestCards.filter((c) => c.active).length, icon: <CheckCircleOutlineIcon sx={{ fontSize: 18, color: "var(--nw-success-bright)" }} />, accent: "var(--nw-success-bright)" },
+          { label: "Featured Cards", value: allDestCards.filter((c) => c.featured).length, icon: <StarOutlineIcon sx={{ fontSize: 18, color: "var(--nw-secondary)" }} />, accent: "var(--nw-secondary)" },
+          { label: "Categories", value: new Set(allDestCards.map((c) => c.category)).size, icon: <FolderOpenIcon sx={{ fontSize: 18, color: "var(--nw-accent-violet)" }} />, accent: "var(--nw-accent-violet)" },
         ].map((card) => (
-          <Paper key={card.label} elevation={0} sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 2.5 }}>
+          <Paper key={card.label} elevation={0} sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 2.5 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
               <Box sx={{ width: 36, height: 36, borderRadius: "10px", background: `${card.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem" }}>{card.icon}</Box>
               <Box sx={{ height: 3, width: "35%", borderRadius: 2, background: card.accent, opacity: 0.5 }} />
             </Box>
-            <Typography sx={{ color: "#FFFFFF", fontSize: "1.5rem", fontWeight: 800 }}>{card.value}</Typography>
-            <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", mt: 0.3 }}>{card.label}</Typography>
+            <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "1.5rem", fontWeight: 800 }}>{card.value}</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", mt: 0.3 }}>{card.label}</Typography>
           </Paper>
         ))}
       </Box>
@@ -241,34 +241,34 @@ export default function HomepageTab() {
       ) : (
         <>
           {/* ── Hero Section Editor ── */}
-          <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
+          <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Box sx={{ width: 32, height: 32, borderRadius: "8px", background: "rgba(249,115,22,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}><HomeOutlinedIcon sx={{ fontSize: 20, color: "#F97316" }} /></Box>
+                <Box sx={{ width: 32, height: 32, borderRadius: "8px", background: "var(--nw-primary-12)", display: "flex", alignItems: "center", justifyContent: "center" }}><HomeOutlinedIcon sx={{ fontSize: 20, color: "var(--nw-primary)" }} /></Box>
                 <Box>
-                  <Typography sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: "1.1rem" }}>Hero Section</Typography>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.72rem" }}>The big banner users see first when visiting</Typography>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: "1.1rem" }}>Hero Section</Typography>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.72rem" }}>The big banner users see first when visiting</Typography>
                 </Box>
               </Box>
-              <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+              <Divider sx={{ borderColor: "var(--nw-border)" }} />
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2 }}>
                 <Box>
-                  <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Hero Title</Typography>
+                  <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Hero Title</Typography>
                   <input
                     type="text"
                     value={hcHeroTitle}
                     onChange={(e) => setHcHeroTitle(e.target.value)}
-                    style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+                    style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
                     placeholder="Where do you want to fly?"
                   />
                 </Box>
                 <Box>
-                  <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Hero Subtitle</Typography>
+                  <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>Hero Subtitle</Typography>
                   <input
                     type="text"
                     value={hcHeroSubtitle}
                     onChange={(e) => setHcHeroSubtitle(e.target.value)}
-                    style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+                    style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
                     placeholder="Search and book flights at the best prices"
                   />
                 </Box>
@@ -286,14 +286,14 @@ export default function HomepageTab() {
                   });
                 }}
                 sx={{
-                  background: "linear-gradient(135deg, #F97316, #F59E0B)",
-                  color: "#FFFFFF",
+                  background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
+                  color: "var(--nw-text-primary)",
                   fontWeight: 700,
                   px: 3,
                   py: 1.2,
                   borderRadius: "12px",
                   textTransform: "none",
-                  "&:hover": { background: "linear-gradient(135deg, #EA580C, #D97706)" },
+                  "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-secondary))" },
                   "&:disabled": { opacity: 0.5 },
                 }}
               >
@@ -304,14 +304,14 @@ export default function HomepageTab() {
           </Paper>
 
           {/* ── Destination Cards Manager ── */}
-          <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
+          <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Box sx={{ width: 32, height: 32, borderRadius: "8px", background: "rgba(249,115,22,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}><MapIcon sx={{ fontSize: 20, color: "#F97316" }} /></Box>
+                <Box sx={{ width: 32, height: 32, borderRadius: "8px", background: "var(--nw-primary-12)", display: "flex", alignItems: "center", justifyContent: "center" }}><MapIcon sx={{ fontSize: 20, color: "var(--nw-primary)" }} /></Box>
                 <Box>
-                  <Typography sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: "1.1rem" }}>Destination Cards</Typography>
-                  <Typography sx={{ color: "#6B7280", fontSize: "0.72rem" }}>Cards displayed on the homepage explore section</Typography>
+                  <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: "1.1rem" }}>Destination Cards</Typography>
+                  <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.72rem" }}>Cards displayed on the homepage explore section</Typography>
                 </Box>
               </Box>
               <Button
@@ -321,49 +321,49 @@ export default function HomepageTab() {
                 }}
                 startIcon={<AddIcon sx={{ fontSize: 16 }} />}
                 sx={{
-                  background: "linear-gradient(135deg, #F97316, #F59E0B)",
-                  color: "#FFFFFF",
+                  background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
+                  color: "var(--nw-text-primary)",
                   fontWeight: 700,
                   px: 2.5,
                   py: 1,
                   borderRadius: "10px",
                   textTransform: "none",
                   fontSize: "0.85rem",
-                  "&:hover": { background: "linear-gradient(135deg, #EA580C, #D97706)" },
+                  "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-secondary))" },
                 }}
               >
                 Add New Card
               </Button>
             </Box>
-            <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+            <Divider sx={{ borderColor: "var(--nw-border)" }} />
 
             {/* Filters */}
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
               <select
                 value={destStatusFilter}
                 onChange={(e) => setDestStatusFilter(e.target.value as any)}
-                style={{ padding: "8px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none" }}
+                style={{ padding: "8px 12px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none" }}
               >
-                <option value="all" style={{ background: "#111111" }}>All Status</option>
-                <option value="active" style={{ background: "#111111" }}>Active Only</option>
-                <option value="inactive" style={{ background: "#111111" }}>Inactive Only</option>
-                <option value="featured" style={{ background: "#111111" }}>Featured Only</option>
+                <option value="all" style={{ background: "var(--nw-card)" }}>All Status</option>
+                <option value="active" style={{ background: "var(--nw-card)" }}>Active Only</option>
+                <option value="inactive" style={{ background: "var(--nw-card)" }}>Inactive Only</option>
+                <option value="featured" style={{ background: "var(--nw-card)" }}>Featured Only</option>
               </select>
               <select
                 value={destCategoryFilter}
                 onChange={(e) => setDestCategoryFilter(e.target.value)}
-                style={{ padding: "8px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.85rem", outline: "none" }}
+                style={{ padding: "8px 12px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.85rem", outline: "none" }}
               >
-                <option value="all" style={{ background: "#111111" }}>All Categories</option>
-                <option value="Beach" style={{ background: "#111111" }}>Beach</option>
-                <option value="Hills" style={{ background: "#111111" }}>Hills</option>
-                <option value="Heritage" style={{ background: "#111111" }}>Heritage</option>
-                <option value="Honeymoon" style={{ background: "#111111" }}>Honeymoon</option>
-                <option value="Adventure" style={{ background: "#111111" }}>Adventure</option>
-                <option value="Spiritual" style={{ background: "#111111" }}>Spiritual</option>
-                <option value="Wildlife" style={{ background: "#111111" }}>Wildlife</option>
-                <option value="City Break" style={{ background: "#111111" }}>City Break</option>
-                <option value="Weekend Getaway" style={{ background: "#111111" }}>Weekend Getaway</option>
+                <option value="all" style={{ background: "var(--nw-card)" }}>All Categories</option>
+                <option value="Beach" style={{ background: "var(--nw-card)" }}>Beach</option>
+                <option value="Hills" style={{ background: "var(--nw-card)" }}>Hills</option>
+                <option value="Heritage" style={{ background: "var(--nw-card)" }}>Heritage</option>
+                <option value="Honeymoon" style={{ background: "var(--nw-card)" }}>Honeymoon</option>
+                <option value="Adventure" style={{ background: "var(--nw-card)" }}>Adventure</option>
+                <option value="Spiritual" style={{ background: "var(--nw-card)" }}>Spiritual</option>
+                <option value="Wildlife" style={{ background: "var(--nw-card)" }}>Wildlife</option>
+                <option value="City Break" style={{ background: "var(--nw-card)" }}>City Break</option>
+                <option value="Weekend Getaway" style={{ background: "var(--nw-card)" }}>Weekend Getaway</option>
               </select>
             </Box>
 
@@ -371,17 +371,17 @@ export default function HomepageTab() {
             {destCardsQuery.isLoading ? (
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }, gap: 2 }}>
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <Box key={i} sx={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", height: 256, animation: "pulse 2s ease-in-out infinite", "@keyframes pulse": { "0%, 100%": { opacity: 0.4 }, "50%": { opacity: 0.8 } } }} />
+                  <Box key={i} sx={{ background: "var(--nw-border-soft)", borderRadius: "16px", height: 256, animation: "pulse 2s ease-in-out infinite", "@keyframes pulse": { "0%, 100%": { opacity: 0.4 }, "50%": { opacity: 0.8 } } }} />
                 ))}
               </Box>
             ) : filteredDestCards.length === 0 ? (
-              <Typography sx={{ color: "#6B7280", textAlign: "center", py: 4 }}>No destination cards found.</Typography>
+              <Typography sx={{ color: "var(--nw-text-muted)", textAlign: "center", py: 4 }}>No destination cards found.</Typography>
             ) : (
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }, gap: 2 }}>
                 {filteredDestCards.map((card) => (
                   <Paper
                     key={card.id}
-                    sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", overflow: "hidden", transition: "border-color 0.2s", "&:hover": { borderColor: "rgba(255,255,255,0.12)" } }}
+                    sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", overflow: "hidden", transition: "border-color 0.2s", "&:hover": { borderColor: "var(--nw-border-strong)" } }}
                   >
                     {/* Image */}
                     <Box sx={{ position: "relative", height: 128 }}>
@@ -396,28 +396,28 @@ export default function HomepageTab() {
                       />
                       <Box sx={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 0.5 }}>
                         {card.featured && (
-                          <Chip size="small" label="Featured" sx={{ fontWeight: 700, fontSize: "0.65rem", backgroundColor: "rgba(245,158,11,0.2)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.4)" }} />
+                          <Chip size="small" label="Featured" sx={{ fontWeight: 700, fontSize: "0.65rem", backgroundColor: "var(--nw-warning-20)", color: "var(--nw-secondary)", border: "1px solid rgba(245,158,11,0.4)" }} />
                         )}
                         {card.active ? (
-                          <Chip size="small" label="Active" sx={{ fontWeight: 700, fontSize: "0.65rem", backgroundColor: "rgba(34,197,94,0.2)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.4)" }} />
+                          <Chip size="small" label="Active" sx={{ fontWeight: 700, fontSize: "0.65rem", backgroundColor: "var(--nw-success-20)", color: "var(--nw-success-bright)", border: "1px solid rgba(34,197,94,0.4)" }} />
                         ) : (
-                          <Chip size="small" label="Inactive" sx={{ fontWeight: 700, fontSize: "0.65rem", backgroundColor: "rgba(107,114,128,0.2)", color: "#6B7280", border: "1px solid rgba(107,114,128,0.4)" }} />
+                          <Chip size="small" label="Inactive" sx={{ fontWeight: 700, fontSize: "0.65rem", backgroundColor: "rgba(107,114,128,0.2)", color: "var(--nw-text-muted)", border: "1px solid rgba(107,114,128,0.4)" }} />
                         )}
                       </Box>
                     </Box>
 
                     {/* Content */}
                     <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1 }}>
-                      <Typography sx={{ fontWeight: 700, color: "#FFFFFF", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <Typography sx={{ fontWeight: 700, color: "var(--nw-text-primary)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {card.title}
                       </Typography>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Chip size="small" label={card.category} sx={{ fontSize: "0.65rem", fontWeight: 600, backgroundColor: "rgba(59,130,246,0.15)", color: "#3B82F6", border: "1px solid rgba(59,130,246,0.3)" }} />
-                        <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>{card.badge}</Typography>
+                        <Chip size="small" label={card.category} sx={{ fontSize: "0.65rem", fontWeight: 600, backgroundColor: "rgba(59,130,246,0.15)", color: "var(--nw-info)", border: "1px solid rgba(59,130,246,0.3)" }} />
+                        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>{card.badge}</Typography>
                       </Box>
-                      <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>{card.state}</Typography>
+                      <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>{card.state}</Typography>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>Order:</Typography>
+                        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>Order:</Typography>
                         <input
                           type="number"
                           value={card.displayOrder}
@@ -427,7 +427,7 @@ export default function HomepageTab() {
                               destOrderMutation.mutate({ id: card.id, order });
                             }
                           }}
-                          style={{ width: 60, padding: "4px 8px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px", color: "#FFFFFF", fontSize: "0.75rem", textAlign: "center" as const, outline: "none" }}
+                          style={{ width: 60, padding: "4px 8px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "6px", color: "var(--nw-text-primary)", fontSize: "0.75rem", textAlign: "center" as const, outline: "none" }}
                         />
                       </Box>
 
@@ -438,9 +438,9 @@ export default function HomepageTab() {
                           onClick={() => destFeatureMutation.mutate(card.id)}
                           sx={{
                             textTransform: "none", fontSize: "0.7rem", fontWeight: 600, borderRadius: "8px", py: 0.6,
-                            color: card.featured ? "#F59E0B" : "#6B7280",
+                            color: card.featured ? "var(--nw-secondary)" : "var(--nw-text-muted)",
                             border: card.featured ? "1px solid rgba(245,158,11,0.4)" : "1px solid rgba(107,114,128,0.3)",
-                            "&:hover": { backgroundColor: card.featured ? "rgba(245,158,11,0.1)" : "rgba(107,114,128,0.1)" },
+                            "&:hover": { backgroundColor: card.featured ? "var(--nw-warning-10)" : "rgba(107,114,128,0.1)" },
                           }}
                         >
                           Feature
@@ -450,9 +450,9 @@ export default function HomepageTab() {
                           onClick={() => destToggleMutation.mutate(card.id)}
                           sx={{
                             textTransform: "none", fontSize: "0.7rem", fontWeight: 600, borderRadius: "8px", py: 0.6,
-                            color: card.active ? "#22C55E" : "#6B7280",
+                            color: card.active ? "var(--nw-success-bright)" : "var(--nw-text-muted)",
                             border: card.active ? "1px solid rgba(34,197,94,0.4)" : "1px solid rgba(107,114,128,0.3)",
-                            "&:hover": { backgroundColor: card.active ? "rgba(34,197,94,0.1)" : "rgba(107,114,128,0.1)" },
+                            "&:hover": { backgroundColor: card.active ? "var(--nw-success-10)" : "rgba(107,114,128,0.1)" },
                           }}
                         >
                           Toggle
@@ -462,7 +462,7 @@ export default function HomepageTab() {
                           onClick={() => handleEditDestCard(card)}
                           sx={{
                             textTransform: "none", fontSize: "0.7rem", fontWeight: 600, borderRadius: "8px", py: 0.6,
-                            color: "#3B82F6",
+                            color: "var(--nw-info)",
                             border: "1px solid rgba(59,130,246,0.4)",
                             "&:hover": { backgroundColor: "rgba(59,130,246,0.1)" },
                           }}
@@ -478,9 +478,9 @@ export default function HomepageTab() {
                           }}
                           sx={{
                             textTransform: "none", fontSize: "0.7rem", fontWeight: 600, borderRadius: "8px", py: 0.6,
-                            color: "#EF4444",
+                            color: "var(--nw-error)",
                             border: "1px solid rgba(239,68,68,0.4)",
-                            "&:hover": { backgroundColor: "rgba(239,68,68,0.1)" },
+                            "&:hover": { backgroundColor: "var(--nw-error-10)" },
                           }}
                         >
                           Delete
@@ -508,13 +508,13 @@ export default function HomepageTab() {
         PaperProps={{
           sx: {
             width: 420,
-            background: "#111111",
-            borderLeft: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--nw-card)",
+            borderLeft: "1px solid var(--nw-border)",
           },
         }}
       >
-        <Box sx={{ p: 3, borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, background: "#111111", zIndex: 10 }}>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: "1.1rem" }}>
+        <Box sx={{ p: 3, borderBottom: "1px solid var(--nw-border)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, background: "var(--nw-card)", zIndex: 10 }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: "1.1rem" }}>
             {editingDestCard ? "Edit Destination Card" : "Add Destination Card"}
           </Typography>
           <IconButton
@@ -523,14 +523,14 @@ export default function HomepageTab() {
               setEditingDestCard(null);
               resetDestForm();
             }}
-            sx={{ color: "#6B7280", "&:hover": { color: "#FFFFFF" } }}
+            sx={{ color: "var(--nw-text-muted)", "&:hover": { color: "var(--nw-text-primary)" } }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
         <Box sx={{ p: 3, display: "flex", flexDirection: "column", gap: 2.5, overflowY: "auto" }}>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
               Title *
             </Typography>
             <input
@@ -538,12 +538,12 @@ export default function HomepageTab() {
               onChange={(e) =>
                 setDestForm({ ...destForm, title: e.target.value })
               }
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
               placeholder="Goa — Beach Paradise"
             />
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
               Destination City *
             </Typography>
             <CityCombobox
@@ -554,12 +554,12 @@ export default function HomepageTab() {
               placeholder="Select destination city"
               label=""
             />
-            <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", mt: 0.5 }}>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", mt: 0.5 }}>
               City name that links to flight search
             </Typography>
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
               State *
             </Typography>
             <input
@@ -567,12 +567,12 @@ export default function HomepageTab() {
               onChange={(e) =>
                 setDestForm({ ...destForm, state: e.target.value })
               }
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
               placeholder="Goa"
             />
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
               Tagline *
             </Typography>
             <input
@@ -580,13 +580,13 @@ export default function HomepageTab() {
               onChange={(e) =>
                 setDestForm({ ...destForm, tagline: e.target.value })
               }
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
               placeholder="Sun, sand & sea awaits"
             />
-            <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", mt: 0.5 }}>Short catchy line</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", mt: 0.5 }}>Short catchy line</Typography>
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
               Description *
             </Typography>
             <textarea
@@ -595,12 +595,12 @@ export default function HomepageTab() {
                 setDestForm({ ...destForm, description: e.target.value })
               }
               rows={3}
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const, resize: "vertical" }}
+              style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const, resize: "vertical" }}
               placeholder="2-3 sentences about the destination..."
             />
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
               Image URL *
             </Typography>
             <input
@@ -608,17 +608,17 @@ export default function HomepageTab() {
               onChange={(e) =>
                 setDestForm({ ...destForm, imageUrl: e.target.value })
               }
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
               placeholder="https://images.unsplash.com/..."
             />
-            <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", mt: 0.5 }}>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", mt: 0.5 }}>
               Use Unsplash: https://images.unsplash.com/photo-ID?w=800&q=80
             </Typography>
             {destForm.imageUrl && (
               <img
                 src={destForm.imageUrl}
                 alt="Preview"
-                style={{ borderRadius: "12px", height: 128, width: "100%", objectFit: "cover", marginTop: 8, border: "1px solid rgba(255,255,255,0.08)" }}
+                style={{ borderRadius: "12px", height: 128, width: "100%", objectFit: "cover", marginTop: 8, border: "1px solid var(--nw-border-strong)" }}
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}
@@ -627,7 +627,7 @@ export default function HomepageTab() {
           </Box>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
             <Box>
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
                 Category *
               </Typography>
               <select
@@ -635,21 +635,21 @@ export default function HomepageTab() {
                 onChange={(e) =>
                   setDestForm({ ...destForm, category: e.target.value })
                 }
-                style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none" }}
+                style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none" }}
               >
-                <option value="Beach" style={{ background: "#111111" }}>Beach</option>
-                <option value="Hills" style={{ background: "#111111" }}>Hills</option>
-                <option value="Heritage" style={{ background: "#111111" }}>Heritage</option>
-                <option value="Honeymoon" style={{ background: "#111111" }}>Honeymoon</option>
-                <option value="Adventure" style={{ background: "#111111" }}>Adventure</option>
-                <option value="Spiritual" style={{ background: "#111111" }}>Spiritual</option>
-                <option value="Wildlife" style={{ background: "#111111" }}>Wildlife</option>
-                <option value="City Break" style={{ background: "#111111" }}>City Break</option>
-                <option value="Weekend Getaway" style={{ background: "#111111" }}>Weekend Getaway</option>
+                <option value="Beach" style={{ background: "var(--nw-card)" }}>Beach</option>
+                <option value="Hills" style={{ background: "var(--nw-card)" }}>Hills</option>
+                <option value="Heritage" style={{ background: "var(--nw-card)" }}>Heritage</option>
+                <option value="Honeymoon" style={{ background: "var(--nw-card)" }}>Honeymoon</option>
+                <option value="Adventure" style={{ background: "var(--nw-card)" }}>Adventure</option>
+                <option value="Spiritual" style={{ background: "var(--nw-card)" }}>Spiritual</option>
+                <option value="Wildlife" style={{ background: "var(--nw-card)" }}>Wildlife</option>
+                <option value="City Break" style={{ background: "var(--nw-card)" }}>City Break</option>
+                <option value="Weekend Getaway" style={{ background: "var(--nw-card)" }}>Weekend Getaway</option>
               </select>
             </Box>
             <Box>
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
                 Display Order
               </Typography>
               <input
@@ -661,12 +661,12 @@ export default function HomepageTab() {
                     displayOrder: parseInt(e.target.value) || 0,
                   })
                 }
-                style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+                style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
               />
             </Box>
           </Box>
           <Box>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 0.8 }}>
               Badge *
             </Typography>
             <input
@@ -674,10 +674,10 @@ export default function HomepageTab() {
               onChange={(e) =>
                 setDestForm({ ...destForm, badge: e.target.value })
               }
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "#FFFFFF", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
+              style={{ width: "100%", padding: "12px 16px", background: "var(--nw-glass)", border: "1px solid var(--nw-border-strong)", borderRadius: "10px", color: "var(--nw-text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" as const }}
               placeholder="🔥 Trending"
             />
-            <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", mt: 0.5 }}>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", mt: 0.5 }}>
               Examples: 🔥 Trending, 💕 Honeymoon Special, 🏔 Adventure
             </Typography>
           </Box>
@@ -689,10 +689,10 @@ export default function HomepageTab() {
                   onChange={(e) =>
                     setDestForm({ ...destForm, featured: e.target.checked })
                   }
-                  sx={{ color: "#6B7280", "&.Mui-checked": { color: "#F59E0B" } }}
+                  sx={{ color: "var(--nw-text-muted)", "&.Mui-checked": { color: "var(--nw-secondary)" } }}
                 />
               }
-              label={<Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem", fontWeight: 500 }}>Featured (larger card on homepage)</Typography>}
+              label={<Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem", fontWeight: 500 }}>Featured (larger card on homepage)</Typography>}
             />
             <FormControlLabel
               control={
@@ -701,10 +701,10 @@ export default function HomepageTab() {
                   onChange={(e) =>
                     setDestForm({ ...destForm, active: e.target.checked })
                   }
-                  sx={{ color: "#6B7280", "&.Mui-checked": { color: "#22C55E" } }}
+                  sx={{ color: "var(--nw-text-muted)", "&.Mui-checked": { color: "var(--nw-success-bright)" } }}
                 />
               }
-              label={<Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem", fontWeight: 500 }}>Active (visible on homepage)</Typography>}
+              label={<Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem", fontWeight: 500 }}>Active (visible on homepage)</Typography>}
             />
           </Box>
           <Button
@@ -714,14 +714,14 @@ export default function HomepageTab() {
             }
             sx={{
               width: "100%",
-              background: "linear-gradient(135deg, #F97316, #F59E0B)",
-              color: "#FFFFFF",
+              background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
+              color: "var(--nw-text-primary)",
               fontWeight: 700,
               py: 1.5,
               borderRadius: "12px",
               textTransform: "none",
               mt: 2,
-              "&:hover": { background: "linear-gradient(135deg, #EA580C, #D97706)" },
+              "&:hover": { background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-secondary))" },
               "&:disabled": { opacity: 0.5, cursor: "not-allowed" },
             }}
           >
@@ -736,3 +736,7 @@ export default function HomepageTab() {
     </Box>
   );
 }
+
+
+
+

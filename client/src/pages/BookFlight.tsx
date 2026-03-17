@@ -77,10 +77,10 @@ export default function BookFlight() {
           onClick={() => navigate(-1)}
           sx={{
             mb: 3,
-            color: "#9CA3AF",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            "&:hover": { background: "rgba(249,115,22,0.1)", color: "#F97316" },
+            color: "var(--nw-text-secondary)",
+            background: "var(--nw-border-soft)",
+            border: "1px solid var(--nw-border-strong)",
+            "&:hover": { background: "var(--nw-primary-10)", color: "var(--nw-primary)" },
           }}
         >
           <ArrowBackIcon fontSize="small" />
@@ -93,8 +93,8 @@ export default function BookFlight() {
         {/* Flight Summary Card */}
         <Paper
           sx={{
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-border)",
             borderRadius: "16px",
             p: { xs: 3, sm: 4 },
             mb: 3,
@@ -110,11 +110,11 @@ export default function BookFlight() {
               left: 0,
               right: 0,
               height: 3,
-              background: "linear-gradient(90deg, #F97316, #F59E0B)",
+              background: "linear-gradient(90deg, var(--nw-primary), var(--nw-secondary))",
             }}
           />
 
-          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 2 }}>
+          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--nw-primary)", fontWeight: 700, mb: 2 }}>
             Flight Summary
           </Typography>
 
@@ -125,19 +125,19 @@ export default function BookFlight() {
                 width: 40,
                 height: 40,
                 borderRadius: "10px",
-                background: "rgba(249,115,22,0.1)",
+                background: "var(--nw-primary-10)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <FlightIcon sx={{ color: "#F97316", fontSize: 20 }} />
+              <FlightIcon sx={{ color: "var(--nw-primary)", fontSize: 20 }} />
             </Box>
             <Box>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.95rem" }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.95rem" }}>
                 {flight.airlineName}
               </Typography>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.8rem", fontFamily: "monospace" }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.8rem", fontFamily: "monospace" }}>
                 {flight.flightNumber}
               </Typography>
             </Box>
@@ -147,10 +147,10 @@ export default function BookFlight() {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
             <Box sx={{ flex: 1 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: 0.5 }}>
-                <FlightTakeoffIcon sx={{ fontSize: 16, color: "#F97316" }} />
-                <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>From</Typography>
+                <FlightTakeoffIcon sx={{ fontSize: 16, color: "var(--nw-primary)" }} />
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>From</Typography>
               </Box>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.1rem" }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>
                 {flight.source}
               </Typography>
             </Box>
@@ -160,7 +160,7 @@ export default function BookFlight() {
                 sx={{
                   width: 80,
                   height: 0,
-                  borderTop: "2px dashed rgba(249,115,22,0.3)",
+                  borderTop: "2px dashed var(--nw-primary-30)",
                   position: "relative",
                 }}
               >
@@ -170,9 +170,9 @@ export default function BookFlight() {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%) rotate(90deg)",
-                    color: "#F97316",
+                    color: "var(--nw-primary)",
                     fontSize: 18,
-                    background: "#111111",
+                    background: "var(--nw-card)",
                     px: 0.3,
                   }}
                 />
@@ -181,28 +181,28 @@ export default function BookFlight() {
 
             <Box sx={{ flex: 1, textAlign: "right" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: 0.5, justifyContent: "flex-end" }}>
-                <FlightLandIcon sx={{ fontSize: 16, color: "#F97316" }} />
-                <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>To</Typography>
+                <FlightLandIcon sx={{ fontSize: 16, color: "var(--nw-primary)" }} />
+                <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>To</Typography>
               </Box>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.1rem" }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.1rem" }}>
                 {flight.destination}
               </Typography>
             </Box>
           </Box>
 
-          <Divider sx={{ borderColor: "rgba(255,255,255,0.06)", mb: 2.5 }} />
+          <Divider sx={{ borderColor: "var(--nw-border)", mb: 2.5 }} />
 
           {/* Details row */}
           <Box sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 2 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <EventIcon sx={{ fontSize: 16, color: "#6B7280" }} />
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>
+              <EventIcon sx={{ fontSize: 16, color: "var(--nw-text-muted)" }} />
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem" }}>
                 {formatDateTime(flight.departureTime)} — {formatDateTime(flight.arrivalTime)}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <AirlineSeatReclineExtraIcon sx={{ fontSize: 16, color: "#6B7280" }} />
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.85rem" }}>
+              <AirlineSeatReclineExtraIcon sx={{ fontSize: 16, color: "var(--nw-text-muted)" }} />
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.85rem" }}>
                 {flight.availableSeats} seats available
               </Typography>
             </Box>
@@ -210,7 +210,7 @@ export default function BookFlight() {
               sx={{
                 fontWeight: 700,
                 fontSize: "1rem",
-                background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -226,13 +226,13 @@ export default function BookFlight() {
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
         <Paper
           sx={{
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-border)",
             borderRadius: "16px",
             p: { xs: 3, sm: 4 },
           }}
         >
-          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", fontWeight: 700, mb: 3 }}>
+          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--nw-primary)", fontWeight: 700, mb: 3 }}>
             Select Passengers
           </Typography>
 
@@ -262,8 +262,8 @@ export default function BookFlight() {
                   {/* Total price display */}
                   <Box
                     sx={{
-                      background: "rgba(249,115,22,0.06)",
-                      border: "1px solid rgba(249,115,22,0.15)",
+                      background: "var(--nw-primary-06)",
+                      border: "1px solid var(--nw-primary-15)",
                       borderRadius: "12px",
                       p: 2.5,
                       display: "flex",
@@ -272,12 +272,12 @@ export default function BookFlight() {
                       mb: 3,
                     }}
                   >
-                    <Typography sx={{ color: "#9CA3AF", fontWeight: 500 }}>Estimated Total</Typography>
+                    <Typography sx={{ color: "var(--nw-text-secondary)", fontWeight: 500 }}>Estimated Total</Typography>
                     <Typography
                       sx={{
                         fontSize: "1.5rem",
                         fontWeight: 800,
-                        background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                        background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         backgroundClip: "text",
@@ -298,9 +298,9 @@ export default function BookFlight() {
                       borderRadius: "12px",
                       fontWeight: 700,
                       fontSize: "1rem",
-                      background: "linear-gradient(135deg, #F97316, #EA580C)",
+                      background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
                       "&:hover": {
-                        background: "linear-gradient(135deg, #EA580C, #DC2626)",
+                        background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-error))",
                       },
                     }}
                   >
@@ -315,3 +315,6 @@ export default function BookFlight() {
     </Box>
   );
 }
+
+
+

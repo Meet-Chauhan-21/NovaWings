@@ -62,7 +62,7 @@ export default function UsersTab({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <Typography sx={{ fontSize: "1.4rem", fontWeight: 800, color: "#FFFFFF" }}>Users</Typography>
+      <Typography sx={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--nw-text-primary)" }}>Users</Typography>
 
       {/* Filters */}
       <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: "16px" }}>
@@ -75,13 +75,13 @@ export default function UsersTab({
             onChange={(e) => setUserSearch(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-root": {
-                background: "rgba(255,255,255,0.03)",
+                background: "var(--nw-glass)",
                 borderRadius: "10px",
                 fontSize: "0.85rem",
-                color: "#FFFFFF",
-                "& fieldset": { borderColor: "rgba(255,255,255,0.08)" },
-                "&:hover fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                "&.Mui-focused fieldset": { borderColor: "#F97316" },
+                color: "var(--nw-text-primary)",
+                "& fieldset": { borderColor: "var(--nw-border-strong)" },
+                "&:hover fieldset": { borderColor: "var(--nw-border-strong)" },
+                "&.Mui-focused fieldset": { borderColor: "var(--nw-primary)" },
               },
             }}
           />
@@ -95,15 +95,15 @@ export default function UsersTab({
               sx={
                 userRoleFilter === role
                   ? {
-                      background: "rgba(249,115,22,0.15)",
-                      color: "#F97316",
-                      border: "1px solid rgba(249,115,22,0.3)",
+                      background: "var(--nw-primary-15)",
+                      color: "var(--nw-primary)",
+                      border: "1px solid var(--nw-primary-30)",
                       fontWeight: 600,
                       cursor: "pointer",
                     }
                   : {
-                      background: "rgba(255,255,255,0.04)",
-                      color: "#6B7280",
+                      background: "var(--nw-border-soft)",
+                      color: "var(--nw-text-muted)",
                       cursor: "pointer",
                     }
               }
@@ -116,17 +116,17 @@ export default function UsersTab({
         <LoadingSpinner />
       ) : (
         <>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", overflow: "hidden" }}>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", overflow: "hidden" }}>
           <Box sx={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
-                  <th style={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "rgba(255,255,255,0.04)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>#</th>
-                  <th style={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "rgba(255,255,255,0.04)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Name</th>
-                  <th style={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "rgba(255,255,255,0.04)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Email</th>
-                  <th style={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "rgba(255,255,255,0.04)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Role</th>
-                  <th style={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "rgba(255,255,255,0.04)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Total Bookings</th>
-                  <th style={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "rgba(255,255,255,0.04)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Actions</th>
+                  <th style={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "var(--nw-border-soft)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid var(--nw-border)" }}>#</th>
+                  <th style={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "var(--nw-border-soft)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid var(--nw-border)" }}>Name</th>
+                  <th style={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "var(--nw-border-soft)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid var(--nw-border)" }}>Email</th>
+                  <th style={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "var(--nw-border-soft)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid var(--nw-border)" }}>Role</th>
+                  <th style={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "var(--nw-border-soft)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid var(--nw-border)" }}>Total Bookings</th>
+                  <th style={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase" as const, background: "var(--nw-border-soft)", padding: "12px 20px", textAlign: "left" as const, borderBottom: "1px solid var(--nw-border)" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -194,20 +194,20 @@ function UserRow({
   const visibleBookings = showAll ? userBookings : userBookings.slice(0, 5);
 
   const tdStyle: React.CSSProperties = {
-    color: "#FFFFFF",
+    color: "var(--nw-text-primary)",
     fontSize: "0.85rem",
     padding: "14px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.04)",
+    borderBottom: "1px solid var(--nw-border-soft)",
   };
 
   const isAdmin = u.role === "ADMIN";
 
   return (
     <>
-      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-        <td style={{ ...tdStyle, color: "#6B7280" }}>{index}</td>
+      <tr style={{ borderBottom: "1px solid var(--nw-border-soft)" }}>
+        <td style={{ ...tdStyle, color: "var(--nw-text-muted)" }}>{index}</td>
         <td style={{ ...tdStyle, fontWeight: 600 }}>{u.name}</td>
-        <td style={{ ...tdStyle, color: "#9CA3AF", fontSize: "0.75rem" }}>{u.email}</td>
+        <td style={{ ...tdStyle, color: "var(--nw-text-secondary)", fontSize: "0.75rem" }}>{u.email}</td>
         <td style={tdStyle}>
           <Chip
             size="small"
@@ -215,7 +215,7 @@ function UserRow({
             sx={{
               fontWeight: 600,
               fontSize: "0.7rem",
-              color: "#FFFFFF",
+              color: "var(--nw-text-primary)",
               backgroundColor: isAdmin ? "rgba(139,92,246,0.25)" : "rgba(59,130,246,0.25)",
               border: isAdmin ? "1px solid rgba(139,92,246,0.4)" : "1px solid rgba(59,130,246,0.4)",
             }}
@@ -231,12 +231,12 @@ function UserRow({
                 textTransform: "none",
                 fontSize: "0.75rem",
                 fontWeight: 600,
-                color: "#F97316",
-                border: "1px solid rgba(249,115,22,0.3)",
+                color: "var(--nw-primary)",
+                border: "1px solid var(--nw-primary-30)",
                 borderRadius: "8px",
                 px: 1.5,
                 py: 0.5,
-                "&:hover": { backgroundColor: "rgba(249,115,22,0.1)" },
+                "&:hover": { backgroundColor: "var(--nw-primary-10)" },
               }}
             >
               {isExpanded ? "Hide" : "View Bookings"}
@@ -246,13 +246,13 @@ function UserRow({
       </tr>
       {isExpanded && (
         <tr>
-          <td colSpan={6} style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", background: "rgba(255,255,255,0.02)" }}>
-            <Box sx={{ background: "#0A0A0A", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
+          <td colSpan={6} style={{ padding: "16px 20px", borderBottom: "1px solid var(--nw-border-soft)", background: "var(--nw-glass)" }}>
+            <Box sx={{ background: "var(--nw-bg)", borderRadius: "12px", border: "1px solid var(--nw-border)", overflow: "hidden" }}>
               <table style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <tr style={{ borderBottom: "1px solid var(--nw-border)" }}>
                     {["Flight No", "Route", "Seats", "Total Price", "Status", "Date"].map((h) => (
-                      <th key={h} style={{ padding: "10px 14px", fontSize: "0.7rem", fontWeight: 600, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                      <th key={h} style={{ padding: "10px 14px", fontSize: "0.7rem", fontWeight: 600, color: "var(--nw-text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                         {h}
                       </th>
                     ))}
@@ -263,17 +263,17 @@ function UserRow({
                     const innerTd: React.CSSProperties = {
                       padding: "10px 14px",
                       fontSize: "0.8rem",
-                      color: "#FFFFFF",
-                      borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      color: "var(--nw-text-primary)",
+                      borderBottom: "1px solid var(--nw-border-soft)",
                     };
                     return (
-                      <tr key={b.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                      <tr key={b.id} style={{ borderBottom: "1px solid var(--nw-border-soft)" }}>
                         <td style={{ ...innerTd, fontFamily: "monospace", fontSize: "0.75rem" }}>{b.flightNumber}</td>
                         <td style={innerTd}>
                           {b.source} &rarr; {b.destination}
                         </td>
                         <td style={innerTd}>{b.numberOfSeats}</td>
-                        <td style={{ ...innerTd, fontWeight: 700, color: "#F97316" }}>
+                        <td style={{ ...innerTd, fontWeight: 700, color: "var(--nw-primary)" }}>
                           &#8377;{b.totalPrice.toLocaleString("en-IN")}
                         </td>
                         <td style={innerTd}>
@@ -283,7 +283,7 @@ function UserRow({
                             onSaved={onStatusSaved}
                           />
                         </td>
-                        <td style={{ ...innerTd, color: "#6B7280", fontSize: "0.75rem" }}>
+                        <td style={{ ...innerTd, color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>
                           {new Date(b.bookingDate).toLocaleDateString("en-IN")}
                         </td>
                       </tr>
@@ -292,7 +292,7 @@ function UserRow({
                 </tbody>
               </table>
               {userBookings.length > 5 && (
-                <Box sx={{ px: 2, py: 1.5, borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                <Box sx={{ px: 2, py: 1.5, borderTop: "1px solid var(--nw-border)", textAlign: "center" }}>
                   <Button
                     onClick={() => setShowAll(!showAll)}
                     size="small"
@@ -300,8 +300,8 @@ function UserRow({
                       textTransform: "none",
                       fontSize: "0.75rem",
                       fontWeight: 600,
-                      color: "#F97316",
-                      "&:hover": { backgroundColor: "rgba(249,115,22,0.1)" },
+                      color: "var(--nw-primary)",
+                      "&:hover": { backgroundColor: "var(--nw-primary-10)" },
                     }}
                   >
                     {showAll ? "Show less" : `Show all ${userBookings.length} bookings`}
@@ -315,3 +315,6 @@ function UserRow({
     </>
   );
 }
+
+
+

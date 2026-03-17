@@ -109,25 +109,25 @@ export default function AnalyticsTab({
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       {/* Header */}
       <Box>
-        <Typography sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: "1.5rem" }}>Analytics</Typography>
-        <Typography sx={{ color: "#6B7280", fontSize: "0.85rem", mt: 0.5 }}>Performance overview and key business metrics</Typography>
+        <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 800, fontSize: "1.5rem" }}>Analytics</Typography>
+        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem", mt: 0.5 }}>Performance overview and key business metrics</Typography>
       </Box>
 
       {/* KPI Cards */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: 2.5 }}>
         {[
-          { label: "Total Bookings", value: stats.totalBookings, icon: <BookOnlineIcon sx={{ fontSize: 18, color: "#6366F1" }} />, accent: "#6366F1", sub: "All time" },
-          { label: "Confirmed", value: stats.confirmed, icon: <CheckCircleOutlineIcon sx={{ fontSize: 18, color: "#22C55E" }} />, accent: "#22C55E", sub: `${stats.totalBookings > 0 ? Math.round((stats.confirmed / stats.totalBookings) * 100) : 0}% confirmation rate` },
-          { label: "Cancelled", value: stats.cancelled, icon: <CancelOutlinedIcon sx={{ fontSize: 18, color: "#EF4444" }} />, accent: "#EF4444", sub: `${stats.totalBookings > 0 ? Math.round((stats.cancelled / stats.totalBookings) * 100) : 0}% cancellation rate` },
-          { label: "Total Revenue", value: `₹${totalRevenueFromPayments.toLocaleString("en-IN")}`, icon: <CurrencyRupeeIcon sx={{ fontSize: 18, color: "#10B981" }} />, accent: "#10B981", sub: "Actual payments" },
+          { label: "Total Bookings", value: stats.totalBookings, icon: <BookOnlineIcon sx={{ fontSize: 18, color: "var(--nw-accent-indigo)" }} />, accent: "var(--nw-accent-indigo)", sub: "All time" },
+          { label: "Confirmed", value: stats.confirmed, icon: <CheckCircleOutlineIcon sx={{ fontSize: 18, color: "var(--nw-success-bright)" }} />, accent: "var(--nw-success-bright)", sub: `${stats.totalBookings > 0 ? Math.round((stats.confirmed / stats.totalBookings) * 100) : 0}% confirmation rate` },
+          { label: "Cancelled", value: stats.cancelled, icon: <CancelOutlinedIcon sx={{ fontSize: 18, color: "var(--nw-error)" }} />, accent: "var(--nw-error)", sub: `${stats.totalBookings > 0 ? Math.round((stats.cancelled / stats.totalBookings) * 100) : 0}% cancellation rate` },
+          { label: "Total Revenue", value: `₹${totalRevenueFromPayments.toLocaleString("en-IN")}`, icon: <CurrencyRupeeIcon sx={{ fontSize: 18, color: "var(--nw-success)" }} />, accent: "var(--nw-success)", sub: "Actual payments" },
         ].map((card) => (
-          <Paper key={card.label} elevation={0} sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 2.5 }}>
+          <Paper key={card.label} elevation={0} sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 2.5 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
               <Box sx={{ width: 36, height: 36, borderRadius: "10px", background: `${card.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem" }}>{card.icon}</Box>
               <Box sx={{ height: 3, width: "35%", borderRadius: 2, background: card.accent, opacity: 0.5 }} />
             </Box>
-            <Typography sx={{ color: "#FFFFFF", fontSize: "1.5rem", fontWeight: 800 }}>{card.value}</Typography>
-            <Typography sx={{ color: "#6B7280", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", mt: 0.3 }}>{card.label}</Typography>
+            <Typography sx={{ color: "var(--nw-text-primary)", fontSize: "1.5rem", fontWeight: 800 }}>{card.value}</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", mt: 0.3 }}>{card.label}</Typography>
             <Typography sx={{ color: card.accent, fontSize: "0.72rem", mt: 0.5 }}>{card.sub}</Typography>
           </Paper>
         ))}
@@ -135,27 +135,27 @@ export default function AnalyticsTab({
 
       {/* Charts Row 1: Revenue + Status */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" }, gap: 3 }}>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 700, mb: 2, fontSize: "1rem" }}>Revenue Trend (Last 7 Days)</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 2, fontSize: "1rem" }}>Revenue Trend (Last 7 Days)</Typography>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={revenueData}>
-              <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-              <XAxis dataKey="date" tick={{ fill: "#6B7280", fontSize: 11 }} axisLine={{ stroke: "rgba(255,255,255,0.06)" }} tickLine={false} />
-              <YAxis tick={{ fill: "#6B7280", fontSize: 11 }} axisLine={{ stroke: "rgba(255,255,255,0.06)" }} tickLine={false} tickFormatter={(v) => `₹${((v as number) / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={(v) => [`₹${(v as number).toLocaleString("en-IN")}`, "Revenue"]} contentStyle={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: "0.8rem" }} />
-              <Line type="monotone" dataKey="revenue" stroke="#F97316" strokeWidth={2.5} dot={{ fill: "#F97316", r: 3 }} activeDot={{ r: 5 }} name="Revenue" />
+              <CartesianGrid stroke="var(--nw-border)" strokeDasharray="3 3" />
+              <XAxis dataKey="date" tick={{ fill: "var(--nw-text-muted)", fontSize: 11 }} axisLine={{ stroke: "var(--nw-border)" }} tickLine={false} />
+              <YAxis tick={{ fill: "var(--nw-text-muted)", fontSize: 11 }} axisLine={{ stroke: "var(--nw-border)" }} tickLine={false} tickFormatter={(v) => `₹${((v as number) / 1000).toFixed(0)}k`} />
+              <Tooltip formatter={(v) => [`₹${(v as number).toLocaleString("en-IN")}`, "Revenue"]} contentStyle={{ background: "var(--nw-elevated)", border: "1px solid var(--nw-border-strong)", borderRadius: 8, color: "var(--nw-text-primary)", fontSize: "0.8rem" }} />
+              <Line type="monotone" dataKey="revenue" stroke="var(--nw-primary)" strokeWidth={2.5} dot={{ fill: "var(--nw-primary)", r: 3 }} activeDot={{ r: 5 }} name="Revenue" />
             </LineChart>
           </ResponsiveContainer>
         </Paper>
 
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 700, mb: 1.5, fontSize: "1rem" }}>Booking Status</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 1.5, fontSize: "1rem" }}>Booking Status</Typography>
           <ResponsiveContainer width="100%" height={190}>
             <PieChart>
               <Pie data={bookingStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
                 {bookingStatusData.map((_entry, i) => <Cell key={i} fill={bookingStatusData[i].fill} />)}
               </Pie>
-              <Tooltip contentStyle={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: "0.8rem" }} />
+              <Tooltip contentStyle={{ background: "var(--nw-elevated)", border: "1px solid var(--nw-border-strong)", borderRadius: 8, color: "var(--nw-text-primary)", fontSize: "0.8rem" }} />
             </PieChart>
           </ResponsiveContainer>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -163,9 +163,9 @@ export default function AnalyticsTab({
               <Box key={d.name} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Box sx={{ width: 8, height: 8, borderRadius: "50%", background: d.fill }} />
-                  <Typography sx={{ color: "#9CA3AF", fontSize: "0.75rem" }}>{d.name}</Typography>
+                  <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.75rem" }}>{d.name}</Typography>
                 </Box>
-                <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "0.75rem" }}>{d.value}</Typography>
+                <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "0.75rem" }}>{d.value}</Typography>
               </Box>
             ))}
           </Box>
@@ -174,30 +174,30 @@ export default function AnalyticsTab({
 
       {/* Charts Row 2: Top Flights + Payment Revenue */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: 3 }}>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 700, mb: 2, fontSize: "1rem" }}>Top 5 Most Booked Flights</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 2, fontSize: "1rem" }}>Top 5 Most Booked Flights</Typography>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={topFlightsData} layout="vertical" margin={{ top: 5, right: 20, left: 80, bottom: 5 }}>
-              <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" horizontal={false} />
-              <XAxis type="number" tick={{ fill: "#6B7280", fontSize: 11 }} axisLine={{ stroke: "rgba(255,255,255,0.06)" }} tickLine={false} />
-              <YAxis dataKey="flight" type="category" width={75} tick={{ fill: "#9CA3AF", fontSize: 11 }} axisLine={{ stroke: "rgba(255,255,255,0.06)" }} tickLine={false} />
-              <Tooltip contentStyle={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: "0.8rem" }} />
+              <CartesianGrid stroke="var(--nw-border)" strokeDasharray="3 3" horizontal={false} />
+              <XAxis type="number" tick={{ fill: "var(--nw-text-muted)", fontSize: 11 }} axisLine={{ stroke: "var(--nw-border)" }} tickLine={false} />
+              <YAxis dataKey="flight" type="category" width={75} tick={{ fill: "var(--nw-text-secondary)", fontSize: 11 }} axisLine={{ stroke: "var(--nw-border)" }} tickLine={false} />
+              <Tooltip contentStyle={{ background: "var(--nw-elevated)", border: "1px solid var(--nw-border-strong)", borderRadius: 8, color: "var(--nw-text-primary)", fontSize: "0.8rem" }} />
               <Bar dataKey="count" radius={[0, 8, 8, 0]}>
-                {topFlightsData.map((_entry, i) => <Cell key={i} fill={["#F97316","#6366F1","#0EA5E9","#22C55E","#A855F7"][i % 5]} />)}
+                {topFlightsData.map((_entry, i) => <Cell key={i} fill={["var(--nw-primary)","var(--nw-accent-indigo)","var(--nw-accent-blue)","var(--nw-success-bright)","var(--nw-accent-violet)"][i % 5]} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </Paper>
 
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3 }}>
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 700, mb: 2, fontSize: "1rem" }}>Payment Revenue (Last 14 Days)</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3 }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, mb: 2, fontSize: "1rem" }}>Payment Revenue (Last 14 Days)</Typography>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={paymentRevenueData}>
-              <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-              <XAxis dataKey="date" tick={{ fill: "#6B7280", fontSize: 10 }} axisLine={{ stroke: "rgba(255,255,255,0.06)" }} tickLine={false} />
-              <YAxis tick={{ fill: "#6B7280", fontSize: 11 }} axisLine={{ stroke: "rgba(255,255,255,0.06)" }} tickLine={false} tickFormatter={(v) => `₹${((v as number) / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={(v) => [`₹${(v as number).toLocaleString("en-IN")}`, "Revenue"]} contentStyle={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: "0.8rem" }} />
-              <Bar dataKey="revenue" fill="#10B981" radius={[6, 6, 0, 0]} />
+              <CartesianGrid stroke="var(--nw-border)" strokeDasharray="3 3" />
+              <XAxis dataKey="date" tick={{ fill: "var(--nw-text-muted)", fontSize: 10 }} axisLine={{ stroke: "var(--nw-border)" }} tickLine={false} />
+              <YAxis tick={{ fill: "var(--nw-text-muted)", fontSize: 11 }} axisLine={{ stroke: "var(--nw-border)" }} tickLine={false} tickFormatter={(v) => `₹${((v as number) / 1000).toFixed(0)}k`} />
+              <Tooltip formatter={(v) => [`₹${(v as number).toLocaleString("en-IN")}`, "Revenue"]} contentStyle={{ background: "var(--nw-elevated)", border: "1px solid var(--nw-border-strong)", borderRadius: 8, color: "var(--nw-text-primary)", fontSize: "0.8rem" }} />
+              <Bar dataKey="revenue" fill="var(--nw-success)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>
@@ -205,22 +205,25 @@ export default function AnalyticsTab({
 
       {/* Summary Cards */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr 1fr" }, gap: 3 }}>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3, borderTop: "3px solid #F97316" }}>
-          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#6B7280", fontWeight: 600, mb: 1 }}>Avg Booking Value</Typography>
-          <Typography sx={{ fontSize: "1.875rem", fontWeight: 800, color: "#F97316" }}>₹{stats.avgBookingValue.toLocaleString("en-IN")}</Typography>
-          <Typography sx={{ fontSize: "0.72rem", color: "#6B7280", mt: 0.5 }}>Average per confirmed booking</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3, borderTop: "3px solid var(--nw-primary)" }}>
+          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--nw-text-muted)", fontWeight: 600, mb: 1 }}>Avg Booking Value</Typography>
+          <Typography sx={{ fontSize: "1.875rem", fontWeight: 800, color: "var(--nw-primary)" }}>₹{stats.avgBookingValue.toLocaleString("en-IN")}</Typography>
+          <Typography sx={{ fontSize: "0.72rem", color: "var(--nw-text-muted)", mt: 0.5 }}>Average per confirmed booking</Typography>
         </Paper>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3, borderTop: "3px solid #22C55E" }}>
-          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#6B7280", fontWeight: 600, mb: 1 }}>Total Revenue</Typography>
-          <Typography sx={{ fontSize: "1.875rem", fontWeight: 800, color: "#22C55E" }}>₹{stats.totalRevenue.toLocaleString("en-IN")}</Typography>
-          <Typography sx={{ fontSize: "0.72rem", color: "#6B7280", mt: 0.5 }}>From {stats.confirmed} confirmed bookings</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3, borderTop: "3px solid var(--nw-success-bright)" }}>
+          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--nw-text-muted)", fontWeight: 600, mb: 1 }}>Total Revenue</Typography>
+          <Typography sx={{ fontSize: "1.875rem", fontWeight: 800, color: "var(--nw-success-bright)" }}>₹{stats.totalRevenue.toLocaleString("en-IN")}</Typography>
+          <Typography sx={{ fontSize: "0.72rem", color: "var(--nw-text-muted)", mt: 0.5 }}>From {stats.confirmed} confirmed bookings</Typography>
         </Paper>
-        <Paper sx={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", p: 3, borderTop: "3px solid #6366F1" }}>
-          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#6B7280", fontWeight: 600, mb: 1 }}>Registered Users</Typography>
-          <Typography sx={{ fontSize: "1.875rem", fontWeight: 800, color: "#6366F1" }}>{stats.totalUsers.toLocaleString("en-IN")}</Typography>
-          <Typography sx={{ fontSize: "0.72rem", color: "#6B7280", mt: 0.5 }}>Total users on platform</Typography>
+        <Paper sx={{ background: "var(--nw-card)", border: "1px solid var(--nw-border)", borderRadius: "16px", p: 3, borderTop: "3px solid var(--nw-accent-indigo)" }}>
+          <Typography sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--nw-text-muted)", fontWeight: 600, mb: 1 }}>Registered Users</Typography>
+          <Typography sx={{ fontSize: "1.875rem", fontWeight: 800, color: "var(--nw-accent-indigo)" }}>{stats.totalUsers.toLocaleString("en-IN")}</Typography>
+          <Typography sx={{ fontSize: "0.72rem", color: "var(--nw-text-muted)", mt: 0.5 }}>Total users on platform</Typography>
         </Paper>
       </Box>
     </Box>
   );
 }
+
+
+

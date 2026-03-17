@@ -65,8 +65,8 @@ const NumberInput: React.FC<NumberInputProps> = ({
     width: 28,
     height: 28,
     borderRadius: "7px",
-    border: "1px solid rgba(249,115,22,0.25)",
-    background: "rgba(249,115,22,0.08)",
+    border: "1px solid var(--nw-primary-20)",
+    background: "var(--nw-primary-08)",
     color: "#F97316",
     cursor: enabled ? "pointer" : "not-allowed",
     opacity: enabled ? 1 : 0.35,
@@ -86,7 +86,7 @@ const NumberInput: React.FC<NumberInputProps> = ({
       {label && (
         <Typography
           sx={{
-            color: "#6B7280",
+            color: "var(--nw-text-muted)",
             fontSize: "0.7rem",
             fontWeight: 600,
             mb: 0.8,
@@ -105,8 +105,8 @@ const NumberInput: React.FC<NumberInputProps> = ({
           gap: 1,
           px: 1.5,
           py: "14px",
-          background: "#1a1a1a",
-          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+          background: "var(--nw-elevated)",
+          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "var(--nw-border-strong)"}`,
           borderRadius: "12px",
           transition: "all 0.2s ease",
           "&:hover": {
@@ -127,7 +127,7 @@ const NumberInput: React.FC<NumberInputProps> = ({
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography
             sx={{
-              color: "#FFFFFF",
+              color: "var(--nw-text-primary)",
               fontSize: "0.9375rem",
               fontWeight: 500,
               lineHeight: 1,
@@ -137,7 +137,7 @@ const NumberInput: React.FC<NumberInputProps> = ({
             {value}&nbsp;
             <Box
               component="span"
-              sx={{ color: "#9CA3AF", fontSize: "0.8125rem", fontWeight: 400 }}
+              sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8125rem", fontWeight: 400 }}
             >
               {value === 1 ? "Passenger" : "Passengers"}
             </Box>

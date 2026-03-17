@@ -39,9 +39,9 @@ interface FoodSelectionState {
 }
 
 function getDietColor(dietType: FoodItem["dietType"]) {
-  if (dietType === "VEG") return { bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.3)", text: "#22C55E" };
-  if (dietType === "NON_VEG") return { bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.3)", text: "#EF4444" };
-  if (dietType === "VEGAN") return { bg: "rgba(156,163,175,0.1)", border: "rgba(156,163,175,0.3)", text: "#9CA3AF" };
+  if (dietType === "VEG") return { bg: "var(--nw-success-10)", border: "var(--nw-success-30)", text: "var(--nw-success-bright)" };
+  if (dietType === "NON_VEG") return { bg: "var(--nw-error-10)", border: "var(--nw-error-30)", text: "var(--nw-error)" };
+  if (dietType === "VEGAN") return { bg: "rgba(156,163,175,0.1)", border: "rgba(156,163,175,0.3)", text: "var(--nw-text-secondary)" };
   return { bg: "rgba(234,179,8,0.1)", border: "rgba(234,179,8,0.3)", text: "#EAB308" };
 }
 
@@ -143,8 +143,8 @@ export default function FoodSelection() {
   if (!bookingState || !flightId) {
     return (
       <Box sx={{ maxWidth: 600, mx: "auto", px: 3, py: 12, textAlign: "center" }}>
-        <Typography sx={{ color: "#EF4444", fontWeight: 600, mb: 2 }}>Booking information not available</Typography>
-        <Typography sx={{ color: "#6B7280", mb: 4, fontSize: "0.9rem" }}>Please select seats again to proceed with meal selection.</Typography>
+        <Typography sx={{ color: "var(--nw-error)", fontWeight: 600, mb: 2 }}>Booking information not available</Typography>
+        <Typography sx={{ color: "var(--nw-text-muted)", mb: 4, fontSize: "0.9rem" }}>Please select seats again to proceed with meal selection.</Typography>
         <Button variant="contained" onClick={() => navigate("/explore")} sx={{ borderRadius: "10px" }}>
           Go to Flights
         </Button>
@@ -161,16 +161,16 @@ export default function FoodSelection() {
           sx={{
             width: 48,
             height: 48,
-            border: "3px solid rgba(249,115,22,0.2)",
-            borderTop: "3px solid #F97316",
+            border: "3px solid var(--nw-primary-20)",
+            borderTop: "3px solid var(--nw-primary)",
             borderRadius: "50%",
             animation: "spin 1s linear infinite",
             mb: 3,
             "@keyframes spin": { "100%": { transform: "rotate(360deg)" } },
           }}
         />
-        <Typography sx={{ color: "#FFFFFF", fontWeight: 600 }}>Loading meal options...</Typography>
-        <Typography sx={{ color: "#6B7280", fontSize: "0.85rem", mt: 1 }}>
+        <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600 }}>Loading meal options...</Typography>
+        <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem", mt: 1 }}>
           {confirmedState.airlineName} | {confirmedState.cabinClass}
         </Typography>
       </Box>
@@ -182,8 +182,8 @@ export default function FoodSelection() {
     const errorMsg = menuQuery.error instanceof Error ? menuQuery.error.message : 'Unknown error';
     return (
       <Box sx={{ maxWidth: 480, mx: "auto", px: 3, py: 12, textAlign: "center" }}>
-        <Typography sx={{ color: "#EF4444", fontWeight: 600, mb: 2 }}>Failed to Load Menu</Typography>
-        <Typography sx={{ color: "#6B7280", mb: 4, fontSize: "0.9rem" }}>{errorMsg}</Typography>
+        <Typography sx={{ color: "var(--nw-error)", fontWeight: 600, mb: 2 }}>Failed to Load Menu</Typography>
+        <Typography sx={{ color: "var(--nw-text-muted)", mb: 4, fontSize: "0.9rem" }}>{errorMsg}</Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
           <Button variant="contained" fullWidth onClick={() => window.location.reload()} sx={{ borderRadius: "10px" }}>
             Retry
@@ -284,10 +284,10 @@ export default function FoodSelection() {
         onClick={() => navigate(`/select-seats/${flightId}?seats=${bookingState.numberOfSeats}`)}
         sx={{
           mb: 2,
-          color: "#9CA3AF",
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          "&:hover": { background: "rgba(249,115,22,0.1)", color: "#F97316" },
+          color: "var(--nw-text-secondary)",
+          background: "var(--nw-border-soft)",
+          border: "1px solid var(--nw-border-strong)",
+          "&:hover": { background: "var(--nw-primary-10)", color: "var(--nw-primary)" },
         }}
       >
         <ArrowBackIcon fontSize="small" />
@@ -299,20 +299,20 @@ export default function FoodSelection() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <Paper
           sx={{
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--nw-card)",
+            border: "1px solid var(--nw-border)",
             borderRadius: "16px",
             p: { xs: 2.5, sm: 3.5 },
             mb: 3,
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
-            <RestaurantMenuIcon sx={{ color: "#F97316", fontSize: 24 }} />
-            <Typography sx={{ fontSize: { xs: "1.2rem", md: "1.4rem" }, fontWeight: 800, color: "#FFFFFF" }}>
+            <RestaurantMenuIcon sx={{ color: "var(--nw-primary)", fontSize: 24 }} />
+            <Typography sx={{ fontSize: { xs: "1.2rem", md: "1.4rem" }, fontWeight: 800, color: "var(--nw-text-primary)" }}>
               Add Meals to Your Flight
             </Typography>
           </Box>
-          <Typography sx={{ color: "#6B7280", fontSize: "0.85rem" }}>
+          <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.85rem" }}>
             {bookingState.airlineName} {bookingState.flightNumber} | {bookingState.source} to {bookingState.destination} | {bookingState.numberOfSeats} Passenger(s)
           </Typography>
         </Paper>
@@ -321,14 +321,14 @@ export default function FoodSelection() {
       {/* Passenger tabs */}
       <Paper
         sx={{
-          background: "#111111",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--nw-card)",
+          border: "1px solid var(--nw-border)",
           borderRadius: "16px",
           p: 2.5,
           mb: 3,
         }}
       >
-        <Typography sx={{ color: "#9CA3AF", fontSize: "0.8rem", fontWeight: 600, mb: 2 }}>
+        <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8rem", fontWeight: 600, mb: 2 }}>
           Select meals for each passenger
         </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
@@ -345,14 +345,14 @@ export default function FoodSelection() {
                   fontWeight: active ? 600 : 400,
                   fontSize: "0.8rem",
                   background: active
-                    ? "linear-gradient(135deg, #F97316, #EA580C)"
-                    : "rgba(255,255,255,0.04)",
-                  color: active ? "#FFFFFF" : "#9CA3AF",
-                  border: active ? "none" : "1px solid rgba(255,255,255,0.08)",
+                    ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                    : "var(--nw-border-soft)",
+                  color: active ? "var(--nw-text-primary)" : "var(--nw-text-secondary)",
+                  border: active ? "none" : "1px solid var(--nw-border-strong)",
                   "&:hover": {
                     background: active
-                      ? "linear-gradient(135deg, #F97316, #EA580C)"
-                      : "rgba(255,255,255,0.08)",
+                      ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                      : "var(--nw-border-strong)",
                   },
                 }}
               />
@@ -378,14 +378,14 @@ export default function FoodSelection() {
               borderRadius: "8px",
               fontSize: "0.8rem",
               background: dietFilter === filter.key
-                ? "linear-gradient(135deg, #F97316, #EA580C)"
-                : "rgba(255,255,255,0.04)",
-              color: dietFilter === filter.key ? "#FFFFFF" : "#9CA3AF",
-              border: dietFilter === filter.key ? "none" : "1px solid rgba(255,255,255,0.08)",
+                ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                : "var(--nw-border-soft)",
+              color: dietFilter === filter.key ? "var(--nw-text-primary)" : "var(--nw-text-secondary)",
+              border: dietFilter === filter.key ? "none" : "1px solid var(--nw-border-strong)",
               "&:hover": {
                 background: dietFilter === filter.key
-                  ? "linear-gradient(135deg, #F97316, #EA580C)"
-                  : "rgba(255,255,255,0.08)",
+                  ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                  : "var(--nw-border-strong)",
               },
             }}
           />
@@ -401,14 +401,14 @@ export default function FoodSelection() {
             borderRadius: "8px",
             fontSize: "0.8rem",
             background: activeCategory === "all"
-              ? "linear-gradient(135deg, #F97316, #EA580C)"
-              : "rgba(255,255,255,0.04)",
-            color: activeCategory === "all" ? "#FFFFFF" : "#9CA3AF",
-            border: activeCategory === "all" ? "none" : "1px solid rgba(255,255,255,0.08)",
+              ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+              : "var(--nw-border-soft)",
+            color: activeCategory === "all" ? "var(--nw-text-primary)" : "var(--nw-text-secondary)",
+            border: activeCategory === "all" ? "none" : "1px solid var(--nw-border-strong)",
             "&:hover": {
               background: activeCategory === "all"
-                ? "linear-gradient(135deg, #F97316, #EA580C)"
-                : "rgba(255,255,255,0.08)",
+                ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                : "var(--nw-border-strong)",
             },
           }}
         />
@@ -422,14 +422,14 @@ export default function FoodSelection() {
               borderRadius: "8px",
               fontSize: "0.8rem",
               background: activeCategory === group.category.id
-                ? "linear-gradient(135deg, #F97316, #EA580C)"
-                : "rgba(255,255,255,0.04)",
-              color: activeCategory === group.category.id ? "#FFFFFF" : "#9CA3AF",
-              border: activeCategory === group.category.id ? "none" : "1px solid rgba(255,255,255,0.08)",
+                ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                : "var(--nw-border-soft)",
+              color: activeCategory === group.category.id ? "var(--nw-text-primary)" : "var(--nw-text-secondary)",
+              border: activeCategory === group.category.id ? "none" : "1px solid var(--nw-border-strong)",
               "&:hover": {
                 background: activeCategory === group.category.id
-                  ? "linear-gradient(135deg, #F97316, #EA580C)"
-                  : "rgba(255,255,255,0.08)",
+                  ? "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))"
+                  : "var(--nw-border-strong)",
               },
             }}
           />
@@ -440,14 +440,14 @@ export default function FoodSelection() {
       {filteredItems.length === 0 ? (
         <Paper
           sx={{
-            background: "#111111",
-            border: "1px dashed rgba(255,255,255,0.1)",
+            background: "var(--nw-card)",
+            border: "1px dashed var(--nw-border-strong)",
             borderRadius: "16px",
             p: 8,
             textAlign: "center",
           }}
         >
-          <Typography sx={{ color: "#6B7280" }}>No food items found for selected filters.</Typography>
+          <Typography sx={{ color: "var(--nw-text-muted)" }}>No food items found for selected filters.</Typography>
         </Paper>
       ) : (
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", xl: "1fr 1fr 1fr" }, gap: 2.5 }}>
@@ -466,15 +466,15 @@ export default function FoodSelection() {
               >
                 <Paper
                   sx={{
-                    background: "#111111",
+                    background: "var(--nw-card)",
                     border: qty > 0
-                      ? "1px solid rgba(249,115,22,0.3)"
-                      : "1px solid rgba(255,255,255,0.06)",
+                      ? "1px solid var(--nw-primary-30)"
+                      : "1px solid var(--nw-border)",
                     borderRadius: "16px",
                     overflow: "hidden",
                     transition: "all 0.2s ease",
                     "&:hover": {
-                      border: "1px solid rgba(255,255,255,0.12)",
+                      border: "1px solid var(--nw-border-strong)",
                     },
                   }}
                 >
@@ -507,8 +507,8 @@ export default function FoodSelection() {
                           position: "absolute",
                           top: 0,
                           left: 0,
-                          background: "linear-gradient(135deg, #F97316, #EA580C)",
-                          color: "#FFFFFF",
+                          background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
+                          color: "var(--nw-text-primary)",
                           fontSize: "0.65rem",
                           fontWeight: 700,
                           px: 1.5,
@@ -525,19 +525,19 @@ export default function FoodSelection() {
                     {/* Tags */}
                     <Box sx={{ display: "flex", gap: 0.8, mb: 1 }}>
                       {item.newItem && (
-                        <Chip label="New" size="small" sx={{ background: "rgba(16,185,129,0.1)", color: "#10B981", fontSize: "0.65rem", height: 22 }} />
+                        <Chip label="New" size="small" sx={{ background: "rgba(16,185,129,0.1)", color: "var(--nw-success)", fontSize: "0.65rem", height: 22 }} />
                       )}
                       {item.popular && (
-                        <Chip label="Popular" size="small" sx={{ background: "rgba(245,158,11,0.1)", color: "#F59E0B", fontSize: "0.65rem", height: 22 }} />
+                        <Chip label="Popular" size="small" sx={{ background: "var(--nw-warning-10)", color: "var(--nw-secondary)", fontSize: "0.65rem", height: 22 }} />
                       )}
                     </Box>
 
-                    <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.95rem", mb: 0.5 }}>
+                    <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.95rem", mb: 0.5 }}>
                       {item.name}
                     </Typography>
                     <Typography
                       sx={{
-                        color: "#6B7280",
+                        color: "var(--nw-text-muted)",
                         fontSize: "0.8rem",
                         lineHeight: 1.5,
                         mb: 1,
@@ -549,24 +549,24 @@ export default function FoodSelection() {
                     >
                       {item.description}
                     </Typography>
-                    <Typography sx={{ color: "#4B5563", fontSize: "0.75rem", mb: 0.5 }}>
+                    <Typography sx={{ color: "var(--nw-text-disabled)", fontSize: "0.75rem", mb: 0.5 }}>
                       {item.calories} cal • {item.weight}
                     </Typography>
                     {item.allergens.length > 0 && (
-                      <Typography sx={{ color: "#F59E0B", fontSize: "0.7rem", mb: 1.5 }}>
+                      <Typography sx={{ color: "var(--nw-secondary)", fontSize: "0.7rem", mb: 1.5 }}>
                         Contains: {item.allergens.join(", ")}
                       </Typography>
                     )}
 
                     {/* Price + Controls */}
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pt: 1.5, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pt: 1.5, borderTop: "1px solid var(--nw-border)" }}>
                       <Typography
                         sx={{
                           fontWeight: 700,
                           fontSize: "1.05rem",
                           background: complimentary
-                            ? "linear-gradient(135deg, #10B981, #059669)"
-                            : "linear-gradient(135deg, #F97316, #F59E0B)",
+                            ? "linear-gradient(135deg, var(--nw-success), #059669)"
+                            : "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
                           backgroundClip: "text",
@@ -581,15 +581,15 @@ export default function FoodSelection() {
                           sx={{
                             width: 32,
                             height: 32,
-                            background: "rgba(255,255,255,0.04)",
-                            border: "1px solid rgba(255,255,255,0.1)",
-                            color: "#9CA3AF",
-                            "&:hover": { background: "rgba(255,255,255,0.08)" },
+                            background: "var(--nw-border-soft)",
+                            border: "1px solid var(--nw-border-strong)",
+                            color: "var(--nw-text-secondary)",
+                            "&:hover": { background: "var(--nw-border-strong)" },
                           }}
                         >
                           <RemoveIcon sx={{ fontSize: 16 }} />
                         </IconButton>
-                        <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "0.9rem", minWidth: 20, textAlign: "center" }}>
+                        <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "0.9rem", minWidth: 20, textAlign: "center" }}>
                           {qty}
                         </Typography>
                         <IconButton
@@ -604,10 +604,10 @@ export default function FoodSelection() {
                           sx={{
                             width: 32,
                             height: 32,
-                            background: "rgba(249,115,22,0.1)",
-                            border: "1px solid rgba(249,115,22,0.2)",
-                            color: "#F97316",
-                            "&:hover": { background: "rgba(249,115,22,0.2)" },
+                            background: "var(--nw-primary-10)",
+                            border: "1px solid var(--nw-primary-20)",
+                            color: "var(--nw-primary)",
+                            "&:hover": { background: "var(--nw-primary-20)" },
                           }}
                         >
                           <AddIcon sx={{ fontSize: 16 }} />
@@ -629,8 +629,8 @@ export default function FoodSelection() {
           bottom: 0,
           left: 0,
           right: 0,
-          background: "#111111",
-          borderTop: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--nw-card)",
+          borderTop: "1px solid var(--nw-border-strong)",
           py: 2,
           px: 3,
           zIndex: 30,
@@ -643,7 +643,7 @@ export default function FoodSelection() {
               sx={{
                 fontWeight: 700,
                 fontSize: "1.05rem",
-                background: "linear-gradient(135deg, #F97316, #F59E0B)",
+                background: "linear-gradient(135deg, var(--nw-primary), var(--nw-secondary))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -651,7 +651,7 @@ export default function FoodSelection() {
             >
               ₹{foodTotal.toLocaleString("en-IN")} added
             </Typography>
-            <Typography sx={{ color: "#6B7280", fontSize: "0.75rem" }}>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem" }}>
               {totalItems} item(s) across {bookingState.numberOfSeats} seat(s)
             </Typography>
           </Box>
@@ -661,12 +661,12 @@ export default function FoodSelection() {
               variant="outlined"
               sx={{
                 borderRadius: "10px",
-                borderColor: "rgba(255,255,255,0.12)",
-                color: "#9CA3AF",
+                borderColor: "var(--nw-border-strong)",
+                color: "var(--nw-text-secondary)",
                 fontSize: "0.85rem",
                 "&:hover": {
-                  borderColor: "rgba(255,255,255,0.2)",
-                  background: "rgba(255,255,255,0.04)",
+                  borderColor: "var(--nw-border-strong)",
+                  background: "var(--nw-border-soft)",
                 },
               }}
             >
@@ -680,9 +680,9 @@ export default function FoodSelection() {
                 borderRadius: "10px",
                 fontWeight: 700,
                 fontSize: "0.85rem",
-                background: "linear-gradient(135deg, #F97316, #EA580C)",
+                background: "linear-gradient(135deg, var(--nw-primary), var(--nw-primary-dark))",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #EA580C, #DC2626)",
+                  background: "linear-gradient(135deg, var(--nw-primary-dark), var(--nw-error))",
                 },
               }}
             >
@@ -694,3 +694,7 @@ export default function FoodSelection() {
     </Box>
   );
 }
+
+
+
+

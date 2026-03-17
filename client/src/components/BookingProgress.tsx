@@ -86,12 +86,12 @@ function CustomStepIcon({
         width: 40,
         height: 40,
         borderRadius: "50%",
-        background: "rgba(255,255,255,0.06)",
-        border: "1px solid rgba(255,255,255,0.1)",
+        background: "var(--nw-glass)",
+        border: "1px solid var(--nw-border-strong)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: "#6B7280",
+        color: "var(--nw-text-muted)",
       }}
     >
       <Typography sx={{ fontSize: "0.85rem", fontWeight: 600 }}>
@@ -108,8 +108,8 @@ export default function BookingProgress({ activeStep }: BookingProgressProps) {
   return (
     <Box
       sx={{
-        background: "#111111",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--nw-card)",
+        border: "1px solid var(--nw-border)",
         borderRadius: "16px",
         p: { xs: 2.5, sm: 3.5 },
         mb: 3,
@@ -122,7 +122,7 @@ export default function BookingProgress({ activeStep }: BookingProgressProps) {
           "& .MuiStepConnector-line": {
             borderTopStyle: "dashed",
             borderTopWidth: 2,
-            borderColor: "rgba(255,255,255,0.1)",
+            borderColor: "var(--nw-border-strong)",
           },
           "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": {
             borderColor: "#F97316",
@@ -151,10 +151,10 @@ export default function BookingProgress({ activeStep }: BookingProgressProps) {
                   fontWeight: index === stepIndex ? 600 : 400,
                   color:
                     index < stepIndex
-                      ? "#F97316"
+                      ? "var(--nw-primary)"
                       : index === stepIndex
-                        ? "#FFFFFF"
-                        : "#6B7280",
+                        ? "var(--nw-text-primary)"
+                        : "var(--nw-text-muted)",
                   mt: 0.5,
                 }}
               >
