@@ -22,6 +22,7 @@ const Register = lazy(() => import("./pages/Register"));
 const ExplorePage = lazy(() => import("./pages/ExplorePage"));
 const FlightDetail = lazy(() => import("./pages/FlightDetail"));
 const SearchResults = lazy(() => import("./pages/SearchResults"));
+const Contact = lazy(() => import("./pages/Contact"));
 const BookFlight = lazy(() => import("./pages/BookFlight"));
 const SeatSelection = lazy(() => import("./pages/SeatSelection"));
 const FoodSelection = lazy(() => import("./pages/FoodSelection"));
@@ -29,6 +30,7 @@ const PaymentPreview = lazy(() => import("./pages/PaymentPreview"));
 const MyBookings = lazy(() => import("./pages/MyBookings"));
 const BookingDetail = lazy(() => import("./pages/BookingDetail"));
 const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
+const Profile = lazy(() => import("./pages/Profile"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AddFlight = lazy(() => import("./pages/admin/AddFlight"));
 const EditFlight = lazy(() => import("./pages/admin/EditFlight"));
@@ -64,6 +66,7 @@ function AppContent() {
               <Route path="/explore" element={<ExplorePage />} />
               <Route path="/flights/:id" element={<FlightDetail />} />
               <Route path="/search" element={<SearchResults />} />
+              <Route path="/contact" element={<Contact />} />
 
               {/* Protected routes (any logged-in user) */}
               <Route element={<ProtectedRoute />}>
@@ -74,6 +77,7 @@ function AppContent() {
                 <Route path="/my-bookings" element={<MyBookings />} />
                 <Route path="/bookings/:id" element={<BookingDetail />} />
                 <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
+                <Route path="/profile" element={<Profile />} />
               </Route>
 
               {/* Admin-only routes */}

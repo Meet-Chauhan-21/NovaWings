@@ -38,6 +38,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final FlightRepository flightRepository;
+    private final EmailService emailService;
 
     /**
      * Step 1: Create a Razorpay order and save a PENDING payment record.
@@ -218,6 +219,14 @@ public class PaymentService {
         payment.setPaidAt(LocalDateTime.now());
         payment.setUpdatedAt(LocalDateTime.now());
         paymentRepository.save(payment);
+
+        // Send booking confirmation email
+        try {
+            emailService.sendBookingConfirmationEmail(savedBooking);
+        } catch (Exception e) {
+            // Log error but don't fail the payment
+            System.err.println("Failed to send confirmation email: " + e.getMessage());
+        }
 
         // Build response
         PaymentResponse response = new PaymentResponse();

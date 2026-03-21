@@ -40,7 +40,7 @@ const SUPPORT_LINKS = [
   { label: "Terms of Service" },
   { label: "Privacy Policy" },
   { label: "Refund Policy" },
-  { label: "Contact Us" },
+  { label: "Contact Us", path: "/contact" },
 ];
 
 const CONTACT_INFO = [
@@ -206,23 +206,35 @@ export default function Footer() {
             <Grid size={{ xs: 6, sm: 3, md: 2 }}>
               <Typography sx={headingSx}>Support</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 0.3 }}>
-                {SUPPORT_LINKS.map((link) => (
-                  <Typography
-                    key={link.label}
-                    sx={{
-                      color: textDisabled,
-                      fontSize: "0.85rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                      py: 0.5,
-                      cursor: "default",
-                    }}
-                  >
-                    <ChevronRightIcon sx={{ fontSize: 14, opacity: 0.3 }} />
-                    {link.label}
-                  </Typography>
-                ))}
+                {SUPPORT_LINKS.map((link) =>
+                  link.path ? (
+                    <MuiLink
+                      key={link.label}
+                      component={RouterLink}
+                      to={link.path}
+                      sx={linkSx}
+                    >
+                      <ChevronRightIcon sx={{ fontSize: 14, opacity: 0.5 }} />
+                      {link.label}
+                    </MuiLink>
+                  ) : (
+                    <Typography
+                      key={link.label}
+                      sx={{
+                        color: textDisabled,
+                        fontSize: "0.85rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        py: 0.5,
+                        cursor: "default",
+                      }}
+                    >
+                      <ChevronRightIcon sx={{ fontSize: 14, opacity: 0.3 }} />
+                      {link.label}
+                    </Typography>
+                  )
+                )}
               </Box>
             </Grid>
 

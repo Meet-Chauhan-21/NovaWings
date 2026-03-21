@@ -44,8 +44,8 @@ function calcDuration(dep: string, arr: string): string {
 }
 
 const CARD_BASE = {
-  background: "#111111",
-  border: "1px solid rgba(255,255,255,0.06)",
+  background: "var(--nw-card)",
+  border: "1px solid var(--nw-border)",
   borderRadius: "16px",
   transition: "all 0.25s ease",
   "&:hover": {
@@ -83,13 +83,13 @@ const FlightCard: React.FC<FlightCardProps> = React.memo(
           }}
           onClick={() => onSelect ? onSelect(flight) : undefined}
         >
-          <Typography sx={{ color: "#FFFFFF", fontWeight: 600, fontSize: "0.875rem" }}>
+          <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 600, fontSize: "0.875rem" }}>
             {flight.source} → {flight.destination}
           </Typography>
-          <Typography sx={{ color: "#9CA3AF", fontSize: "0.8125rem" }}>
+          <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.8125rem" }}>
             {fmtTime(flight.departureTime)}
           </Typography>
-          <Typography sx={{ color: "#F97316", fontWeight: 700, fontSize: "0.9375rem", flexShrink: 0 }}>
+          <Typography sx={{ color: "var(--nw-primary)", fontWeight: 700, fontSize: "0.9375rem", flexShrink: 0 }}>
             ₹{flight.price.toLocaleString("en-IN")}
           </Typography>
         </Box>
@@ -103,46 +103,46 @@ const FlightCard: React.FC<FlightCardProps> = React.memo(
           {/* Airline + flight number */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <Box>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1rem", lineHeight: 1.2 }}>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1rem", lineHeight: 1.2 }}>
                 {flight.airlineName}
               </Typography>
-              <Typography sx={{ color: "#F97316", fontSize: "0.75rem", fontFamily: '"JetBrains Mono",monospace', fontWeight: 600, mt: 0.25 }}>
+              <Typography sx={{ color: "var(--nw-primary)", fontSize: "0.75rem", fontFamily: '"JetBrains Mono",monospace', fontWeight: 600, mt: 0.25 }}>
                 {flight.flightNumber}
               </Typography>
             </Box>
             {seatsLow && (
-              <Chip label={`${flight.availableSeats} left`} size="small" sx={{ background: "rgba(239,68,68,0.12)", color: "#EF4444", border: "1px solid rgba(239,68,68,0.2)", fontSize: "0.7rem", fontWeight: 600 }} />
+              <Chip label={`${flight.availableSeats} left`} size="small" sx={{ background: "var(--nw-error-12)", color: "var(--nw-error)", border: "1px solid var(--nw-error-20)", fontSize: "0.7rem", fontWeight: 600 }} />
             )}
           </Box>
 
           {/* Route + times */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Box sx={{ textAlign: "center" }}>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.departureTime)}</Typography>
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.75rem" }}>{flight.source}</Typography>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.departureTime)}</Typography>
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.75rem" }}>{flight.source}</Typography>
             </Box>
             <Box sx={{ flex: 1, textAlign: "center" }}>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", mb: 0.25 }}>{duration}</Typography>
-              <Box sx={{ position: "relative", height: "1px", background: "rgba(255,255,255,0.1)" }}>
-                <AirlineStopsIcon sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 16, color: "#F97316" }} />
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem", mb: 0.25 }}>{duration}</Typography>
+              <Box sx={{ position: "relative", height: "1px", background: "var(--nw-border)" }}>
+                <AirlineStopsIcon sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 16, color: "var(--nw-primary)" }} />
               </Box>
-              <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", mt: 0.25 }}>Direct</Typography>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem", mt: 0.25 }}>Direct</Typography>
             </Box>
             <Box sx={{ textAlign: "center" }}>
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.arrivalTime)}</Typography>
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.75rem" }}>{flight.destination}</Typography>
+              <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.arrivalTime)}</Typography>
+              <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.75rem" }}>{flight.destination}</Typography>
             </Box>
           </Box>
 
           {/* Price + Book */}
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: "auto" }}>
             <Box>
-              <Typography sx={{ color: "#6B7280", fontSize: "0.6875rem" }}>from</Typography>
-              <Typography sx={{ color: "#F97316", fontWeight: 800, fontSize: "1.375rem", lineHeight: 1 }}>
+              <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem" }}>from</Typography>
+              <Typography sx={{ color: "var(--nw-primary)", fontWeight: 800, fontSize: "1.375rem", lineHeight: 1 }}>
                 ₹{flight.price.toLocaleString("en-IN")}
               </Typography>
             </Box>
-            <Button {...ctaButtonProps} variant="contained" size="small" sx={{ borderRadius: "8px", fontWeight: 600, background: "linear-gradient(135deg,#F97316,#EA580C)", boxShadow: "0 4px 12px rgba(249,115,22,0.3)" }}>
+            <Button {...ctaButtonProps} variant="contained" size="small" sx={{ borderRadius: "8px", fontWeight: 600, background: "linear-gradient(135deg,var(--nw-primary),var(--nw-primary-dark))", boxShadow: "0 4px 12px rgba(249,115,22,0.3)" }}>
               Book
             </Button>
           </Box>
@@ -155,42 +155,42 @@ const FlightCard: React.FC<FlightCardProps> = React.memo(
       <Box sx={{ ...CARD_BASE, px: { xs: 2, sm: 3 }, py: 2.5, display: "flex", alignItems: "center", gap: { xs: 2, sm: 3 }, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
         {/* Airline info */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: { sm: "180px" } }}>
-          <Box sx={{ width: 44, height: 44, borderRadius: "10px", background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <FlightTakeoffIcon sx={{ color: "#F97316", fontSize: 20 }} />
+          <Box sx={{ width: 44, height: 44, borderRadius: "10px", background: "var(--nw-primary-10)", border: "1px solid var(--nw-primary-20)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <FlightTakeoffIcon sx={{ color: "var(--nw-primary)", fontSize: 20 }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "0.9375rem", lineHeight: 1.2 }}>{flight.airlineName}</Typography>
-            <Typography sx={{ color: "#6B7280", fontSize: "0.75rem", fontFamily: '"JetBrains Mono",monospace', fontWeight: 600 }}>{flight.flightNumber}</Typography>
+            <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "0.9375rem", lineHeight: 1.2 }}>{flight.airlineName}</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.75rem", fontFamily: '"JetBrains Mono",monospace', fontWeight: 600 }}>{flight.flightNumber}</Typography>
           </Box>
         </Box>
 
         {/* Route + times */}
         <Box sx={{ flex: 1, display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 }, justifyContent: "center" }}>
           <Box sx={{ textAlign: "center" }}>
-            <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.departureTime)}</Typography>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.75rem", mt: 0.25 }}>{flight.source}</Typography>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem" }}>{fmtDate(flight.departureTime)}</Typography>
+            <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.departureTime)}</Typography>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.75rem", mt: 0.25 }}>{flight.source}</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem" }}>{fmtDate(flight.departureTime)}</Typography>
           </Box>
           <Box sx={{ textAlign: "center", px: 1 }}>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", mb: 0.5 }}>{duration}</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem", mb: 0.5 }}>{duration}</Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <Box sx={{ width: 20, height: "1px", background: "rgba(255,255,255,0.15)" }} />
-              <FlightTakeoffIcon sx={{ fontSize: 14, color: "#F97316" }} />
-              <Box sx={{ width: 20, height: "1px", background: "rgba(255,255,255,0.15)" }} />
+              <Box sx={{ width: 20, height: "1px", background: "var(--nw-border)" }} />
+              <FlightTakeoffIcon sx={{ fontSize: 14, color: "var(--nw-primary)" }} />
+              <Box sx={{ width: 20, height: "1px", background: "var(--nw-border)" }} />
             </Box>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem", mt: 0.5 }}>Direct</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem", mt: 0.5 }}>Direct</Typography>
           </Box>
           <Box sx={{ textAlign: "center" }}>
-            <Typography sx={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.arrivalTime)}</Typography>
-            <Typography sx={{ color: "#9CA3AF", fontSize: "0.75rem", mt: 0.25 }}>{flight.destination}</Typography>
-            <Typography sx={{ color: "#4B5563", fontSize: "0.6875rem" }}>{fmtDate(flight.arrivalTime)}</Typography>
+            <Typography sx={{ color: "var(--nw-text-primary)", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1 }}>{fmtTime(flight.arrivalTime)}</Typography>
+            <Typography sx={{ color: "var(--nw-text-secondary)", fontSize: "0.75rem", mt: 0.25 }}>{flight.destination}</Typography>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem" }}>{fmtDate(flight.arrivalTime)}</Typography>
           </Box>
         </Box>
 
         {/* Seats */}
         <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", alignItems: "center", gap: 0.5 }}>
-          <AirlineSeatReclineNormalIcon sx={{ color: seatsLow ? "#EF4444" : "#6B7280", fontSize: 18 }} />
-          <Typography sx={{ color: seatsLow ? "#EF4444" : "#6B7280", fontSize: "0.75rem", fontWeight: 500 }}>
+          <AirlineSeatReclineNormalIcon sx={{ color: seatsLow ? "var(--nw-error)" : "var(--nw-text-muted)", fontSize: 18 }} />
+          <Typography sx={{ color: seatsLow ? "var(--nw-error)" : "var(--nw-text-muted)", fontSize: "0.75rem", fontWeight: 500 }}>
             {flight.availableSeats} seats
           </Typography>
         </Box>
@@ -198,8 +198,8 @@ const FlightCard: React.FC<FlightCardProps> = React.memo(
         {/* Price + CTA */}
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1, flexShrink: 0 }}>
           <Box sx={{ textAlign: "right" }}>
-            <Typography sx={{ color: "#6B7280", fontSize: "0.6875rem" }}>per person</Typography>
-            <Typography sx={{ color: "#F97316", fontWeight: 800, fontSize: "1.375rem", lineHeight: 1 }}>
+            <Typography sx={{ color: "var(--nw-text-muted)", fontSize: "0.6875rem" }}>per person</Typography>
+            <Typography sx={{ color: "var(--nw-primary)", fontWeight: 800, fontSize: "1.375rem", lineHeight: 1 }}>
               ₹{flight.price.toLocaleString("en-IN")}
             </Typography>
           </Box>
@@ -208,7 +208,7 @@ const FlightCard: React.FC<FlightCardProps> = React.memo(
             variant="contained"
             size="small"
             endIcon={<FlightLandIcon sx={{ fontSize: "14px !important" }} />}
-            sx={{ borderRadius: "8px", fontWeight: 600, fontSize: "0.8125rem", px: 2, background: "linear-gradient(135deg,#F97316,#EA580C)", boxShadow: "0 4px 12px rgba(249,115,22,0.3)", "&:hover": { boxShadow: "0 6px 16px rgba(249,115,22,0.45)", transform: "translateY(-1px)" } }}
+            sx={{ borderRadius: "8px", fontWeight: 600, fontSize: "0.8125rem", px: 2, background: "linear-gradient(135deg,var(--nw-primary),var(--nw-primary-dark))", boxShadow: "0 4px 12px rgba(249,115,22,0.3)", "&:hover": { boxShadow: "0 6px 16px rgba(249,115,22,0.45)", transform: "translateY(-1px)" } }}
           >
             View Details
           </Button>

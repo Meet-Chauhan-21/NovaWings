@@ -43,6 +43,7 @@ const NAV_LINKS = [
   { label: "Home", path: "/" },
   { label: "Explore", path: "/explore" },
   { label: "Flights", path: "/search" },
+  { label: "Contact", path: "/contact" },
 ];
 
 export default function Navbar() {
@@ -353,7 +354,10 @@ export default function Navbar() {
                   </Box>
                   <Divider sx={{ my: 0.5 }} />
 
-                  <MenuItem disabled sx={{ opacity: 0.4, borderRadius: "8px" }}>
+                  <MenuItem
+                    onClick={() => handleNavigate("/profile")}
+                    sx={{ borderRadius: "8px" }}
+                  >
                     <PersonOutlineIcon sx={{ fontSize: 20, mr: 1.5, color: textSecondary }} />
                     <Typography variant="body2">My Profile</Typography>
                   </MenuItem>
@@ -535,6 +539,16 @@ export default function Navbar() {
               </Box>
 
               <List sx={{ p: 0 }}>
+                <ListItemButton
+                  onClick={() => handleNavigate("/profile")}
+                  sx={{ borderRadius: "10px", mb: 0.5, color: textSecondary, "&:hover": { background: "rgba(249,115,22,0.08)" } }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36, color: "inherit" }}>
+                    <PersonOutlineIcon sx={{ fontSize: 20 }} />
+                  </ListItemIcon>
+                  <ListItemText primary="My Profile" primaryTypographyProps={{ fontSize: "0.9rem" }} />
+                </ListItemButton>
+
                 <ListItemButton
                   onClick={() => handleNavigate("/my-bookings")}
                   sx={{ borderRadius: "10px", mb: 0.5, color: textSecondary, "&:hover": { background: "rgba(249,115,22,0.08)" } }}
